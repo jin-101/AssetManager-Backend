@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,6 +29,16 @@ public class AptTest {
 	
 	@Autowired
 	ApiAptTrade aptTrade;
+	
+	// 복합키 테스트 (MySQL에서 직접 복합키로 설정했는데, 이게 자바 entity랑 연동이 되는지 궁금하네)
+	@Test
+	void multikeyTest() {
+		String dong = "엔티티 동";
+		String gu = "엔티티 구";
+		String sido = "서울특별시";
+		AdministrativeDistrictDTO district = AdministrativeDistrictDTO.builder().dong(dong).gu(gu).sido(sido).build();
+		dRepo.save(district);
+	}
 	
 	// 3. 
 	//@Test
@@ -59,13 +70,13 @@ public class AptTest {
 		System.out.println(areaCodeList[0]);
 		System.out.println(dateList.get(0));
 		
-		// [인증키 1개당 하루에 3번밖에 못함...] for(int i=0; i<dateList.size(); i++)
-		for(int i=0; i<1; i++) { 
+		// ★★★ 운영계정 키를 받게 된다면.. date도 달라지면서 insert하는 코드를 짜봐야겠는데 
+		// (1번 할 때 1개월치를 넣을 수 있게끔 => 그래야 나중에 한달에 한번씩 추가할 때도 이 코드를 재사용하지)
+		for(int i=0; i<1; i++) { // for(int i=0; i<dateList.size(); i++)
 			String date = dateList.get(i);
 			System.out.println("★★★ 계약연월 : "+date);
 			
-			// for(int j=0; j<areaCodeList.length; j++)
-			for(int j=238; j<250; j++) { 
+			for(int j=0; j<areaCodeList.length; j++) { // for(int j=0; j<areaCodeList.length; j++)
 				Thread.sleep(3000); 
 				String areaCode = areaCodeList[j]; 
 				String url = ApiAptTrade.urlBuild(areaCode, date); 
