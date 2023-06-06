@@ -30,16 +30,6 @@ public class AptTest {
 	@Autowired
 	ApiAptTrade aptTrade;
 	
-	// 복합키 테스트 (MySQL에서 직접 복합키로 설정했는데, 이게 자바 entity랑 연동이 되는지 궁금하네)
-	@Test
-	void multikeyTest() {
-		String dong = "엔티티 동";
-		String gu = "엔티티 구";
-		String sido = "서울특별시";
-		AdministrativeDistrictDTO district = AdministrativeDistrictDTO.builder().dong(dong).gu(gu).sido(sido).build();
-		dRepo.save(district);
-	}
-	
 	// 3. 
 	//@Test
 	void test2() {
@@ -59,20 +49,25 @@ public class AptTest {
 		});
 	}
 	
+	//@Test
+	void dateTest() {
+		String[] areaCodeList = AptParamList.getAreaCodeList();
+		List<String> dateList = AptParamList.getDateList();
+		
+		System.out.println(dateList.get(0));
+	}
+	
 	
 	// 1. 아파트 리스트 insert (★★★)
-	// 오라클에서 데이터 익스포트도 안되므로 일일이 넣는 걸로..
 	//@Test
 	void insertAptTrade() throws InterruptedException {
 		String[] areaCodeList = AptParamList.getAreaCodeList();
 		List<String> dateList = AptParamList.getDateList();
 		List<AptDTO> aptList = new ArrayList<>();
-		System.out.println(areaCodeList[0]);
-		System.out.println(dateList.get(0));
 		
 		// ★★★ 운영계정 키를 받게 된다면.. date도 달라지면서 insert하는 코드를 짜봐야겠는데 
 		// (1번 할 때 1개월치를 넣을 수 있게끔 => 그래야 나중에 한달에 한번씩 추가할 때도 이 코드를 재사용하지)
-		for(int i=0; i<1; i++) { // for(int i=0; i<dateList.size(); i++)
+		for(int i=6; i<12; i++) { // for(int i=0; i<dateList.size(); i++)
 			String date = dateList.get(i);
 			System.out.println("★★★ 계약연월 : "+date);
 			
@@ -90,7 +85,8 @@ public class AptTest {
 					tRepo.save(apt);
 					System.out.println(apt.toString());
 				});
-				System.out.println("------------------" + (areaCodeList.length+1) + "번째 진행중" + "------------------"); 
+				System.out.println("★★★ 계약연월 : "+date);
+				System.out.println("------------------" + (j+1) + "번째 진행중" + "------------------"); 
 			}
 		}
 	}
