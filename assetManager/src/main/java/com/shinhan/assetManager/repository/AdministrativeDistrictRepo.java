@@ -3,9 +3,11 @@ package com.shinhan.assetManager.repository;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import com.shinhan.assetManager.apt.AdministrativeDistrictDTO;
 
+@Repository
 public interface AdministrativeDistrictRepo extends CrudRepository<AdministrativeDistrictDTO, String> {
 	
 	// # 아파트 입력을 위한 메소드
