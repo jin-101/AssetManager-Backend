@@ -14,7 +14,7 @@ import lombok.ToString;
 public class CoinDtoForReact {
 	
 	private String market;
-	private String name;
+	private String coinName;
 	private String quantity;
 	private String price;
 

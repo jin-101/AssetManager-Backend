@@ -33,12 +33,19 @@ public class CoinController {
 	
 	@PostMapping(value = "/add", consumes = "application/json", produces = "text/plain;charset=utf-8")
 	public String addUpbit(@RequestBody CoinDtoForReact coin) {
-		System.out.println(coin);
-		System.out.println(coin.getPrice().replace(",", "")); 
-		String result = null;
+		System.out.println("axios로 넘어온 데이터: "+coin);
 		
+		String price = coin.getPrice().replace(",", "");
+		String coinName = coin.getCoinName().toUpperCase(); // 대문자로 바꾸기 위한 작업
+		System.out.println(coinName); 
+		System.out.println(price);
+		
+		
+		String result = null;
 		// Insert에 성공하면 성공, 실패하면 실패를 React에 보내서 => 그에 따른 Alert 창을 보여주게끔 코드 짜야 함!!
 		result = "성공";
+		
+		
 		return result;
 	}
 	
