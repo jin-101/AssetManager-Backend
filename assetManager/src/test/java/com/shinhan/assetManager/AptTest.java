@@ -115,6 +115,7 @@ public class AptTest {
 			case "29": sido = "광주광역시"; break;
 			case "30": sido = "대전광역시"; break;
 			case "31": sido = "울산광역시"; break;
+			case "36": sido = "세종특별자치시"; break;
 			case "41": sido = "경기도"; break;
 			case "42": sido = "강원도"; break;
 			case "43": sido = "충청북도"; break;

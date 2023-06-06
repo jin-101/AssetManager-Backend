@@ -29,6 +29,7 @@ public class CoinController {
 	@PostMapping(value = "/add", consumes = "application/json", produces = "text/plain;charset=utf-8")
 	public String addUpbit(@RequestBody CoinDtoForReact coin) {
 		System.out.println(coin);
+		System.out.println(coin.getPrice().replace(",", "")); 
 		String result = null;
 		
 		// Insert에 성공하면 성공, 실패하면 실패를 React에 보내서 => 그에 따른 Alert 창을 보여주게끔 코드 짜야 함!!
