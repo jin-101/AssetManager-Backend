@@ -30,6 +30,17 @@ public class AptTest {
 	@Autowired
 	ApiAptTrade aptTrade;
 	
+	//
+	@Test
+	void tt() {
+		List<String> guList = new ArrayList<>();
+		String sido2 = "서울특별시";
+		dRepo.findBySido(sido2).forEach(district->{
+			guList.add(district.getGu());
+		}); 
+		System.out.println(guList);
+	}
+	
 	// 3. 
 	//@Test
 	void test2() {

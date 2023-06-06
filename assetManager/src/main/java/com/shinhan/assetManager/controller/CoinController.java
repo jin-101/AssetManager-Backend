@@ -1,9 +1,14 @@
 package com.shinhan.assetManager.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shinhan.assetManager.coin.CoinBithumbDTO;
@@ -36,5 +41,35 @@ public class CoinController {
 		result = "성공";
 		return result;
 	}
-
+	
+	@PostMapping(value = "/getCoinList", consumes = "application/json") // produces = "application/json"
+	@ResponseBody
+	public Map<String, String> getCoinList(/*@RequestBody CoinDtoForReact coin*/) {
+		Map<String, String> coinMap = new HashMap<>();
+//		System.out.println(coin);
+//		String market = coin.getMarket();
+		
+		upbitRepo.findAll().forEach(upbit->{
+			String coinName = upbit.getCoinName().replace("_upbit", " : 업비트");
+			coinMap.put(coinName, "밸류 아무거나 줘버려 걍");
+		});
+		bitRepo.findAll().forEach(bithumb->{
+			String coinName = bithumb.getCoinName().replace("_bithumb", " : 빗썸");
+			coinMap.put(coinName, "밸류 아무거나 줘버려 걍");
+		});
+		
+//		if(market.equals("업비트")) { // ★ 또 .equals() 안 쓰고 == 쓰고 있네 (JS도 하다 보니까 ㅈㄴ 헷갈려 ㅡㅡ)
+//			upbitRepo.findAll().forEach(upbit->{
+//				String coinName = upbit.getCoinName().replace("_upbit", "");
+//				coinMap.put(coinName, coinName);
+//			});
+//		}else if(market.equals("빗썸")) {
+//			bitRepo.findAll().forEach(bithumb->{
+//				String coinName = bithumb.getCoinName().replace("_bithumb", "");
+//				coinMap.put(coinName, coinName);
+//			});
+//		}
+		System.out.println(coinMap);
+		return coinMap;
+	}
 }
