@@ -1,10 +1,13 @@
 package com.shinhan.assetManager.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +24,7 @@ import com.shinhan.assetManager.repository.AptTradeRepo;
 public class AptController {
 	
 	@Autowired
-	AptTradeRepo aRepo;
+	AptTradeRepo tRepo;
 	@Autowired
 	AdministrativeDistrictRepo dRepo;
 	
@@ -37,17 +40,53 @@ public class AptController {
 		return result;
 	}
 	
-	// 시/도 선택시 => 구 리스트를 얻는 
-	@PostMapping(value = "/getGu", consumes = "application/json")
-	public List<String> getGu(@RequestBody AptDtoForReact apt) {
-		List<String> guList = new ArrayList<>();
-		System.out.println(apt.getGu());
-		String sido = apt.getSido();
-		dRepo.findBySido(sido).forEach(district->{
-			guList.add(district.getGu());
-		}); 
-		System.out.println(guList);
+	// 1. 시/도 선택시 => 구를 얻는 
+	@GetMapping(value = "/getGu/{sido}") // consumes = "application/json" (★★넘기는 파라미터는 String인데, consumes는 JSON으로 지정해버리면 415 에러가 뜹니다~)
+	@ResponseBody
+	public Map<String, String> getGu(@PathVariable String sido) {
+		System.out.println("리액트에서 선택한 Picker : "+sido);
 		
-		return guList; 
+		Map<String, String> guMap = new HashMap<>();
+		dRepo.findBySido(sido).forEach(district->{
+			String gu = district.getGu();
+			guMap.put(gu, "??"); // ★ 여기에 이제 구 이름을 넣어줘야겠네요 ㅅㅂ 언제 다 쓰냐 이거. 아마 이거 district 테이블 내용물도 바꿔줘야 할 거 같은데;;
+		}); 
+		System.out.println(guMap);
+		
+		return guMap; 
+	}
+	
+	// 2. 구 선택시 => 동/읍/면을 얻는
+	@GetMapping(value = "/getDong/{gu}")
+	@ResponseBody
+	public Map<String, String> getDong(@PathVariable String gu) {
+		
+		Map<String, String> dongMap = new HashMap<>();
+		dRepo.findByGu(gu).forEach(district->{ // ★ 유의 : 메소드가 다름 (findByGu != findBySido)
+			String dong = district.getDong();
+			dongMap.put(dong, "??");
+		}); 
+		System.out.println(dongMap);
+		
+		return dongMap;
+	}
+	
+	// 3. 동/읍/면 선택시 => 아파트 검색 가능하게끔
+	@GetMapping(value = "/getAptName/{dong}")
+	@ResponseBody
+	public Map<String, String> getAptName(@PathVariable String dong) {
+		Map<String, String> aptMap = new HashMap<>();
+		System.out.println("리액트에서 넘어온 동 이름 : "+dong);
+		
+		// ★ tRepo에 추가할 메소드 : (1)시 (2)구 (3)동 => 이 3가지 검색조건을 모두 만족하는 아파트 이름을 find
+		// ★ 
+//		tRepo.findByDong(dong).forEach(district->{ // ★ 유의 : 메소드가 다름 (findByGu != findBySido)
+//			String aptName = district.getDong()();
+//			aptMap.put("", "??");
+//		}); 
+		
+		System.out.println(aptMap);
+		
+		return aptMap;
 	}
 }
