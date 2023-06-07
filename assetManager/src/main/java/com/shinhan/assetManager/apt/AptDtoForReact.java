@@ -1,4 +1,4 @@
-package com.shinhan.assetManager.coin;
+package com.shinhan.assetManager.apt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +11,13 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CoinDtoForReact {
+public class AptDtoForReact {
 	
-	private String market;
-	private String coinName;
-	private String quantity;
+	private String sido;
+	private String gu;
+	private String dong;
+	private String aptName;
+	private String netLeasableArea;
 	private String price;
 
 }
