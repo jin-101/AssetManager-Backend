@@ -6,6 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.stereotype.Component;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "coin_bithumb")
+@Component
 public class CoinBithumbDTO {
 	
 	@Id

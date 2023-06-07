@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,6 +30,17 @@ public class AptTest {
 	@Autowired
 	ApiAptTrade aptTrade;
 	
+	//
+	@Test
+	void tt() {
+		List<String> guList = new ArrayList<>();
+		String sido2 = "서울특별시";
+		dRepo.findBySido(sido2).forEach(district->{
+			guList.add(district.getGu());
+		}); 
+		System.out.println(guList);
+	}
+	
 	// 3. 
 	//@Test
 	void test2() {
@@ -48,24 +60,29 @@ public class AptTest {
 		});
 	}
 	
+	//@Test
+	void dateTest() {
+		String[] areaCodeList = AptParamList.getAreaCodeList();
+		List<String> dateList = AptParamList.getDateList();
+		
+		System.out.println(dateList.get(0));
+	}
+	
 	
 	// 1. 아파트 리스트 insert (★★★)
-	// 오라클에서 데이터 익스포트도 안되므로 일일이 넣는 걸로..
 	//@Test
 	void insertAptTrade() throws InterruptedException {
 		String[] areaCodeList = AptParamList.getAreaCodeList();
 		List<String> dateList = AptParamList.getDateList();
 		List<AptDTO> aptList = new ArrayList<>();
-		System.out.println(areaCodeList[0]);
-		System.out.println(dateList.get(0));
 		
-		// [인증키 1개당 하루에 3번밖에 못함...] for(int i=0; i<dateList.size(); i++)
-		for(int i=0; i<1; i++) { 
+		// ★★★ 운영계정 키를 받게 된다면.. date도 달라지면서 insert하는 코드를 짜봐야겠는데 
+		// (1번 할 때 1개월치를 넣을 수 있게끔 => 그래야 나중에 한달에 한번씩 추가할 때도 이 코드를 재사용하지)
+		for(int i=6; i<12; i++) { // for(int i=0; i<dateList.size(); i++)
 			String date = dateList.get(i);
 			System.out.println("★★★ 계약연월 : "+date);
 			
-			// for(int j=0; j<areaCodeList.length; j++)
-			for(int j=238; j<250; j++) { 
+			for(int j=0; j<areaCodeList.length; j++) { // for(int j=0; j<areaCodeList.length; j++)
 				Thread.sleep(3000); 
 				String areaCode = areaCodeList[j]; 
 				String url = ApiAptTrade.urlBuild(areaCode, date); 
@@ -79,7 +96,8 @@ public class AptTest {
 					tRepo.save(apt);
 					System.out.println(apt.toString());
 				});
-				System.out.println("------------------" + (areaCodeList.length+1) + "번째 진행중" + "------------------"); 
+				System.out.println("★★★ 계약연월 : "+date);
+				System.out.println("------------------" + (j+1) + "번째 진행중" + "------------------"); 
 			}
 		}
 	}
@@ -108,6 +126,7 @@ public class AptTest {
 			case "29": sido = "광주광역시"; break;
 			case "30": sido = "대전광역시"; break;
 			case "31": sido = "울산광역시"; break;
+			case "36": sido = "세종특별자치시"; break;
 			case "41": sido = "경기도"; break;
 			case "42": sido = "강원도"; break;
 			case "43": sido = "충청북도"; break;

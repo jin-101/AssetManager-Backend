@@ -79,7 +79,7 @@ public class AptParamList {
 
 		for (int i = 0; i < 12; i++) {
 			// year는 for문 하나 더 써서 여러개 만들어주면 될 듯
-			int year = cal.get(Calendar.YEAR); // ★★★★★ 실제로 데이터 넣을 땐 1년 단위로 insert할 것!!
+			int year = cal.get(Calendar.YEAR) - 1; // ★★★★★ 실제로 데이터 넣을 땐 1년 단위로 insert할 것!!
 
 			int month = cal.get(Calendar.JANUARY) + i; // (정정)MONTH 안쓰고 JANUARY 쓰니까 (+ 1 안해도 되더라)
 
