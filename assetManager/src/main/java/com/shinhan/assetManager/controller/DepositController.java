@@ -16,28 +16,13 @@ public class DepositController {
 		//예적금 추가 버튼 클릭시 => 
 		@PostMapping(value = "/add.do")
 		public String addDeposit(@RequestBody DepositDtoForReact[] depositList) {
-
-			String result = null;
+			String result = "";
 			for(DepositDtoForReact de : depositList) {
 				System.out.println(de.toString());
-				result = "성공";
+				//db에 넣는 로직
 			}
-			
-			// Insert에 성공하면 성공, 실패하면 실패를 React에 보내서 => 그에 따른 Alert 창을 보여주게끔 코드 짜야 함!!
-		
+			result = "성공";
 			return result;
 		}
 		
-//		@PostMapping(value = "/add", consumes = "application/json", produces = "text/plain;charset=utf-8")
-//		public String addDeposit(@RequestBody List<DepositDtoForReact> depositList) {
-//			
-//			for(DepositDtoForReact de : depositList) {
-//				System.out.println(de.toString());
-//			}
-//			String result = null;
-//			
-//			// Insert에 성공하면 성공, 실패하면 실패를 React에 보내서 => 그에 따른 Alert 창을 보여주게끔 코드 짜야 함!!
-//			result = "성공";
-//			return result;
-//		}
 }
