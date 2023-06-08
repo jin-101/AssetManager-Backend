@@ -10,7 +10,7 @@ public class EncryptionTest {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 
-		EncryptSsn en = new EncryptSsn();
+		SHA256 en = new SHA256();
 		String ssn = "9900111234567"; // 주민번호
 		String pw = "12345678"; // 비번
 		
