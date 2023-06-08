@@ -21,7 +21,7 @@ import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
 
 @RestController
 @RequestMapping("/rest/webboard")
-public class Controller {
+public class AccountBookController {
 	
 	@Autowired
 	HouseholdAccountsRepository accountRepo;

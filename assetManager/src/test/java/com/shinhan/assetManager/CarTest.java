@@ -147,7 +147,7 @@ class CarTest {
 				 	    	if(modelCode!="" && !duplCheck.contains(modelCode)) {
 				 	    		duplCheck.add((String) newModel.get("modelCode"));
 				 	    		driver.get(CralwingURL + newModel.get("makerCode") + "&classCode=" + newModel.get("classCode") + "&carCode="+ newModel.get("carCode")+"&modelCode="+modelCode);
-				 	    		Thread.sleep(1500);
+				 	    		Thread.sleep(1600);
 				 	    		List<WebElement> elements = driver.findElements(By.cssSelector(".generalRegist .area"));
 		 	    				int tempCount = 0;
 		 	    				for (WebElement element : elements) { //자동차 1대 전체 정보
