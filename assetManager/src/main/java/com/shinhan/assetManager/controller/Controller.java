@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shinhan.assetManager.dto.AccountbookDTO;
 import com.shinhan.assetManager.dto.ExcelDTO;
 import com.shinhan.assetManager.dto.HouseholdAccountsDTO;
 import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
@@ -25,10 +26,16 @@ public class Controller {
 	@Autowired
 	HouseholdAccountsRepository accountRepo;
 	
-	@GetMapping("/list.do")
-	public List<HouseholdAccountsDTO> selectAll() {
-		System.out.println((List<HouseholdAccountsDTO>)accountRepo.findAll());
-		return (List<HouseholdAccountsDTO>)accountRepo.findAll();
+	@PostMapping(value = "/list.do", consumes = "application/json")
+	public List<HouseholdAccountsDTO> selectAll(@RequestBody AccountbookDTO dto) {
+		System.out.println(dto);
+		return (List<HouseholdAccountsDTO>)accountRepo.findByMonth(dto.getYear(), dto.getMonth());
 	}
 	
+//	@GetMapping("/list.do")
+//	public List<HouseholdAccountsDTO> selectAll(String year, String month) {
+//		System.out.println((List<HouseholdAccountsDTO>)accountRepo.findByMonth(year, month));
+//		System.out.println("연도!!!!!!!!!!!! : " + year + "월!!!!!!!!!! : " + month);
+//		return (List<HouseholdAccountsDTO>)accountRepo.findByMonth(year, month);
+//	}
 }
