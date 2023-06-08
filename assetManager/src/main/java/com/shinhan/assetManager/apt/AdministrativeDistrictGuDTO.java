@@ -21,17 +21,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "district")
+@Table(name = "district_gu")
 @BatchSize(size = 100) 
-@IdClass(DistrictMultiKey.class) // 복합키 설정을 위한 @ (설명 ppt 100)
-public class AdministrativeDistrictDTO { // 한국 행정구역 DTO (시 / 구 / 동)
+public class AdministrativeDistrictGuDTO { // 한국 행정구역 DTO_2 (구 코드 / 구 이름)
 	
-	@Id
-	private String dong; // 동
 	@Id
 	private String gu; // 구 코드 (ex. 11110)
 	
-	private String sido; // 시,도
-	 
-	//private String guName; // 구 이름 (ex. 종로구) 
+	private String guName; // 구 이름 (ex. 종로구) 
 }
