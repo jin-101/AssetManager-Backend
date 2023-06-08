@@ -4,13 +4,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import org.springframework.stereotype.Component;
+
 // 주민번호 암호화를 위한 클래스 (비밀번호는 양방향이라서 ㄴㄴ)
 // 단방향 해시 함수 (One-way Hash Function) 사용
 // ex. SHA-256
-public class EncryptSsn {
+@Component
+public class SHA256 {
 
 	public static void main(String[] args) {
-		EncryptSsn en = new EncryptSsn();
+		SHA256 en = new SHA256();
 		
 		String pwd = "내가 암호화 하고 싶은 놈";
 		System.out.println("pwd : " + pwd);

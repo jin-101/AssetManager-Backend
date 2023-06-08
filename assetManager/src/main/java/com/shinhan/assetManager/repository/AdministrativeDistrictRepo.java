@@ -6,9 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.shinhan.assetManager.apt.AdministrativeDistrictDTO;
+import com.shinhan.assetManager.apt.MultikeyForDistrict;
 
 @Repository
-public interface AdministrativeDistrictRepo extends CrudRepository<AdministrativeDistrictDTO, String> {
+public interface AdministrativeDistrictRepo extends CrudRepository<AdministrativeDistrictDTO, MultikeyForDistrict> { // 복합키의 경우 : key에 String이 아니라 복합키 클래스를 줘야 한다?! (by 동열) 
 	
 	// # 아파트 입력을 위한 메소드
 	// 1. 서울특별시(11)를 고르면 => 종로구~강동구까지 보이게
