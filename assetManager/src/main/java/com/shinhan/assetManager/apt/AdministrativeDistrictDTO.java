@@ -23,7 +23,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "district")
 @BatchSize(size = 100) 
-@IdClass(DistrictMultiKey.class) // 복합키 설정을 위한 @ (설명 ppt 100)
+@IdClass(MultikeyForDistrict.class) // 복합키 설정을 위한 @ (설명 ppt 100)
 public class AdministrativeDistrictDTO { // 한국 행정구역 DTO (시 / 구 / 동)
 	
 	@Id
