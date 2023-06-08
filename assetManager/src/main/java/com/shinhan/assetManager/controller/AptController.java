@@ -34,9 +34,10 @@ public class AptController {
 	@PostMapping(value = "/add", consumes = "application/json", produces = "text/plain;charset=utf-8")
 	public String addApt(@RequestBody AptDtoForReact apt) {
 		System.out.println(apt);
-		System.out.println(apt.getPrice().replace(",", "")); 
-		String result = null;
+		System.out.println(apt.getPurchasePrice().replace(",", "")); 
 		
+		
+		String result = null;
 		// Insert에 성공하면 성공, 실패하면 실패를 React에 보내서 => 그에 따른 Alert 창을 보여주게끔 코드 짜야 함!!
 		result = "성공";
 		return result;

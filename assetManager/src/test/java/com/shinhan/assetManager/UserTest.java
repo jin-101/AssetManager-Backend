@@ -21,6 +21,36 @@ public class UserTest {
 	@Autowired
 	AES256 aes256; // 양방향
 	
+	// 1명당 최대 3개의 ID 가질 수 있게끔 체크 => ★ 아 이건 주민번호를 단방향으로 암호화하는 이상 못하겠는데?? (양방향으로 해서 복호화 한 다음에 그걸로 찾으면 모를까)
+	//@Test
+	void checkMaxAccount() {
+		// ★ 아예 통 메소드로 만들어서 사용하면 좋을 듯
+		String inputSsn = "1234561234567";
+		String salt = uRepo.findBySsn(inputSsn).get(0).getSalt();
+		System.out.println(salt);
+		
+		String ssn = inputSsn+salt;
+		String realSsn = sha256.getEncrypt(ssn, salt);
+		int numOfAccounts = uRepo.findBySsn(realSsn).size();
+		
+		if(numOfAccounts > 3) {
+			System.out.println("최대 3개의 계정만 가질 수 있습니다. 라고 고지해주기");
+		}
+	}
+	
+	// 아이디 중복 체크 기능
+	//@Test
+	void checkDuplicatedId() {
+		// (1) 앱에서 중복체크 버튼을 누르면 => Id를 받아서
+		String inputId = "godJin";
+		// (2) 그 Id가 있는지 체크
+		if(uRepo.findByUserIdEquals(inputId) != null) {
+			System.out.println("아이디 중복");
+		}else {
+			System.out.println("사용가능한 ID입니다 라고 보여주기");
+		}
+	}
+	
 	// 비밀번호 찾기 기능
 	//@Test
 	void findPw() throws Exception {
@@ -97,7 +127,7 @@ public class UserTest {
 		// 예시
 		UserDTO user = UserDTO.builder()
 					.ssn(encryptedSsn)
-					.userId("jin")
+					.userId("jinjin")
 					.userEmail("djdjdddd@naver.com")
 					.userAddress("구리시")
 					.userName("한진")
