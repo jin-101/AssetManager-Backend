@@ -19,5 +19,5 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 			+ " where year(b.exchangeDate) = ?1"
 			+ " and month(b.exchangeDate) = ?2"
 			+ " order by b.exchangeDate desc")
-	public List<HouseholdAccountsDTO> findByMonth(String year, String month);
+	public List<HouseholdAccountsDTO> findByMonth(int year, int month);
 }
