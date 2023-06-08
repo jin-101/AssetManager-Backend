@@ -28,46 +28,7 @@ public class AptTest {
 	AdministrativeDistrictRepo dRepo;
 	
 	@Autowired
-	ApiAptTrade aptTrade;
-	
-	//
-	@Test
-	void tt() {
-		List<String> guList = new ArrayList<>();
-		String sido2 = "서울특별시";
-		dRepo.findBySido(sido2).forEach(district->{
-			guList.add(district.getGu());
-		}); 
-		System.out.println(guList);
-	}
-	
-	// 3. 
-	//@Test
-	void test2() {
-		// 1. 시/도를 고르면 => 구가 보이게끔
-		dRepo.findBySido("서울특별시").forEach(district->{ // "서울특별시" 부분에 <= 리액트에서 select한 변수를 넣어줄 예정 
-			log.info(district.getGu());
-		});
-		
-		// 2. 구를 고르면 => 동이 보이게끔
-		dRepo.findByGu("종로구").forEach(district->{
-			log.info(district.getDong());
-		});
-		
-		// 3. 동을 고르면 => 그에 해당하는 아파트 검색이 가능하게
-		dRepo.findByDong("종로2동").forEach(district->{
-			// log.info(district.getAptList);
-		});
-	}
-	
-	//@Test
-	void dateTest() {
-		String[] areaCodeList = AptParamList.getAreaCodeList();
-		List<String> dateList = AptParamList.getDateList();
-		
-		System.out.println(dateList.get(0));
-	}
-	
+	ApiAptTrade aptTrade;	
 	
 	// 1. 아파트 리스트 insert (★★★)
 	//@Test
@@ -78,7 +39,7 @@ public class AptTest {
 		
 		// ★★★ 운영계정 키를 받게 된다면.. date도 달라지면서 insert하는 코드를 짜봐야겠는데 
 		// (1번 할 때 1개월치를 넣을 수 있게끔 => 그래야 나중에 한달에 한번씩 추가할 때도 이 코드를 재사용하지)
-		for(int i=6; i<12; i++) { // for(int i=0; i<dateList.size(); i++)
+		for(int i=0; i<1; i++) { // for(int i=0; i<dateList.size(); i++)
 			String date = dateList.get(i);
 			System.out.println("★★★ 계약연월 : "+date);
 			
@@ -141,6 +102,45 @@ public class AptTest {
 			
 			dRepo.save(district);
 		});
+	}
+	
+	
+	//
+	//@Test
+	void tt() {
+		List<String> guList = new ArrayList<>();
+		String sido2 = "서울특별시";
+		dRepo.findBySido(sido2).forEach(district->{
+			guList.add(district.getGu());
+		}); 
+		System.out.println(guList);
+	}
+	
+	// 3. 
+	//@Test
+	void test2() {
+		// 1. 시/도를 고르면 => 구가 보이게끔
+		dRepo.findBySido("서울특별시").forEach(district->{ // "서울특별시" 부분에 <= 리액트에서 select한 변수를 넣어줄 예정 
+			log.info(district.getGu());
+		});
+		
+		// 2. 구를 고르면 => 동이 보이게끔
+		dRepo.findByGu("종로구").forEach(district->{
+			log.info(district.getDong());
+		});
+		
+		// 3. 동을 고르면 => 그에 해당하는 아파트 검색이 가능하게
+		dRepo.findByDong("종로2동").forEach(district->{
+			// log.info(district.getAptList);
+		});
+	}
+	
+	//@Test
+	void dateTest() {
+		String[] areaCodeList = AptParamList.getAreaCodeList();
+		List<String> dateList = AptParamList.getDateList();
+		
+		System.out.println(dateList.get(0));
 	}
 
 }

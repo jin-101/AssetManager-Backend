@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class DistrictMultiKey implements Serializable {
+public class MultikeyForDistrict implements Serializable {
 
 	private String dong; // 동 (ex. 제기동)
 	private String gu; // 구 (ex. 11110)
