@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shinhan.assetManager.dto.AccountbookDTO;
 import com.shinhan.assetManager.dto.ExcelDTO;
+import com.shinhan.assetManager.dto.HouseholdAccountsCategoryDTO;
 import com.shinhan.assetManager.dto.HouseholdAccountsDTO;
+import com.shinhan.assetManager.repository.HouseholdAccountsCategoryRepository;
 import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
 
 @RestController
@@ -26,10 +28,18 @@ public class AccountBookController {
 	@Autowired
 	HouseholdAccountsRepository accountRepo;
 	
+	@Autowired
+	HouseholdAccountsCategoryRepository categoryRepo;
+	
 	@PostMapping(value = "/list.do", consumes = "application/json")
 	public List<HouseholdAccountsDTO> selectAll(@RequestBody AccountbookDTO dto) {
 		System.out.println(dto);
 		return (List<HouseholdAccountsDTO>)accountRepo.findByMonth(dto.getYear(), dto.getMonth());
+	}
+	
+	@PostMapping("/categorylist.do")
+	public List<HouseholdAccountsCategoryDTO> categorylist() {
+		return (List<HouseholdAccountsCategoryDTO>) categoryRepo.findAll();
 	}
 	
 //	@GetMapping("/list.do")
