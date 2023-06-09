@@ -26,6 +26,9 @@ public class UserTest {
 	SHA256 sha256; // 단방향
 	@Autowired
 	AES256 aes256; // 양방향
+	
+	//
+	
 
 	// 1명당 최대 3개의 ID만 가질 수 있게끔 (= 회원가입 가능 여부 체크버튼)
     @Test
