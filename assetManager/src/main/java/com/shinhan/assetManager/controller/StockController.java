@@ -11,13 +11,14 @@ import com.shinhan.assetManager.repository.StockRepo;
 import com.shinhan.assetManager.repository.UserAssetRepo;
 import com.shinhan.assetManager.stock.StockInputDTO;
 import com.shinhan.assetManager.user.UserAssetDTO;
+import com.shinhan.assetManager.user.UserDTO;
 
 @Controller
 @RequestMapping("/stock")
 public class StockController {
 	
 	private String assetCode = "C1";
-	private String userId = "jin";
+	private UserDTO user;  
 	
 	@Autowired
 	private StockRepo stockRepo;
@@ -35,7 +36,7 @@ public class StockController {
 		String market = map.getMarket();
 		System.out.println(market);
 		
-		UserAssetDTO userAssetDto = new UserAssetDTO(userId, assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
+		UserAssetDTO userAssetDto = new UserAssetDTO(user, assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
 		userAssetRepo.save(userAssetDto);
 		
 		return "주식자산 등록완료";
