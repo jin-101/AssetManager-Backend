@@ -31,7 +31,7 @@ public class AptTest {
 	ApiAptTrade aptTrade;	
 	
 	// 1. 아파트 리스트 insert (★★★)
-	//@Test
+	@Test
 	void insertAptTrade() throws InterruptedException {
 		String[] areaCodeList = AptParamList.getAreaCodeList();
 		List<String> dateList = AptParamList.getDateList();
@@ -39,7 +39,7 @@ public class AptTest {
 		
 		// ★★★ 운영계정 키를 받게 된다면.. date도 달라지면서 insert하는 코드를 짜봐야겠는데 
 		// (1번 할 때 1개월치를 넣을 수 있게끔 => 그래야 나중에 한달에 한번씩 추가할 때도 이 코드를 재사용하지)
-		for(int i=0; i<1; i++) { // for(int i=0; i<dateList.size(); i++)
+		for(int i=1; i<dateList.size(); i++) { // for(int i=0; i<dateList.size(); i++)
 			String date = dateList.get(i);
 			System.out.println("★★★ 계약연월 : "+date);
 			
