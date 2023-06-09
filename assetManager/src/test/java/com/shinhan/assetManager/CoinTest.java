@@ -46,7 +46,7 @@ class CoinTest {
 	}
 	
 	// 당일시세 insert => (O) 테스트 결과 문제 없음!
-	//@Test
+	@Test
 	void coin1() throws IOException, InterruptedException {
 		List<String> marketList = upbit.getMarketList();
 		List<CoinUpbitDTO> coinUpbitList = upbit.getCoinPrice(marketList);
