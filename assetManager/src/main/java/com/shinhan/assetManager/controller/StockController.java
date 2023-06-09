@@ -1,7 +1,14 @@
 package com.shinhan.assetManager.controller;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,7 +25,8 @@ import com.shinhan.assetManager.user.UserDTO;
 public class StockController {
 	
 	private String assetCode = "C1";
-	private UserDTO user;  
+	private UserDTO user = new UserDTO("jin", "/6HLGPldbbPh7+aTUJ5BJg==", "한진", "+Ltah1m3mBTypNmsrC8E/7kfq6BzINSiuLyJNO6DWUE=", 
+			"jin@naver.com", "01012345678", "구리시", "f1d7ed69", null);
 	
 	@Autowired
 	private StockRepo stockRepo;
@@ -42,8 +50,39 @@ public class StockController {
 		return "주식자산 등록완료";
 	}
 	
-	public long handleStockPriceRequest() {
-		//ss
-		return 0L;
+	@GetMapping("/stockPrice")
+	@ResponseBody
+	public List<UserAssetDTO> handleStockPriceRequest() {
+		List<UserAssetDTO> userStocks = userAssetRepo.getSpecificUserAssets(user, assetCode);
+		
+		Map<String, Long> totalSharesByStockCode = new HashMap<>();
+		Map<String, Long> totalAmountByStockCode = new HashMap<>();
+		
+		
+		for(UserAssetDTO asset:userStocks) {
+			String stockCode = asset.getDetailCode();
+			Long shares =  Long.parseLong(asset.getQuantity());     
+			Long price = Long.parseLong(asset.getPurchasePrice());
+			Long avergePrice = 0L;
+			
+			if(totalSharesByStockCode.containsKey(stockCode)) {
+				Long prevShares = totalSharesByStockCode.get(stockCode);
+				Long prevAmount = totalAmountByStockCode.get(stockCode);
+				
+				totalSharesByStockCode.put(stockCode, prevShares+shares);
+				totalAmountByStockCode.put(stockCode, prevAmount+(shares*price));
+				
+			} else {
+				totalSharesByStockCode.put(stockCode, shares);
+				totalAmountByStockCode.put(stockCode, price*shares);
+			}
+			
+		}
+		
+		for(String stockCode:totalSharesByStockCode.keySet()) {
+			System.out.println(totalAmountByStockCode.get(stockCode)/totalSharesByStockCode.get(stockCode));
+			System.out.println("----------------------------------");
+		}
+		return userStocks;
 	}
 }
