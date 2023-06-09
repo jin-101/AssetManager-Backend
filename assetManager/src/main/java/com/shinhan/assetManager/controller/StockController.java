@@ -16,27 +16,33 @@ import com.shinhan.assetManager.user.UserAssetDTO;
 @RequestMapping("/stock")
 public class StockController {
 	
+	private String assetCode = "C1";
+	private String userId = "jin";
+	
 	@Autowired
 	private StockRepo stockRepo;
 	
 	@Autowired
 	private UserAssetRepo userAssetRepo;
 	
-	@PostMapping("/stockInfo")
+	@PostMapping("/stockAssetInput")
 	@ResponseBody
-	public String getStockAssets(StockInputDTO stockInputDTO) {
+	public String handleStockAssetsInputRequest(StockInputDTO stockInputDTO) {
 		System.out.println("i got------------------------");
-		System.out.println(stockInputDTO.getBuyDay());
-		System.out.println(stockInputDTO.getStockName());
-		System.out.println(stockInputDTO.getPrice());
-		System.out.println(stockInputDTO.getShares());
 		
 		StockTableEntityMapping  map =  stockRepo.findByCorpname(stockInputDTO.getStockName());
 		String stockCode = map.getStockcode();
+		String market = map.getMarket();
+		System.out.println(market);
 		
-		UserAssetDTO userAssetDto = new UserAssetDTO("godJin", "C1", stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
+		UserAssetDTO userAssetDto = new UserAssetDTO(userId, assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
 		userAssetRepo.save(userAssetDto);
 		
-		return "잘받음";
+		return "주식자산 등록완료";
+	}
+	
+	public long handleStockPriceRequest() {
+		
+		return 0L;
 	}
 }
