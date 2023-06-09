@@ -14,7 +14,7 @@ import lombok.Setter;
 public class MultikeyForUser implements Serializable {
 	
 	// 복합키 (5개로 구성)
-	private String userId;
+	private String user; // ★ 4. 이것도 name을 서로 맞춰줘야 에러 안 나는 듯
 	private String assetCode; // 자산코드
 	private String detailCode; // 세부코드
 	private String purchasePrice; // 매수가

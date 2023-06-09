@@ -29,7 +29,7 @@ public class SHA256 {
 	public String getSalt() {
 		// 1. Random, byte 객체 생성
 		SecureRandom r = new SecureRandom();
-		byte[] salt = new byte[3];
+		byte[] salt = new byte[4];
 		
 		// 2. 난수 생성
 		r.nextBytes(salt);
