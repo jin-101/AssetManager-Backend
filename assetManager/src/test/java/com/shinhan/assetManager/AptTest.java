@@ -31,7 +31,7 @@ public class AptTest {
 	ApiAptTrade aptTrade;	
 	
 	// 1. 아파트 리스트 insert (★★★)
-	@Test
+	//@Test
 	void insertAptTrade() throws InterruptedException {
 		String[] areaCodeList = AptParamList.getAreaCodeList();
 		List<String> dateList = AptParamList.getDateList();
