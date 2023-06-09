@@ -10,6 +10,9 @@ import com.shinhan.assetManager.user.UserDTO;
 @Repository 
 public interface UserRepo extends CrudRepository<UserDTO, String>{
 	
+	// 로그인을 위한 메소드
+	//public UserDTO findByUserIdAndUserPw(String userId, String userPw);
+	
 	// 1명당 최대 3개 계정 limit 위한 메소드
 	public List<UserDTO> findBySsn(String ssn);
 	
