@@ -24,9 +24,9 @@ import com.shinhan.assetManager.user.UserDTO;
 @RequestMapping("/stock")
 public class StockController {
 	
+	//수정 
 	private String assetCode = "C1";
-	private UserDTO user = new UserDTO("jin", "/6HLGPldbbPh7+aTUJ5BJg==", "한진", "+Ltah1m3mBTypNmsrC8E/7kfq6BzINSiuLyJNO6DWUE=", 
-			"jin@naver.com", "01012345678", "구리시", "f1d7ed69", null);
+	private UserDTO user = new UserDTO();
 	
 	@Autowired
 	private StockRepo stockRepo;
