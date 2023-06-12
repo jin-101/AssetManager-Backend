@@ -24,17 +24,16 @@ public class JavaJwt {
 	@Autowired
 	UserRepo userRepo;
 
-	// 암호화하기 위한 키
-	private static String SECRET_KEY = "secret"; // SECRET_KEY : 보안키, 즉 우리만 알고, 이걸 통해 암호화 및 복호화??
+	// 암호화하기 위한 보안키
+	private static String SECRET_KEY = "secret"; 
 	// JWT 만료 시간 1시간
 	private static long tokenValidMilisecond = 1000L * 60 * 60; // (일단 60분으로 책정하고 테스트)
 	static JavaJwt p = new JavaJwt();
-
-	// ★★★★★ 공통 메소드 : JWT로부터 userId 얻기
+	
+	// ★★★ 0. 공통 메소드 : JWT(토큰)로부터 userId 얻는 메소드
 	public UserDTO getUserIdFromJwt(HttpServletRequest request) {
-		// JWT(토큰)로부터 현재 로그인한 유저 ID 얻기 (보안상 Front <-> Back 사이에서 ID를 주고 받는 게 아니라 JWT를 주고
-		// 받게끔 설정)
-		String bearerToken = request.getHeader("Authorization");
+		// JWT(토큰)로부터 현재 로그인한 유저 ID 얻기 (보안상 Front <-> Back 사이에서 ID를 주고 받는 게 아니라 JWT를 주고 받게끔 설정)
+		String bearerToken = request.getHeader("Authorization"); // ★ axios header 부분에 Authorization: `${id}` 를 추가해줘야 함
 		JavaJwt jwt = new JavaJwt(); 
 		String userId = jwt.verifyAndDecodeToken(bearerToken);
 		System.out.println("로그인한 유저 ID : " + userId);
@@ -45,7 +44,7 @@ public class JavaJwt {
 		return user;
 	}
 
-	// 1. 토큰 생성 함수
+	// 적용해야 하는 메소드 1. 토큰 생성 함수
 	public String createToken(String key) {
 		// Claims을 생성
 		Claims claims = Jwts.claims().setId(key);
@@ -65,7 +64,7 @@ public class JavaJwt {
 		return token;
 	}
 
-	// 2. 토큰 복호화 및 검증 파트
+	// 적용해야 하는 메소드 2. 토큰 검증 및 복호화 파트
 	public String verifyAndDecodeToken(String token) {
 		String id = "";
 		// JWT 토큰 복호화
