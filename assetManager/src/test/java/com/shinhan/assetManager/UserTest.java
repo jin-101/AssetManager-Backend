@@ -31,7 +31,7 @@ public class UserTest {
 	
 
 	// 1명당 최대 3개의 ID만 가질 수 있게끔 (= 회원가입 가능 여부 체크버튼)
-    @Test
+    //@Test
 	void checkMaxAccount() { // ★ 아예 통 메소드로 만들어서 사용하면 좋을 듯
     	// (1) 회원가입 양식에 입력한 이름과 주민번호를 파라미터로 받아서
 		String inputName = "한진";
@@ -165,7 +165,7 @@ public class UserTest {
 	}
 
 	// 회원가입 양식을 통해 => 유저 정보를 DB에 insert하는 작업
-	//@Test
+	@Test
 	void insertUser() throws Exception {
 		// (0) 주민번호 암호화 (단방향 by SHA256) => (정정. 양방향 by AES256)
 		// (1) salt 생성
@@ -185,8 +185,8 @@ public class UserTest {
 		String encryptedPw = aes256.encryptAES256(text2);
 
 		// 예시
-		UserDTO user = UserDTO.builder().ssn(encryptedSsn).userPw(encryptedPw).salt(salt).userId("anotherJin")
-				.userEmail("anotherJin@naver.com").phoneNumber("01098765432").userName("한진").build();
+		UserDTO user = UserDTO.builder().ssn(encryptedSsn).userPw(encryptedPw).salt(salt).userId("jin")
+				.userEmail("jin@naver.com").phoneNumber("01012345678").userName("한진").accountLockStatus("N").build();
 		System.out.println("user: " + user);
 
 		// 최종. User 테이블에 save
