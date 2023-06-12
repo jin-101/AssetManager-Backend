@@ -1,5 +1,6 @@
 package com.shinhan.assetManager.service;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,24 +25,90 @@ public class LoginAndSignUpService {
 	@Autowired
 	AES256 aes256; // 양방향
 	
+	// 이메일 체크
+	public String checkEmail(UserDTO userDto) {
+		String userEmail = userDto.getUserEmail();
+		System.out.println("이메일 인증 요청 들어옴");
+		return "hi";
+	}
+	
 	// 로그인
 	public String login(UserDTO userDto) {
-		// 아이디 체크 & 비밀번호 체크 2개 메소드를 여기 안에????
 		String inputId = userDto.getUserId();
 		String inputPw = userDto.getUserPw();
-		String result = null;
+		String result = null; // ★ 3가지 경우에 따라 Front에 출력되는 result를 다르게
+		Long leftTime = 30L; // 로그인 잠금 남은 시간
+		Long currentLoginDate = new Date().getTime()/1000; // 현재 로그인 시점의 시간
 		
-		// 일단 대충 구현
-		// (1) id를 통해 pw 찾기
-		// (2) 입력한 pw와 DB에 있는 pw가 일치하면 로그인 OK
-		UserDTO user = uRepo.findById(inputId).orElse(null); // 여기 ifPresent 쓸지 뭐 쓸지 다시 고민
-		if(user == null) {
-			result = "넌 못 지나간다";
-		}else {
-			String userPw = user.getUserPw();
-			if(inputPw.equals(userPw)) {
-				System.out.println("로그인 성공"); // ★ ㅅㅂ 비번 암호화 해놔서 인식을 못했구나 
-				result = "로그인 성공";
+		// 1. 로그인 공백 체크
+		if(inputId.equals("")) {
+			result = "아이디를 입력해주세요";
+			return result;
+		}else if(inputPw.equals("")) {
+			result = "비밀번호를 입력해주세요";
+			return result;
+		}
+		
+		// 2. 로그인 체크
+		UserDTO user = uRepo.findById(inputId).orElse(null); // return값 => null 또는 UserDTO 1개
+		if(user == null) { // (i) 아이디가 없는 경우
+			result = "아이디가 존재하지 않습니다"; 
+		}else { 
+			// 3. 로그인 잠금 체크 (by 로그인 횟수 제한 초과로 인한)
+			String accountLockStatus = user.getAccountLockStatus();
+			Long latestLoginDate = user.getLatestLoginDate();
+			// (1) 30초 이미 지난 경우
+			if(latestLoginDate != null && (currentLoginDate - latestLoginDate) > 30) { // ★ (1)예전에 로그인했던 시간이 DB에 저장돼있고, (2)이미 30초가 지난 상태라면
+				user.setAccountLockStatus("N"); 
+				user.setLoginFailCount(0); 
+				user.setLatestLoginDate(currentLoginDate); // 로그인 시각도 현재 시각으로 리셋
+				uRepo.save(user);
+			}
+			// (2) 30초 내에 로그인 재시도 하는 경우
+			if(accountLockStatus.equals("Y")) {
+				leftTime = 30 - (currentLoginDate - latestLoginDate);
+				if(leftTime >= 0) {
+					result = "아직 로그인을 할 수 없습니다. 남은시간 ("+leftTime+"초)";
+					return result;
+				}else {
+					user.setAccountLockStatus("N"); // "N" : 30초 지나면 잠금해제
+					user.setLoginFailCount(0); // 0 : 로그인 실패횟수도 초기화
+					uRepo.save(user);
+				}
+			}
+			
+			// 2. 로그인 체크 中 비밀번호 체크
+			String encryptedPw = user.getUserPw();
+			String salt = user.getSalt();
+			String text = inputPw+salt;
+			try {
+				String encryptedText = aes256.encryptAES256(text);
+				if(encryptedText.equals(encryptedPw)) { // (ii) 비밀번호 맞은 경우
+					result = "로그인 성공";
+				}else { // (iii) 비밀번호 틀린 경우
+					int loginFailCount =  user.getLoginFailCount();
+					result = "비밀번호가 틀렸습니다." + " 남은횟수 ("+(5-loginFailCount)+"회)";
+					
+					// 3. 로그인 잠금 체크 - 로그인 시도 횟수 제한
+					loginFailCount++;
+					System.out.println("현재 로그인 시도 횟수 : "+loginFailCount);
+					user.setLoginFailCount(loginFailCount);
+					uRepo.save(user);
+					if(loginFailCount > 5) {
+						result = "비밀번호 5회 연속 실패로 인하여 30초 동안 잠금되었습니다";
+						user.setAccountLockStatus("Y");
+						if(loginFailCount == 6) {
+							latestLoginDate = new Date().getTime()/1000;
+							user.setLatestLoginDate(latestLoginDate);
+						}
+						currentLoginDate = new Date().getTime()/1000;
+						user.setLatestLoginDate(currentLoginDate);
+						uRepo.save(user);
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("LoginAndSignUpService : login 메소드에서 에러");
+				e.printStackTrace();
 			}
 		}
 		return result;
