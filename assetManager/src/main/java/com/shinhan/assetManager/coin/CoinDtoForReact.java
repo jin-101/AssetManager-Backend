@@ -16,6 +16,6 @@ public class CoinDtoForReact {
 	private String market;
 	private String coinName;
 	private String quantity;
-	private String price;
-
+	private String price; 
+	private String date; 
 }
