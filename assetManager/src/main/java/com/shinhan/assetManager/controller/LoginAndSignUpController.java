@@ -57,5 +57,13 @@ public class LoginAndSignUpController {
 
 		return "회원가입 성공";
 	}
+	
+	// 아이디 중복 체크
+	@GetMapping
+	@RequestMapping(value = "/checkDuplicatedId", consumes = "application/json", produces = "text/plain;charset=UTF-8")
+	public String checkDuplicatedId(@RequestBody UserDTO userDto) {
+		String result = service.checkDuplicatedId(userDto);
+		return result;
+	}
 
 }
