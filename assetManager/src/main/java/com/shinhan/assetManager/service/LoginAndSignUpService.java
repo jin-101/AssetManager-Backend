@@ -4,9 +4,12 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.shinhan.assetManager.jwt.JavaJwt;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.AES256;
 import com.shinhan.assetManager.user.SHA256;
@@ -24,6 +27,7 @@ public class LoginAndSignUpService {
 	SHA256 sha256; // 단방향
 	@Autowired
 	AES256 aes256; // 양방향
+	//@Autowired HttpSession session; (세션인증방식 대신 JWT 토큰인증방식 사용하였음)
 	
 	// 이메일 체크
 	public String checkEmail(UserDTO userDto) {
@@ -78,13 +82,18 @@ public class LoginAndSignUpService {
 			}
 			
 			// 2. 로그인 체크 中 비밀번호 체크
+			String userId = user.getUserId();
 			String encryptedPw = user.getUserPw();
 			String salt = user.getSalt();
 			String text = inputPw+salt;
 			try {
 				String encryptedText = aes256.encryptAES256(text);
 				if(encryptedText.equals(encryptedPw)) { // (ii) 비밀번호 맞은 경우
-					result = "로그인 성공";
+					// ★ 로그인 성공시 JWT 토큰 생성해서 리액트로 보냄
+					JavaJwt jwt = new JavaJwt();
+					String token = jwt.createToken(userId);
+					result = token;
+					
 				}else { // (iii) 비밀번호 틀린 경우
 					int loginFailCount =  user.getLoginFailCount();
 					result = "비밀번호가 틀렸습니다." + " 남은횟수 ("+(5-loginFailCount)+"회)";
@@ -112,6 +121,15 @@ public class LoginAndSignUpService {
 			}
 		}
 		return result;
+	}
+	
+	// 로그아웃
+	public String logout(UserDTO userDto) {
+		String userId = userDto.getUserId();
+		System.out.println(userId);
+		System.out.println(userDto);
+		
+		return "로그아웃 성공";
 	}
 
 	// 회원가입 
