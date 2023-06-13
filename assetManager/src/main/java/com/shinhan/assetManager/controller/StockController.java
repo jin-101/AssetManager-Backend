@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.shinhan.assetManager.mapping.StockTableEntityMapping;
 import com.shinhan.assetManager.repository.StockRepo;
 import com.shinhan.assetManager.repository.UserAssetRepo;
+import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.stock.StockInputDTO;
 import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
@@ -26,26 +29,34 @@ public class StockController {
 	
 	//수정 
 	private String assetCode = "C1";
-	private UserDTO user = new UserDTO();
+
 	
 	@Autowired
 	private StockRepo stockRepo;
 	
 	@Autowired
+	private UserRepo userRepo;
+	
+	@Autowired
 	private UserAssetRepo userAssetRepo;
+	
+
 	
 	@PostMapping("/stockAssetInput")
 	@ResponseBody
 	public String handleStockAssetsInputRequest(StockInputDTO stockInputDTO) {
 		System.out.println("i got------------------------");
+		System.out.println(stockInputDTO);
+		System.out.println(userRepo.findById(stockInputDTO.getUserId()));
+	
 		
-		StockTableEntityMapping  map =  stockRepo.findByCorpname(stockInputDTO.getStockName());
-		String stockCode = map.getStockcode();
-		String market = map.getMarket();
-		System.out.println(market);
-		
-		UserAssetDTO userAssetDto = new UserAssetDTO(user, assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
-		userAssetRepo.save(userAssetDto);
+//		StockTableEntityMapping  map =  stockRepo.findByCorpname(stockInputDTO.getStockName());
+//		String stockCode = map.getStockcode();
+//		String market = map.getMarket();
+//		System.out.println(market);
+//		
+//		UserAssetDTO userAssetDto = new UserAssetDTO(user, assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
+//		userAssetRepo.save(userAssetDto);
 		
 		return "주식자산 등록완료";
 	}
