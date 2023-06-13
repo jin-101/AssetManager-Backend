@@ -42,6 +42,7 @@ public class CoinController {
 	// 코인 자산 추가
 	@PostMapping(value = "/add/{token}", consumes = "application/json", produces = "text/plain;charset=utf-8")
 	public String addUpbit(@RequestBody CoinDtoForReact coin, @PathVariable String token) { //@PathVariable("id") String token, HttpServletRequest request
+		System.out.println(coin);
 		String result = service.addUpbit(coin, token);
   
 		return result;

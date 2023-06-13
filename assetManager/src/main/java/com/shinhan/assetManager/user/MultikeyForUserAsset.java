@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter 
-public class MultikeyForUser implements Serializable {
+public class MultikeyForUserAsset implements Serializable {
 	
 	// 복합키 (5개로 구성)
 	private String user; // ★ 4. 이것도 name을 서로 맞춰줘야 에러 안 나는 듯

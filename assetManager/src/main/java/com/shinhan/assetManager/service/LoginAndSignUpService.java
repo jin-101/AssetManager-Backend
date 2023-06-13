@@ -145,10 +145,10 @@ public class LoginAndSignUpService {
 //	}
 
 	// 로그아웃
-		public String logout(UserDTO userDto) {
-			
-			return "로그아웃 성공";
-		}
+	public String logout(UserDTO userDto) {
+		
+		return "로그아웃 성공";
+	}
 
 	// 회원가입
 	public String signUp(UserDTO userDto) {
@@ -170,10 +170,11 @@ public class LoginAndSignUpService {
 				String text2 = pw + salt;
 				String encryptedPw = aes256.encryptAES256(text2);
 
-				// 3. 암호화된 ssn, pw + "N"
+				// 3. 암호화된 ssn, pw + "N" + salt
 				userDto.setSsn(encryptedSsn);
 				userDto.setUserPw(encryptedPw);
 				userDto.setAccountLockStatus("N");
+				userDto.setSalt(salt);
 
 				// 마지막. User 테이블에 save
 				uRepo.save(userDto);
