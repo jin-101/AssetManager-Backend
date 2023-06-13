@@ -40,9 +40,9 @@ public class CoinController {
 	CoinService service;
 
 	// 코인 자산 추가
-	@PostMapping(value = "/add", consumes = "application/json", produces = "text/plain;charset=utf-8")
-	public String addUpbit(@RequestBody CoinDtoForReact coin, HttpServletRequest request) { //@PathVariable("id") String token, @RequestParam String aa
-		String result = service.addUpbit(coin, request);
+	@PostMapping(value = "/add/{token}", consumes = "application/json", produces = "text/plain;charset=utf-8")
+	public String addUpbit(@RequestBody CoinDtoForReact coin, @PathVariable String token) { //@PathVariable("id") String token, HttpServletRequest request
+		String result = service.addUpbit(coin, token);
   
 		return result;
 	}
