@@ -18,7 +18,7 @@ import com.shinhan.assetManager.user.UserDTO;
 @Controller
 @RequestMapping("/currency")
 public class CurrencyController {
-	
+	//test
 	private String assetCode = "A2";
 	
 	@Autowired
