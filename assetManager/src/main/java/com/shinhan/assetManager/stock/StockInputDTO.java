@@ -8,6 +8,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class StockInputDTO {
+	private String userId;
 	private String stockName;
 	private String price;
 	private String buyDay;

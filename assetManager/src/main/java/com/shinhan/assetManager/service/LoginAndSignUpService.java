@@ -28,6 +28,7 @@ public class LoginAndSignUpService {
 	SHA256 sha256; // 단방향
 	@Autowired
 	AES256 aes256; // 양방향
+
 	@Autowired
 	HttpSession session; // (세션인증방식 대신 JWT 토큰인증방식 사용하였음)
 
@@ -93,6 +94,7 @@ public class LoginAndSignUpService {
 				String encryptedText = aes256.encryptAES256(text);
 				if (encryptedText.equals(encryptedPw)) { // (ii) 비밀번호 맞은 경우
 					// ★ 로그인 성공시 JWT 토큰 생성해서 리액트로 보냄
+
 					//JavaJwt jwt = new JavaJwt();
 					//String token = jwt.createToken(userId); 
 					result = "로그인성공";
