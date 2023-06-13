@@ -25,7 +25,7 @@ public class CoinService {
 	@Autowired
 	JavaJwt jwt;
 	@Autowired
-	UserRepo userRepo;
+	UserRepo uRepo;
 	@Autowired
 	UserAssetRepo assetRepo;
 	@Autowired
@@ -39,13 +39,19 @@ public class CoinService {
 	@Autowired
 	CoinBithumbDTO bit;
 	
-	public String addUpbit(CoinDtoForReact coin, HttpServletRequest request) {
-		UserDTO user = jwt.getUserIdFromJwt(request); // JavaJwt 클래스의 getUserIdFromJwt() 메소드 이용
-
+	public String addUpbit(CoinDtoForReact coin, String token) {
+		//UserDTO user = jwt.getUserIdFromJwt(request); // JavaJwt 클래스의 getUserIdFromJwt() 메소드 이용
+		UserDTO user = uRepo.findById(token).get();
+		
 		// 코인 자산 입력 코드
 		// (1) 데이터 가공
-		String market = coin.getMarket();
 		String price = coin.getPrice().replace(",", ""); // 금액 , 없애기
+		String market = coin.getMarket();
+		if(market.equals("업비트")) {
+			market = "upbit";
+		}else if(market.equals("빗썸")) {
+			market = "bithumb";
+		}
 		String coinName = coin.getCoinName().toUpperCase()+"_"+market; // 대문자로 바꾸기 위한 작업
 		// (2) build
 		userAsset = UserAssetDTO.builder()
