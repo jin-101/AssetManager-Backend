@@ -20,7 +20,7 @@ import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
 
 @Service
-public class CoinService {
+public class CoinService implements AssetService {
 
 	@Autowired
 	JavaJwt jwt;
@@ -91,19 +91,17 @@ public class CoinService {
 		
 		return coinMap;
 	}
-	
-//	upbitRepo.findAll().forEach(upbit -> {
-//		String key = upbit.getCoinName().replace("_upbit", " : 업비트");
-//		String coinName = upbit.getCoinName().replace("_upbit", "");
-//		coinMap.put(key, coinName);
-//	});
-//	bitRepo.findAll().forEach(bithumb -> {
-//		String key = bithumb.getCoinName().replace("_bithumb", " : 빗썸");
-//		String coinName = bithumb.getCoinName().replace("_bithumb", "");
-//		coinMap.put(key, coinName);
-//	});
-//
-//	System.out.println(coinMap);
-//	return coinMap;
+
+	@Override
+	public String getPrice(String assetCode, String detailCode) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getReturn() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
