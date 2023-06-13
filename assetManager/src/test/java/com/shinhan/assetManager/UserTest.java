@@ -175,7 +175,7 @@ public class UserTest {
 		// (2) 회원가입 양식을 통해 넘어온 user 데이터를 받아서 (from 리액트)
 
 		// (3) 암호화
-		String ssn = "987654-1234567"; // 암호화하고 싶은 주민번호
+		String ssn = "990101-1234567"; // 암호화하고 싶은 주민번호
 		String text = ssn + salt;
 		String encryptedSsn = aes256.encryptAES256(text);
 
@@ -185,7 +185,7 @@ public class UserTest {
 		String encryptedPw = aes256.encryptAES256(text2);
 
 		// 예시
-		UserDTO user = UserDTO.builder().ssn(encryptedSsn).userPw(encryptedPw).salt(salt).userId("jin")
+		UserDTO user = UserDTO.builder().ssn(encryptedSsn).userPw(encryptedPw).salt(salt).userId("jin4")
 				.userEmail("jin@naver.com").phoneNumber("01012345678").userName("한진").accountLockStatus("N").build();
 		System.out.println("user: " + user);
 
