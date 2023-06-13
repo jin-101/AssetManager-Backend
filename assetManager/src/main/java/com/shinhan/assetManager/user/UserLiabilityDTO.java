@@ -22,7 +22,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString//(exclude = "userAssets")
+@ToString(exclude = "assetDetail")
 @Table(name = "user_liability")
 @Entity
 @Component 
