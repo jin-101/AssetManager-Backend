@@ -272,12 +272,12 @@ public class LoginAndSignUpService {
 	public String checkMaxAccount(UserDTO userDto) { // ★ 아예 통 메소드로 만들어서 사용하면 좋을 듯
 		// (1) 회원가입 양식에 입력한 이름과 주민번호를 파라미터로 받아서
 		String result = null;
-		String inputName = userDto.getUserId();
+		String inputUserName = userDto.getUserName();
 		String inputSsn = userDto.getSsn();
 
 		// (2) 이름으로 salt를 각각 찾아서 => ssn 암호화하고 => 암호화된 ssn의 형태를 비교
 		List<String> idList = new ArrayList<>();
-		uRepo.findByUserName(inputName).forEach(user -> {
+		uRepo.findByUserName(inputUserName).forEach(user -> {
 			// (i) 즉, forEach로 하나하나 돌려가며
 			String salt = user.getSalt();
 			String ssn = user.getSsn();
