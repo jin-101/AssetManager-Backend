@@ -81,7 +81,7 @@ public class LoginAndSignUpController {
 	
 	// 아이디 찾기
 	@PostMapping
-	@RequestMapping(value = "/findUserId", consumes = "application/json", produces = "text/plain;charset=UTF-8")
+	@RequestMapping(value = "/findUserId", consumes = "application/json", produces = "application/json;charset=UTF-8")
 	public List<String> findUserId(@RequestBody UserDTO userDto) {
 		List<String> result = service.findUserId(userDto); // 찾은 id List 리턴
 
