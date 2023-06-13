@@ -244,13 +244,14 @@ public class LoginAndSignUpService {
 	public List<String> findUserId(UserDTO userDto) {
 		List<String> idList = new ArrayList<>();
 		// (1) 유저 정보를 받음 (이름, 폰번 2개 필요) (★ 원래 주민번호로 하려 했더니 salt값이 다 달라서 이걸 어케할지가 좀 고민..)
-		String inputUserName = userDto.getUserId();
+		String inputUserName = userDto.getUserName();
 		String inputPhoneNumber = userDto.getPhoneNumber();
 
 		// (2) 2개 정보에 해당하는 Id가 있는지 먼저 체크 (이것도 이름이나 주민번호 잘못 입력했는지 체크해주는게 좋을라나..?)
 		List<UserDTO> checkUserList = new ArrayList<>();
 		List<UserDTO> userList = new ArrayList<>();
 		checkUserList = uRepo.findByUserNameAndPhoneNumber(inputUserName, inputPhoneNumber);
+		System.out.println(checkUserList);
 
 		if (checkUserList.size() == 0) {
 			idList.add("존재하는 ID가 없습니다"); // ID 잘못 입력시 '해당문구'를 리턴
