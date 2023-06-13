@@ -2,6 +2,9 @@ package com.shinhan.assetManager.controller;
 
 import java.util.List;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +42,15 @@ public class LoginAndSignUpController {
 		return result;
 	}
 
+//	// 로그아웃
+//	@PostMapping
+//	@RequestMapping(value = "/logout", consumes = "application/json", produces = "text/plain;charset=UTF-8") 
+//	public String logout(@RequestBody UserDTO userDto, HttpServletRequest request) {
+//		String result = service.logout(userDto, request);
+//
+//		return result;
+//	}
+	
 	// 로그아웃
 	@PostMapping
 	@RequestMapping(value = "/logout", consumes = "application/json", produces = "text/plain;charset=UTF-8")
