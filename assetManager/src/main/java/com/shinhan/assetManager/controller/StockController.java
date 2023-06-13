@@ -64,7 +64,7 @@ public class StockController {
 	@GetMapping("/stockPrice")
 	@ResponseBody
 	public List<UserAssetDTO> handleStockPriceRequest() {
-		List<UserAssetDTO> userStocks = userAssetRepo.getSpecificUserAssets(user, assetCode);
+		List<UserAssetDTO> userStocks = userAssetRepo.getSpecificUserAssets(null, assetCode); 
 		
 		Map<String, Long> totalSharesByStockCode = new HashMap<>();
 		Map<String, Long> totalAmountByStockCode = new HashMap<>();

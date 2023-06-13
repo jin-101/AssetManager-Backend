@@ -42,7 +42,7 @@ public class ApiCoinBithumb {
 		HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 		String responseBody = response.body(); // 아 이게 데이터가 너무 많아서 콘솔 창에 안 뜨나 본데..? (1개 시세는 뜨는데, 전체 시세 요청하니까 안 뜨네)
 
-		// 빗썸 코인 리스트 (Set)
+		// 빗썸 코인 리스트 (Set) 
 		JSONObject jsonObj = new JSONObject(responseBody);
 		JSONObject jsonObj2 = (JSONObject) jsonObj.get("data");
 		Set<String> coinSet = jsonObj2.keySet();

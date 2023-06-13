@@ -1,6 +1,8 @@
 package com.shinhan.assetManager.dto;
 
 import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,7 +37,7 @@ public class HouseholdAccountsDTO {
 	private String accountNumber;
 	private String bank;
 	private Date exchangeDate;
-	private String exchangeTime;
+	private Time exchangeTime;
 	private Integer withdraw;
 	private Integer deposit;
 	private String content;
