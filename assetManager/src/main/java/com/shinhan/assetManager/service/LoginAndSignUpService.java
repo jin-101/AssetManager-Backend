@@ -152,9 +152,10 @@ public class LoginAndSignUpService {
 				String text2 = pw + salt;
 				String encryptedPw = aes256.encryptAES256(text2);
 				
-				// 3. 암호화된 ssn, pw를 set 후에
+				// 3. 암호화된 ssn, pw + "N"
 				userDto.setSsn(encryptedSsn);
 				userDto.setUserPw(encryptedPw);
+				userDto.setAccountLockStatus("N");
 				
 				// 마지막. User 테이블에 save
 				uRepo.save(userDto);
@@ -168,10 +169,10 @@ public class LoginAndSignUpService {
 	}
 	
 	// 회원가입 中 아이디 중복 체크
-	public String checkDuplicatedId(UserDTO userDto) {
+	public String checkDuplicatedId(String userId) {
 		String result = null;
-		String inputId = userDto.getUserId(); // (1) 앱에서 중복체크 버튼을 누르면 => Id를 받아서
-		UserDTO user = uRepo.findById(inputId).orElse(null); // (2) 그 Id가 있는지 체크
+		//String inputId = userDto.getUserId(); // (1) 앱에서 중복체크 버튼을 누르면 => Id를 받아서
+		UserDTO user = uRepo.findById(userId).orElse(null); // (2) 그 Id가 있는지 체크
 													// ★ findByID()의 리턴값이 Optional<>이므로 orElse()나 ifPresent()
 													// 등을 이용하여 자체적으로 null값 체크가 가능! (굳이 null 체크 로직 안 짜도 됨 귀찮게)
 		if (user == null) {
@@ -270,7 +271,7 @@ public class LoginAndSignUpService {
 		System.out.println("찾으시는 ID : " + idList);
 
 		if (idList.size() > 3) { // (iv) 현재 보유한 Id가 3개 초과라면
-			result = "최대 3개의 계정만 가질 수 있습니다";
+			result = "최대 3개의 계정만 가질 수 있습니다. 기존 ID를 삭제해주세요";
 		} 
 		return result;
 	}

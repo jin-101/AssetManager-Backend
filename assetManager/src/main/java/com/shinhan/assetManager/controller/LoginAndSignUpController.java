@@ -52,17 +52,17 @@ public class LoginAndSignUpController {
 	@RequestMapping(value = "/signUp", consumes = "application/json", produces = "text/plain;charset=UTF-8")
 	public String signIn(@RequestBody UserDTO userDto) {
 		System.out.println(userDto);
+		String result = service.signUp(userDto);
 
-		// 자세한 메소드 적용 순서는 나중에
-
-		return "회원가입 성공";
+		return result;
 	}
 	
 	// 아이디 중복 체크
 	@GetMapping
-	@RequestMapping(value = "/checkDuplicatedId", consumes = "application/json", produces = "text/plain;charset=UTF-8")
-	public String checkDuplicatedId(@RequestBody UserDTO userDto) {
-		String result = service.checkDuplicatedId(userDto);
+	@RequestMapping(value = "/checkDuplicatedId/{userId}", produces = "text/plain;charset=UTF-8")
+	public String checkDuplicatedId(@PathVariable String userId) {
+		String result = service.checkDuplicatedId(userId); 
+		
 		return result;
 	}
 
