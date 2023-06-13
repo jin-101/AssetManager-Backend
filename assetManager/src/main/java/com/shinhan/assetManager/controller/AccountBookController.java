@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,15 +32,21 @@ public class AccountBookController {
 	@Autowired
 	HouseholdAccountsCategoryRepository categoryRepo;
 	
-	@PostMapping(value = "/list.do", consumes = "application/json")
+	@PostMapping(value = "/list.do", consumes = "application/json") //카드내역 불러오기
 	public List<HouseholdAccountsDTO> selectAll(@RequestBody AccountbookDTO dto) {
 		System.out.println(dto);
 		return (List<HouseholdAccountsDTO>)accountRepo.findByMonth(dto.getYear(), dto.getMonth());
 	}
 	
-	@PostMapping("/categorylist.do")
+	@PostMapping("/categorylist.do") //카데고리 목록 불러오기
 	public List<HouseholdAccountsCategoryDTO> categorylist() {
 		return (List<HouseholdAccountsCategoryDTO>) categoryRepo.findAll();
+	}
+	
+	@PutMapping(value = "/listsave.do", consumes = "application/json") //카테고리, 메모 작성 후 저장하기
+	public void listsave(@RequestBody List<HouseholdAccountsDTO> itemlist) {
+		System.out.println("item 리스트!!!!!!" + itemlist);
+		accountRepo.saveAll(itemlist);
 	}
 	
 //	@GetMapping("/list.do")

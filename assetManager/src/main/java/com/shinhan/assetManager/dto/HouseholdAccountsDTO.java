@@ -41,7 +41,8 @@ public class HouseholdAccountsDTO {
 	private String content;
 	private Integer balance;
 	private String memo;
+	private String category;
 	
-	@ManyToOne
-	HouseholdAccountsCategoryDTO category;
+//	@ManyToOne
+//	HouseholdAccountsCategoryDTO category;
 }
