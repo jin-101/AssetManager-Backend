@@ -30,10 +30,10 @@ public class CrawlingSelenium {
         	 obj = getDataList(carNo);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }finally {
+            driver.close();	//탭 닫기
+            driver.quit();	//브라우저 닫기
         }
-
-        driver.close();	//탭 닫기
-        driver.quit();	//브라우저 닫기
         return obj;
     }
 
@@ -51,10 +51,14 @@ public class CrawlingSelenium {
         
         WebElement tab1 = driver.findElement(By.xpath("//*[@id=\"wrap\"]/div/div[2]/div[2]/div[2]/a"));
         tab1.click();
-        
+        Thread.sleep(1000);
    
-        List<WebElement> elements = driver.findElements(By.cssSelector("#usedcarcompare_data td"));
         String[] keyList = {"className","year","price"};
+        List<WebElement> elements = driver.findElements(By.cssSelector("#usedcarcompare_data td"));
+        
+        //모바일 화면으로 생성시 진행
+        if(elements.get(0).getText().length()==0) elements = driver.findElements(By.cssSelector("#usedcarcompare_data_mob td"));
+        
         for(int i=0; i<elements.size(); i++) {
         	if(i%2==0 && i<6) {
         		obj.put(keyList[i/2], elements.get(i).getText());
