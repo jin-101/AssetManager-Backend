@@ -184,7 +184,8 @@ public class LoginAndSignUpService {
 	}
 
 	// ★ 비밀번호 찾기
-	public void findUserPw(UserDTO userDto) {
+	public String findUserPw(UserDTO userDto) {
+		String result = null;
 		// (1) 유저 정보를 받음 (주민번호, Id 2개 필요)
 		String inputSsn = userDto.getSsn();
 		String inputId = userDto.getUserId();
@@ -194,8 +195,7 @@ public class LoginAndSignUpService {
 		// (i)
 		UserDTO user = uRepo.findById(inputId).orElse(null);
 		if (user == null) {
-			System.out.println("존재하지 않는 ID입니다");
-			return;
+			result = "존재하지 않는 ID입니다";
 		}
 		String salt = user.getSalt();
 
@@ -210,18 +210,20 @@ public class LoginAndSignUpService {
 				String pw = uRepo.findById(inputId).orElse(null).getUserPw();
 				String decryptedPw = aes256.decryptAES256(pw);
 				String realPw = decryptedPw.replace(salt, "");
-				System.out.println("찾으신 회원님의 비밀번호는 : " + realPw + " 입니다");
+				result = "찾으신 회원님의 비밀번호는 : " + realPw + " 입니다";
 			} else { // 틀리면 주민번호 틀렸다고 알려주기
-				System.out.println("주민번호가 일치하지 않습니다");
+				result = "주민번호가 일치하지 않습니다";
 			}
 		} catch (Exception e) {
 			System.out.println("LoginAndSignUpService : 비밀번호 찾기에서 에러");
 			e.printStackTrace();
 		}
+		return result;
 	}
 
 	// ★ 아이디 찾기
-	public void findUserId(UserDTO userDto) {
+	public List<String> findUserId(UserDTO userDto) {
+		List<String> idList = new ArrayList<>();
 		// (1) 유저 정보를 받음 (이름, 폰번 2개 필요) (★ 원래 주민번호로 하려 했더니 salt값이 다 달라서 이걸 어케할지가 좀 고민..)
 		String inputUserName = userDto.getUserId();
 		String inputPhoneNumber = userDto.getPhoneNumber();
@@ -232,17 +234,18 @@ public class LoginAndSignUpService {
 		checkUserList = uRepo.findByUserNameAndPhoneNumber(inputUserName, inputPhoneNumber);
 
 		if (checkUserList.size() == 0) {
-			System.out.println("존재하는 ID가 없습니다");
-			return;
+			idList.add("존재하는 ID가 없습니다"); // ID 잘못 입력시 '해당문구'를 리턴
 		}
 
 		checkUserList.forEach(user -> {
 			userList.add(user);
 		});
 		userList.forEach(user -> {
-			System.out.println("가입하신 ID : " + user.getUserId());
+			String userId = user.getUserId();
 			// 리액트에는 List나 Map 형태로 보내면 될 듯? (근데 그럼 리턴 타입이 서로 달라서 흠..)
+			idList.add(userId);
 		});
+		return idList;
 	}
 
 	// 1인당 최대 3개의 아이디만 가질 수 있게 제한 (= 회원가입 가능 여부 체크버튼)
