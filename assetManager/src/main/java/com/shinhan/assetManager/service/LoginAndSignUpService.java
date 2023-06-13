@@ -266,7 +266,7 @@ public class LoginAndSignUpService {
 			idList.add(userId);
 		});
 		return idList;
-	}
+	} 
 
 	// 1인당 최대 3개의 아이디만 가질 수 있게 제한 (= 회원가입 가능 여부 체크버튼)
 	public String checkMaxAccount(UserDTO userDto) { // ★ 아예 통 메소드로 만들어서 사용하면 좋을 듯

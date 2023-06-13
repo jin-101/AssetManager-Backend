@@ -25,7 +25,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor 
 @AllArgsConstructor 
-@ToString(exclude = "userAssets") // 
+@ToString(exclude = {"userAssets", "userLiabilities"}) // 
 @Entity
 @Table(name = "user") 
 @Component // @Autowired를 위해 필요 
