@@ -10,8 +10,8 @@ public class MokdonService {
 
 	@Autowired
 	MokdonService service;
-	Double principal = null; // 목표금액을 모으는 데 필요한 (총)원금
-	Double interest = null; // 목표금액을 모으는 데 필요한 (총)이자
+	Double principal = null; // 목표금액을 모으는 데 필요한 원금
+	//Double interest = null; // 목표금액을 모으는 데 필요한 이자
 	String targetAmount = "";
 	String targetPeriod = "";
 	String type = "";
@@ -21,33 +21,33 @@ public class MokdonService {
 	Double r0 = null; // 평균금리 (꼭 100으로 나뉜 값인지 체크할 것)
 	Double r1 = null; // 기간 적용한 금리
 
-	public Double calculate(MokdonDTO mokdonDto) {
+	public MokdonDTO calculate(MokdonDTO mokdonDto) {
+		mokdonDto.setRateType( "단리"); // 테스트용
 		type = mokdonDto.getType();
 		rateType = mokdonDto.getRateType();
-		rateType = "복리"; // 테스트용
 		if (type.equals("적금")) {
 			if(rateType.equals("단리")) {
-				principal = service.simpleInterestSavings(mokdonDto); // 단리
+				mokdonDto = service.simpleInterestSavings(mokdonDto); // 단리
 			}else if(rateType.equals("복리")) {
-				principal = service.compoundInterestSavings(mokdonDto); // 복리
+				mokdonDto = service.compoundInterestSavings(mokdonDto); // 복리
 			}
 		} else if (type.equals("예금")) {
 			if(rateType.equals("단리")) {
-				principal = service.simpleInterestDeposit(mokdonDto); // 단리
+				mokdonDto = service.simpleInterestDeposit(mokdonDto); // 단리
 			}else if(rateType.equals("복리")) {
-				principal = service.compoundInterestDeposit(mokdonDto); // 복리
+				mokdonDto = service.compoundInterestDeposit(mokdonDto); // 복리
 			}
 		}
 		
 		// ★ 15.4%, 9.5?% 세금 떼는 경우는 어떻게 해서 할까??
-		return principal;
+		return mokdonDto;
 	}
 
 	// 자유롭게 선택시
 
 	// (1) 예금 - 단리
-	public Double simpleInterestDeposit(MokdonDTO mokdonDto) {
-		targetAmount = mokdonDto.getTargetAmount();
+	public MokdonDTO simpleInterestDeposit(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
@@ -61,17 +61,14 @@ public class MokdonService {
 		r0 = rate / 100; // %이므로 100으로 나누기
 		r1 = (period / 12) * r0; // 연이율 환산
 		principal = amount / (1 + r1); // ★예금계산
+		mokdonDto.setPrincipal(principal);
 
-		System.out.println("목돈 : " + principal);
-		System.out.println("연이율(r0) : " + r0);
-		System.out.println("기간적용이율(r1) : " + r1);
-
-		return principal;
+		return mokdonDto;
 	}
 
 	// (2) 적금 - 단리
-	public Double simpleInterestSavings(MokdonDTO mokdonDto) {
-		targetAmount = mokdonDto.getTargetAmount();
+	public MokdonDTO simpleInterestSavings(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
@@ -95,16 +92,14 @@ public class MokdonService {
 			totalRate += eachRate;
 		}
 		principal = (amount / (totalRate + period));
-		System.out.println("필요원금 : " + principal);
-		System.out.println("총 이자율 : " + totalRate);
-		System.out.println("총이자율 + 기간 : " + (totalRate + period));
+		mokdonDto.setPrincipal(principal);
 
-		return principal;
+		return mokdonDto;
 	}
 
 	// (3) 예금 - 복리 (월복리)
-	public Double compoundInterestDeposit(MokdonDTO mokdonDto) {
-		targetAmount = mokdonDto.getTargetAmount();
+	public MokdonDTO compoundInterestDeposit(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
@@ -119,17 +114,14 @@ public class MokdonService {
 		r1 = (r0 / 12); // 월이율
 		Double denominator = Math.pow((1+r1), period); // 분모
 		principal = amount / denominator; // 필요원금 = 분자 / 분모
+		mokdonDto.setPrincipal(principal);
 
-		System.out.println("필요원금 : " + principal);
-		System.out.println("연이율(r0) : " + r0);
-		System.out.println("월이율(r1) : " + r1);
-
-		return principal;
+		return mokdonDto;
 	}
 
 	// (4) 적금 - 복리 (월복리)
-	public Double compoundInterestSavings(MokdonDTO mokdonDto) {
-		targetAmount = mokdonDto.getTargetAmount();
+	public MokdonDTO compoundInterestSavings(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
@@ -151,10 +143,9 @@ public class MokdonService {
 		}
 		//principal = (amount / (totalRate + period));
 		principal = (amount / totalDenominator); // 단리 계산 때처럼 괄호 안의 기간 분리가 안되므로......
-		System.out.println("필요원금 구하는데 필요한 분모값 : " + totalDenominator);
-		System.out.println("필요원금 : " + principal);
+		mokdonDto.setPrincipal(principal);
 		
-		return principal;
+		return mokdonDto;
 	}
 
 }

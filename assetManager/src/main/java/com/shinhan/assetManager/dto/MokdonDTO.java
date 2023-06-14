@@ -19,4 +19,5 @@ public class MokdonDTO {
 	private String bank; // 선택한 은행 - 신한은행 등
 	private String avgRate; // 평균금리
 	private String rateType; // 단리, 복리 타입
+	private Double principal; // 목표금액을 모으는 데 필요한 원금
 }
