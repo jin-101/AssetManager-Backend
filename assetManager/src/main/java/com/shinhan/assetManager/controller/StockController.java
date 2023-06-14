@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -45,20 +46,24 @@ public class StockController {
 	@PostMapping("/stockAssetInput")
 	@ResponseBody
 	public String handleStockAssetsInputRequest(StockInputDTO stockInputDTO) {
-		System.out.println("i got------------------------");
-		System.out.println(stockInputDTO);
-		System.out.println(userRepo.findById(stockInputDTO.getUserId()));
-	
+		String response = "등록완료";	
 		
-//		StockTableEntityMapping  map =  stockRepo.findByCorpname(stockInputDTO.getStockName());
-//		String stockCode = map.getStockcode();
-//		String market = map.getMarket();
-//		System.out.println(market);
-//		
-//		UserAssetDTO userAssetDto = new UserAssetDTO(user, assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
-//		userAssetRepo.save(userAssetDto);
+		try {
+			
+			System.out.println(stockInputDTO);
+			Optional<UserDTO> user = userRepo.findById(stockInputDTO.getUserId());
 		
-		return "주식자산 등록완료";
+			StockTableEntityMapping  map =  stockRepo.findByCorpname(stockInputDTO.getStockName());
+			String stockCode = map.getStockcode();
+			String market = map.getMarket();
+			UserAssetDTO userAssetDto = new UserAssetDTO(user.get(), assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
+			
+			userAssetRepo.save(userAssetDto);
+		} catch (Exception e) {
+			response = "등록실패";
+		}
+		
+		return response;
 	}
 	
 	@GetMapping("/stockPrice")
