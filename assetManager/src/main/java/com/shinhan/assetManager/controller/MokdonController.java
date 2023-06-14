@@ -21,11 +21,10 @@ public class MokdonController {
 	@PostMapping 
 	@RequestMapping(value = "/calculate", consumes = "application/json", produces = "application/json")
 	public Double calculate(@RequestBody MokdonDTO mokdonDto) {
-		System.out.println("게산 요청 들어옴");
 		System.out.println(mokdonDto);
-		
 		principal = service.calculate(mokdonDto);
-		
+		System.out.println("calculate에서 계산한 원금 : " + principal);
+		 
 		return principal; 
 	}
 	
