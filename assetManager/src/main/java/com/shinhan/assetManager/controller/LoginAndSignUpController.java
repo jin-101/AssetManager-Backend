@@ -97,5 +97,14 @@ public class LoginAndSignUpController {
 
 		return result;
 	}
+	
+	// 새 비밀번호 등록 (비밀번호 찾기 page)
+	@PostMapping
+	@RequestMapping(value = "/registerUserPw", consumes = "application/json", produces = "text/plain;charset=UTF-8")
+	public String registerUserPw(@RequestBody UserDTO userDto) {
+		String result = service.registerUserPw(userDto); // 찾은 pw가 리턴
+
+		return result;
+	}
 
 }
