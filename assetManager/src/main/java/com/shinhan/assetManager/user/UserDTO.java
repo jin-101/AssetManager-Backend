@@ -25,14 +25,14 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor 
 @AllArgsConstructor 
-@ToString(exclude = "userAssets") // 
+@ToString(exclude = {"userAssets", "userLiabilities"}) // 
 @Entity
 @Table(name = "user") 
 @Component // @Autowired를 위해 필요 
 public class UserDTO {
 
 	@Id
-	@Column(name = "user_id") 
+	@Column(name = "user_id")
 	private String userId; // 아이디
 	 
 	//@NotNull // 인용한 글에서는, 결론적으로 nullable = false 보다 @NotNull을 추천하고 있다. (참조: https://kafcamus.tistory.com/15) 
@@ -54,4 +54,8 @@ public class UserDTO {
 	@OneToMany 
 	@JoinColumn(name = "user_id")
 	List<UserAssetDTO> userAssets; 
+	
+	@OneToMany 
+	@JoinColumn(name = "user_id")
+	List<UserLiabilityDTO> userLiabilities; 
 }

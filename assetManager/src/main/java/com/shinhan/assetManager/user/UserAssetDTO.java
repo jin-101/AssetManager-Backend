@@ -1,16 +1,17 @@
 package com.shinhan.assetManager.user;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Component;
-
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,11 +25,11 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString//(exclude = "")
+@ToString//(exclude = "userLiabilities")
 @Entity
 @Table(name = "user_asset")  
 @Component
-@IdClass(MultikeyForUser.class) // 복합키 설정을 위한 @ (설명 ppt 100)
+@IdClass(MultikeyForUserAsset.class) // 복합키 설정을 위한 @ (설명 ppt 100)
 public class UserAssetDTO { // 개인 자산 테이블
 	
 	@Id
@@ -51,4 +52,8 @@ public class UserAssetDTO { // 개인 자산 테이블
 	@Column(length = 50, name = "quantity") // @ColumnDefault 따로 지정 안해주면 디폴트값 null로 지정됨 (숫자 1은 안되는 듯? "1"만 되고)
 	private String quantity; // 수량 
 	
+	// 일단 ManyToOne으로만 연관관계 설정
+	//@OneToMany
+	//private List<UserLiabilityDTO> userLiabilities; 
+	 
 }

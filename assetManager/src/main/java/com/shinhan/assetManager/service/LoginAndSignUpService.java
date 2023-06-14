@@ -145,10 +145,10 @@ public class LoginAndSignUpService {
 //	}
 
 	// 로그아웃
-		public String logout(UserDTO userDto) {
-			
-			return "로그아웃 성공";
-		}
+	public String logout(UserDTO userDto) {
+		
+		return "로그아웃 성공";
+	}
 
 	// 회원가입
 	public String signUp(UserDTO userDto) {
@@ -170,10 +170,11 @@ public class LoginAndSignUpService {
 				String text2 = pw + salt;
 				String encryptedPw = aes256.encryptAES256(text2);
 
-				// 3. 암호화된 ssn, pw + "N"
+				// 3. 암호화된 ssn, pw + "N" + salt
 				userDto.setSsn(encryptedSsn);
 				userDto.setUserPw(encryptedPw);
 				userDto.setAccountLockStatus("N");
+				userDto.setSalt(salt);
 
 				// 마지막. User 테이블에 save
 				uRepo.save(userDto);
@@ -200,6 +201,34 @@ public class LoginAndSignUpService {
 		}
 		return result;
 	}
+	
+	// ★ 아이디 찾기
+	public List<String> findUserId(UserDTO userDto) {
+		List<String> idList = new ArrayList<>();
+		// (1) 유저 정보를 받음 (이름, 폰번 2개 필요) (★ 원래 주민번호로 하려 했더니 salt값이 다 달라서 이걸 어케할지가 좀 고민..)
+		String inputUserName = userDto.getUserName();
+		String inputPhoneNumber = userDto.getPhoneNumber();
+
+		// (2) 2개 정보에 해당하는 Id가 있는지 먼저 체크 (이것도 이름이나 주민번호 잘못 입력했는지 체크해주는게 좋을라나..?)
+		List<UserDTO> checkUserList = new ArrayList<>();
+		List<UserDTO> userList = new ArrayList<>();
+		checkUserList = uRepo.findByUserNameAndPhoneNumber(inputUserName, inputPhoneNumber);
+		System.out.println(checkUserList);
+
+		if (checkUserList.size() == 0) {
+			idList.add("존재하는 ID가 없습니다"); // ID 잘못 입력시 '해당문구'를 리턴
+		}
+
+		checkUserList.forEach(user -> {
+			userList.add(user);
+		});
+		userList.forEach(user -> {
+			String userId = user.getUserId();
+			// 리액트에는 List나 Map 형태로 보내면 될 듯? (근데 그럼 리턴 타입이 서로 달라서 흠..)
+			idList.add(userId);
+		});
+		return idList;
+	} 
 
 	// ★ 비밀번호 찾기
 	public String findUserPw(UserDTO userDto) {
@@ -239,43 +268,16 @@ public class LoginAndSignUpService {
 		return result;
 	}
 
-	// ★ 아이디 찾기
-	public List<String> findUserId(UserDTO userDto) {
-		List<String> idList = new ArrayList<>();
-		// (1) 유저 정보를 받음 (이름, 폰번 2개 필요) (★ 원래 주민번호로 하려 했더니 salt값이 다 달라서 이걸 어케할지가 좀 고민..)
-		String inputUserName = userDto.getUserId();
-		String inputPhoneNumber = userDto.getPhoneNumber();
-
-		// (2) 2개 정보에 해당하는 Id가 있는지 먼저 체크 (이것도 이름이나 주민번호 잘못 입력했는지 체크해주는게 좋을라나..?)
-		List<UserDTO> checkUserList = new ArrayList<>();
-		List<UserDTO> userList = new ArrayList<>();
-		checkUserList = uRepo.findByUserNameAndPhoneNumber(inputUserName, inputPhoneNumber);
-
-		if (checkUserList.size() == 0) {
-			idList.add("존재하는 ID가 없습니다"); // ID 잘못 입력시 '해당문구'를 리턴
-		}
-
-		checkUserList.forEach(user -> {
-			userList.add(user);
-		});
-		userList.forEach(user -> {
-			String userId = user.getUserId();
-			// 리액트에는 List나 Map 형태로 보내면 될 듯? (근데 그럼 리턴 타입이 서로 달라서 흠..)
-			idList.add(userId);
-		});
-		return idList;
-	}
-
 	// 1인당 최대 3개의 아이디만 가질 수 있게 제한 (= 회원가입 가능 여부 체크버튼)
 	public String checkMaxAccount(UserDTO userDto) { // ★ 아예 통 메소드로 만들어서 사용하면 좋을 듯
 		// (1) 회원가입 양식에 입력한 이름과 주민번호를 파라미터로 받아서
 		String result = null;
-		String inputName = userDto.getUserId();
+		String inputUserName = userDto.getUserName();
 		String inputSsn = userDto.getSsn();
 
 		// (2) 이름으로 salt를 각각 찾아서 => ssn 암호화하고 => 암호화된 ssn의 형태를 비교
 		List<String> idList = new ArrayList<>();
-		uRepo.findByUserName(inputName).forEach(user -> {
+		uRepo.findByUserName(inputUserName).forEach(user -> {
 			// (i) 즉, forEach로 하나하나 돌려가며
 			String salt = user.getSalt();
 			String ssn = user.getSsn();
