@@ -29,9 +29,6 @@ public class LoginAndSignUpService {
 	@Autowired
 	AES256 aes256; // 양방향
 
-	@Autowired
-	HttpSession session; // (세션인증방식 대신 JWT 토큰인증방식 사용하였음)
-
 	// 이메일 체크
 	public String checkEmail(UserDTO userDto) {
 		String userEmail = userDto.getUserEmail();
@@ -129,20 +126,6 @@ public class LoginAndSignUpService {
 		}
 		return result;
 	}
-
-//	// 로그아웃
-//	public String logout(UserDTO userDto, HttpServletRequest request) {
-//		// 세션을 삭제
-//		HttpSession session = request.getSession(false);
-//		// session이 null이 아니라는건 기존에 세션이 존재했었다는 뜻이므로
-//		// 세션이 null이 아니라면 session.invalidate()로 세션 삭제해주기.
-//		if (session != null) {
-//			session.invalidate();
-//		}
-//		System.out.println("Back : 로그아웃 버튼 누름!");
-//
-//		return "로그아웃 성공";
-//	}
 
 	// 로그아웃
 	public String logout(UserDTO userDto) {
@@ -257,14 +240,38 @@ public class LoginAndSignUpService {
 				String pw = uRepo.findById(inputId).orElse(null).getUserPw();
 				String decryptedPw = aes256.decryptAES256(pw);
 				String realPw = decryptedPw.replace(salt, "");
-				result = "찾으신 회원님의 비밀번호는 : " + realPw + " 입니다";
+				result = realPw; // 기존 비밀번호 return
 			} else { // 틀리면 주민번호 틀렸다고 알려주기
-				result = "주민번호가 일치하지 않습니다";
+				result = "error";
 			}
 		} catch (Exception e) {
 			System.out.println("LoginAndSignUpService : 비밀번호 찾기에서 에러");
 			e.printStackTrace();
 		}
+		return result;
+	}
+	
+	// 새 비밀번호 등록 (비밀번호 찾기 page)
+	public String registerUserPw(UserDTO userDto) {
+		String result = null;
+		String inputUserId = userDto.getUserId(); // 등록 전에 살짝 바꾸는 걸 어떻게 방지하지??
+		String newUserPw = userDto.getUserPw();
+		
+		// pw 암호화한 후 회원정보 업데이트
+		UserDTO user = uRepo.findById(inputUserId).get();
+		String salt = user.getSalt(); // 기존 salt값 뽑아내기
+		String text = newUserPw+salt;
+		String encryptedPw = null;
+		try {
+			encryptedPw = aes256.encryptAES256(text);
+		} catch (Exception e) {
+			System.out.println("LoginAndSignUpService : 새 비밀번호 등록에서 에러");
+			e.printStackTrace();
+		}
+		user.setUserPw(encryptedPw);
+		uRepo.save(user);
+		result = "다시 로그인해주세요";
+		
 		return result;
 	}
 
@@ -298,4 +305,5 @@ public class LoginAndSignUpService {
 		}
 		return result;
 	}
+
 }
