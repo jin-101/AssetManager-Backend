@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shinhan.assetManager.apt.AptDtoForReact;
 import com.shinhan.assetManager.repository.AdministrativeDistrictRepo;
 import com.shinhan.assetManager.repository.AptTradeRepo;
+import com.shinhan.assetManager.service.AptService;
 
 //React_WebBoardRestController 참조하여 만듦
 @RestController 
@@ -29,17 +30,15 @@ public class AptController {
 	AdministrativeDistrictRepo dRepo;
 	@Autowired
 	AdministrativeDistrictGuRepo guRepo;
+	@Autowired
+	AptService service;
 	
-	// 아파트 자산 추가 버튼 클릭시 => 
-	@PostMapping(value = "/add", consumes = "application/json", produces = "text/plain;charset=utf-8")
-	public String addApt(@RequestBody AptDtoForReact apt) {
+	// 아파트 자산 추가
+	@PostMapping(value = "/add/{token}", consumes = "application/json", produces = "text/plain;charset=utf-8")
+	public String addApt(@RequestBody AptDtoForReact apt, @PathVariable String token) {
+		String result = service.addApt(apt, token);
 		System.out.println(apt);
-		System.out.println(apt.getPurchasePrice().replace(",", "")); 
 		
-		
-		String result = null;
-		// Insert에 성공하면 성공, 실패하면 실패를 React에 보내서 => 그에 따른 Alert 창을 보여주게끔 코드 짜야 함!!
-		result = "성공";
 		return result;
 	}
 	

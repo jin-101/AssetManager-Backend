@@ -1,11 +1,13 @@
 package com.shinhan.assetManager.apt;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@Builder
 @ToString
 @Setter
 @Getter
@@ -19,6 +21,7 @@ public class AptDtoForReact {
 	private String aptName;
 	private String netLeasableArea;
 	private String purchasePrice; // 매입가격
+	private String purchaseDate;
 	private String quantity; // 수량
 	
 	// 대출 field

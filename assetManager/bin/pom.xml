@@ -18,21 +18,46 @@
 		<java.version>8</java.version>
 	</properties>
 	<dependencies>
- 
+
+		<!-- JWT 토큰인증방식(1) - java.jwt (for 로그인, 로그아웃) -->
+		<!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+		<!-- <dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>4.2.1</version>
+		</dependency> -->
+
+		<!-- JWT 토큰인증방식(2) - jjwt (for 로그인, 로그아웃) -->
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+
+		<!-- @NotNull 등 유효성검사를 위한 lib (기본 내장된 nullable = false 보다 낫다고 하는데 아직 잘 
+			모르겠음) -->
+		<!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20201115</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 		<dependency>
-		    <groupId>org.seleniumhq.selenium</groupId>
-		    <artifactId>selenium-java</artifactId>
-		    <version>3.141.59</version>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.141.59</version>
 		</dependency>
-		
+
 		<!-- Querydsl ( Domain Specific Language )를 이용한 동적 SQL의 처리 -->
 		<dependency>
 			<groupId>com.querydsl</groupId>
@@ -82,17 +107,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies> 
+	</dependencies>
 
 	<build>
 		<plugins>
-		
+
 			<!-- Querydsl를 이용한 동적 SQL의 처리 -->
 			<plugin>
 				<groupId>com.mysema.maven</groupId>
@@ -110,7 +135,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
