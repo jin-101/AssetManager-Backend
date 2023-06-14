@@ -20,12 +20,12 @@ public class MokdonController {
 	// 목돈 계산하기
 	@PostMapping 
 	@RequestMapping(value = "/calculate", consumes = "application/json", produces = "application/json")
-	public Double calculate(@RequestBody MokdonDTO mokdonDto) {
+	public MokdonDTO calculate(@RequestBody MokdonDTO mokdonDto) {
 		System.out.println(mokdonDto);
-		principal = service.calculate(mokdonDto);
+		mokdonDto = service.calculate(mokdonDto);
 		System.out.println("calculate에서 계산한 원금 : " + principal);
 		 
-		return principal; 
+		return mokdonDto; 
 	}
 	
 	// 은행별 예적금 평균 금리 조회
