@@ -36,7 +36,7 @@ public class SavingsTest {
     //@Test 
 	void insertSavingsOption() throws IOException {
 		JSONArray optionList = makeJsonObject("optionList");
-		int list_cnt = optionList.length();
+		int list_cnt = optionList.length(); 
 		for (int i = 0; i < list_cnt; i++) {
 			JSONObject jsonObj = optionList.getJSONObject(i);
 			SavingsDTO savings = savingsRepo.findByFinPrdtCd(jsonObj.get("fin_prdt_cd").toString());
