@@ -12,15 +12,19 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.shinhan.assetManager.mapping.StockTableEntityMapping;
 import com.shinhan.assetManager.repository.StockRepo;
 import com.shinhan.assetManager.repository.UserAssetRepo;
 import com.shinhan.assetManager.repository.UserRepo;
+import com.shinhan.assetManager.service.StockService;
 import com.shinhan.assetManager.stock.StockInputDTO;
+import com.shinhan.assetManager.stock.StockTableEntity;
 import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
 
@@ -41,45 +45,47 @@ public class StockController {
 	@Autowired
 	private UserAssetRepo userAssetRepo;
 	
+	@Autowired
+	private StockService stockService;
+	
 
 	
 	@PostMapping("/stockAssetInput")
 	@ResponseBody
 	public String handleStockAssetsInputRequest(StockInputDTO stockInputDTO) {
-		String response = "등록완료";	
 		
-		try {
-			
-			System.out.println(stockInputDTO);
-			Optional<UserDTO> user = userRepo.findById(stockInputDTO.getUserId());
-		
-			StockTableEntityMapping  map =  stockRepo.findByCorpname(stockInputDTO.getStockName());
-			String stockCode = map.getStockcode();
-			String market = map.getMarket();
-			UserAssetDTO userAssetDto = new UserAssetDTO(user.get(), assetCode, stockCode, stockInputDTO.getPrice(), stockInputDTO.getBuyDay(), stockInputDTO.getShares());
-			
-			userAssetRepo.save(userAssetDto);
-		} catch (Exception e) {
-			response = "등록실패";
-		}
+		String response = stockService.registerStock(stockInputDTO);
 		
 		return response;
 	}
 	
-	@GetMapping("/stockPrice")
+	
+	@GetMapping("/stockCrud")
 	@ResponseBody
-	public List<UserAssetDTO> handleStockPriceRequest() {
-		List<UserAssetDTO> userStocks = userAssetRepo.getSpecificUserAssets(null, assetCode);
+	public Map<String,Long> handleStockPriceRequest(@RequestParam String id) {
+		
+		System.out.println(id);
+		
+		
+		Optional<UserDTO> user = userRepo.findById(id);
+		
+		List<UserAssetDTO> userStocksWithUser = userAssetRepo.getSpecificUserAssets(user.get(),assetCode);
+		
+//		for(int i=0; i<userStocks.size();i++) {
+//			System.out.println(userStocks.get(i));
+//		}
+		
 		
 		Map<String, Long> totalSharesByStockCode = new HashMap<>();
 		Map<String, Long> totalAmountByStockCode = new HashMap<>();
+		Map<String, Long> averageStockPriceByStockName = new HashMap<>();
 		
 		
-		for(UserAssetDTO asset:userStocks) {
+		for(UserAssetDTO asset:userStocksWithUser) {
 			String stockCode = asset.getDetailCode();
+			
 			Long shares =  Long.parseLong(asset.getQuantity());     
 			Long price = Long.parseLong(asset.getPurchasePrice());
-			Long avergePrice = 0L;
 			
 			if(totalSharesByStockCode.containsKey(stockCode)) {
 				Long prevShares = totalSharesByStockCode.get(stockCode);
@@ -95,10 +101,16 @@ public class StockController {
 			
 		}
 		
+		
 		for(String stockCode:totalSharesByStockCode.keySet()) {
-			System.out.println(totalAmountByStockCode.get(stockCode)/totalSharesByStockCode.get(stockCode));
-			System.out.println("----------------------------------");
+			
+			Optional<StockTableEntity> stockTable = stockRepo.findById(stockCode);
+			String stockName = stockTable.get().getCorpname();
+			
+			
+			long avergPrice = totalAmountByStockCode.get(stockCode)/totalSharesByStockCode.get(stockCode);
+			averageStockPriceByStockName.put(stockName, avergPrice);
 		}
-		return userStocks;
+		return averageStockPriceByStockName;
 	}
 }
