@@ -14,4 +14,5 @@ import lombok.ToString;
 public class AccountbookDTO {
 	private int year;
 	private int month;
+	private String memberId;
 }
