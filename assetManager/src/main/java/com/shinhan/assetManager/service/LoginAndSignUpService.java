@@ -1,8 +1,10 @@
 package com.shinhan.assetManager.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -37,26 +39,30 @@ public class LoginAndSignUpService {
 	}
 
 	// 로그인 
-	public String login(UserDTO userDto) {
+	public Map<String,String> login(UserDTO userDto) {
 		String inputId = userDto.getUserId();
 		String inputPw = userDto.getUserPw();
 		String result = null; // ★ 3가지 경우에 따라 Front에 출력되는 result를 다르게
 		Long leftTime = 30L; // 로그인 잠금 남은 시간
 		Long currentLoginDate = new Date().getTime() / 1000; // 현재 로그인 시점의 시간
-
+		Map<String,String> loginInfo = new HashMap<>();
+		loginInfo.put("userName", "");
 		// 1. 로그인 공백 체크
 		if (inputId.equals("")) {
 			result = "아이디를 입력해주세요";
-			return result;
+			loginInfo.put("result", result);
+			return loginInfo;
 		} else if (inputPw.equals("")) {
 			result = "비밀번호를 입력해주세요";
-			return result;
+			loginInfo.put("result", result);
+			return loginInfo;
 		}
 
 		// 2. 로그인 체크
 		UserDTO user = uRepo.findById(inputId).orElse(null); // return값 => null 또는 UserDTO 1개
 		if (user == null) { // (i) 아이디가 없는 경우
 			result = "아이디가 존재하지 않습니다";
+			loginInfo.put("result", result);
 		} else {
 			// 3. 로그인 잠금 체크 (by 로그인 횟수 제한 초과로 인한)
 			String accountLockStatus = user.getAccountLockStatus();
@@ -74,7 +80,8 @@ public class LoginAndSignUpService {
 				leftTime = 30 - (currentLoginDate - latestLoginDate);
 				if (leftTime >= 0) {
 					result = "아직 로그인을 할 수 없습니다. 남은시간 (" + leftTime + "초)";
-					return result;
+					loginInfo.put("result", result);
+					return loginInfo;
 				} else {
 					user.setAccountLockStatus("N"); // "N" : 30초 지나면 잠금해제
 					user.setLoginFailCount(0); // 0 : 로그인 실패횟수도 초기화
@@ -95,13 +102,14 @@ public class LoginAndSignUpService {
 					//JavaJwt jwt = new JavaJwt();
 					//String token = jwt.createToken(userId); 
 					result = "로그인성공";
-
+					loginInfo.put("result", result);
+					loginInfo.put("userName", user.getUserName());
 					//session.setAttribute(userId, user);
 
 				} else { // (iii) 비밀번호 틀린 경우
 					int loginFailCount = user.getLoginFailCount();
 					result = "비밀번호가 틀렸습니다." + " 남은횟수 (" + (5 - loginFailCount) + "회)";
-
+					loginInfo.put("result", result);
 					// 3. 로그인 잠금 체크 - 로그인 시도 횟수 제한
 					loginFailCount++;
 					System.out.println("현재 로그인 시도 횟수 : " + loginFailCount);
@@ -109,6 +117,7 @@ public class LoginAndSignUpService {
 					uRepo.save(user);
 					if (loginFailCount > 5) {
 						result = "비밀번호 5회 연속 실패로 인하여 30초 동안 잠금되었습니다";
+						loginInfo.put("result", result);
 						user.setAccountLockStatus("Y");
 						if (loginFailCount == 6) {
 							latestLoginDate = new Date().getTime() / 1000;
@@ -124,7 +133,7 @@ public class LoginAndSignUpService {
 				e.printStackTrace();
 			}
 		}
-		return result;
+		return loginInfo;
 	}
 
 	// 로그아웃
