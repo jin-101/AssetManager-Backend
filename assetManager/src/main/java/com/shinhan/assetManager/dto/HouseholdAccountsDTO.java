@@ -2,7 +2,9 @@ package com.shinhan.assetManager.dto;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,12 +34,12 @@ import lombok.ToString;
 public class HouseholdAccountsDTO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String detailCode;
+	private Integer detailCode;
 	private String memberId;
 	private String accountNumber;
 	private String bank;
-	private Date exchangeDate;
-	private Time exchangeTime;
+	private LocalDate exchangeDate;
+	private LocalTime exchangeTime;
 	private Integer withdraw;
 	private Integer deposit;
 	private String content;
