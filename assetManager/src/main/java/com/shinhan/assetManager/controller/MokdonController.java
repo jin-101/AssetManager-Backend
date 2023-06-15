@@ -1,6 +1,9 @@
 package com.shinhan.assetManager.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +32,13 @@ public class MokdonController {
 	}
 	
 	// 은행별 예적금 평균 금리 조회
+	@GetMapping
+	@RequestMapping(value = "/getAvgRate", produces = "application/json") // consumes = "application/json",
+	public Map<String, String> getAvgRate() {
+		Map<String, String> avgRate = service.getAvgRatePlz(); 
+		//Map<String, Object> bankAndAvgRate = service.getAvgRate();
+		
+		return avgRate; 
+	}
 
 }
