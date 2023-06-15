@@ -1,6 +1,5 @@
 package com.shinhan.assetManager.dto;
 
-import java.io.Serializable;
 import java.sql.Date;
 
 import lombok.Getter;
