@@ -32,7 +32,8 @@ public class DepositTest {
 	@Autowired
 	DepositOptionRepository depositOptionRepo;
 	
-	@Test
+	// 2nd
+	//@Test
 	void insertDepositOption() throws IOException {
 		JSONArray optionList = makeJsonObject("optionList");
 		int list_cnt = optionList.length();
@@ -53,6 +54,7 @@ public class DepositTest {
 		}
 	}
 	
+	// 1st
 	//@Test
 	void insertDeposit() throws IOException {
 		JSONArray productList = makeJsonObject("baseList");
