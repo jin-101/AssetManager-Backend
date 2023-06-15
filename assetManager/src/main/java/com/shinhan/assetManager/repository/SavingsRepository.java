@@ -14,5 +14,9 @@ import com.shinhan.assetManager.dto.SavingsDTO;
 public interface SavingsRepository 
 		extends CrudRepository<SavingsDTO, String>, 
 		QuerydslPredicateExecutor<SavingsDTO>{
+	//
+	public SavingsDTO findByFinPrdtCd(String finPrdtCd); 
 	
+	//
+	public List<DepositDTO> findByFinCo(FinancialCompanyDTO finCo);
 }
