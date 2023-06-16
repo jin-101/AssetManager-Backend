@@ -13,17 +13,15 @@ import com.shinhan.assetManager.dto.DepositOptionDTO;
 public interface DepositOptionRepository
 		extends CrudRepository<DepositOptionDTO, Integer> {
 	
-	// save_trm이 12개월인 놈만 골라서 => 예금 금리 뽑기
-	public List<DepositOptionDTO> findBySaveTrm(Integer saveTrm);
+	// ★ 6~12개월 사이의 평균 예금금리를 구하기 위한 메소드
+	public List<DepositOptionDTO> findByDepositAndSaveTrmBetween(DepositDTO deposit, Integer startTrm, Integer endTrm);
 	
-	// save_trm(12개월) + deposit_id 
+	// 12개월의 평균 예금금리를 구하기 위한 메소드
 	public DepositOptionDTO findBySaveTrmAndDeposit(Integer saveTrm, DepositDTO deposit);
 	
-	// deposit_id
-	//public List<DepositOptionDTO> findByDeposit(DepositDTO deposit);
-	
-	public DepositOptionDTO findByDepositAndDepositOptionId(DepositDTO deposit, Integer depositOptionId);
-
 	// 예금 평균금리 구하는 메소드 (땜빵용)
 	public List<DepositOptionDTO> findByDeposit(DepositDTO deposit);
+	
+	// save_trm이 12개월인 놈만 골라서 => 예금 금리 뽑기
+	//public List<DepositOptionDTO> findBySaveTrm(Integer saveTrm);
 }

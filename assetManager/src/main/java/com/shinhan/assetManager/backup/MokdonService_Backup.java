@@ -1,4 +1,4 @@
-package com.shinhan.assetManager.service;
+package com.shinhan.assetManager.backup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import com.shinhan.assetManager.repository.SavingsOptionRepository;
 import com.shinhan.assetManager.repository.SavingsRepository;
 
 @Service
-public class MokdonService {
+public class MokdonService_Backup {
 
 	@Autowired
 	FinancialCompanyRepository fiCoRepo;
@@ -36,7 +36,7 @@ public class MokdonService {
 	@Autowired
 	SavingsOptionRepository savingsOptionRepo;
 	@Autowired
-	MokdonService service;
+	MokdonService_Backup service;
 	Double principal = null; // 목표금액을 모으는 데 필요한 원금
 	// Double interest = null; // 목표금액을 모으는 데 필요한 이자
 	String targetAmount = "";
@@ -49,7 +49,7 @@ public class MokdonService {
 	Double r1 = null; // 기간 적용한 금리
 	Double d = 0.0;
 
-	// A. 목돈 계산하기
+	// 목돈 계산하기
 	public MokdonDTO calculate(MokdonDTO mokdonDto) {
 		mokdonDto.setRateType("단리"); // 테스트용
 		type = mokdonDto.getType();
@@ -72,7 +72,7 @@ public class MokdonService {
 		return mokdonDto; 
 	}
 	
-	// A-1. 은행별 예적금 평균 금리 조회 (★변경사항 : 평균낼 때 저축금리(intrRate)말고 최고우대금리(intrRate2)로 변경하였음. 일반)
+	// 은행별 예적금 평균 금리 조회
 	// => Map보다 DTO 클래스를 사용해야 하는 이유 (참조: https://mangkyu.tistory.com/164)
 	// => 필요한 데이터를 저장하기 위해 Map<String, Object>보다 => DTO를 이용하는 게 좋은 이유 
 	public Map<String, AvgRateDTO> getAvgRate() {
@@ -91,28 +91,24 @@ public class MokdonService {
 			// 3-1. ★ 예금 List로부터 => 연이율(12개월)만 뽑아
 			Double totalRateOfDeposit = 0.0;
 			Double avgRateOfDeposit = 0.0;
-			int count1 = 0; 
 			for(int i=0; i<depositList.size(); i++) {
+				int num = depositList.size();
 				DepositDTO deposit = depositList.get(i);
-				List<DepositOptionDTO> doList = depositOptionRepo.findByDepositAndSaveTrmBetween(deposit, 6, 12);
-				for(int j=0; j<doList.size(); j++) {
-					DepositOptionDTO depositOption = doList.get(j); 
-					if(depositOption != null) {
-						// 일단은.. 단복리 구분없이 금리만 얻자 (구분해서 평균내기엔 데이터 양도 좀 모자라고)
-						Double intrRate = depositOption.getIntrRate2();
-						totalRateOfDeposit += intrRate;
-						count1++; // 마찬가지로 합산할 때만 count 세기
-					}
+				DepositOptionDTO depositOption = depositOptionRepo.findBySaveTrmAndDeposit(12, deposit);
+				if(depositOption != null) {
+					// 일단은.. 단복리 구분없이 금리만 얻자 (구분해서 평균내기엔 데이터 양도 좀 모자라고)
+					Double intrRate = depositOption.getIntrRate();
+					totalRateOfDeposit += intrRate;
+					avgRateOfDeposit = totalRateOfDeposit / num;
 				}
 			}
-			avgRateOfDeposit = totalRateOfDeposit / count1;
 			String depositAvgRate = String.format("%.2f", avgRateOfDeposit);
 			// 3-1. 예금 계산 끝
 			
 			// 3-2. ★ 적금
 			Double totalRateOfSavings = 0.0;
 			Double avgRateOfSavings = 0.0;
-			int count2 = 0; 
+			int count = 0; 
 			for(int i=0; i<savingsList.size(); i++) {
 				SavingsDTO savings = savingsList.get(i);  
 				List<SavingsOptionDTO> soList1 = savingsOptionRepo.findBySavingsAndRsrvTypeNmAndSaveTrmBetween(savings, "자유적립식",6, 12);
@@ -121,9 +117,9 @@ public class MokdonService {
 					if(soList1.size() != 0) {
 						SavingsOptionDTO so1 = soList1.get(j);
 						if(so1 != null) {
-							Double intrRate1 = so1.getIntrRate2();
+							Double intrRate1 = so1.getIntrRate();
 							totalRateOfSavings += intrRate1;
-							count2++; // 평균금리 구해서 토탈에 합할 때만 count
+							count++; // 평균금리 구해서 토탈에 합할 때만 count
 						}
 					}
 				}
@@ -131,10 +127,10 @@ public class MokdonService {
 					if(soList2.size() != 0) {
 						SavingsOptionDTO so2 = soList2.get(k); // ★ 에러발생 : IndexOutOfBoundsException: Index 0 out of bounds for length 0 (k가 없는데 get(k)하라고 하니까 에러)
 						if(so2 != null) {                                          
-							Double intrRate2 = so2.getIntrRate2();
+							Double intrRate2 = so2.getIntrRate();
 							if(intrRate2 != null) {
 								totalRateOfSavings += intrRate2;
-								count2++;
+								count++;
 							}
 						}
 					}
@@ -142,8 +138,8 @@ public class MokdonService {
 				//System.out.println("count : " + count);
 				//avgRateOfSavings = totalRateOfSavings / count;
 			}
-			System.out.println("count : " + count2);
-			avgRateOfSavings = totalRateOfSavings / count2;
+			System.out.println("count : " + count);
+			avgRateOfSavings = totalRateOfSavings / count;
 			String savingsAvgRate = String.format("%.2f", avgRateOfSavings);
 			// 3-2. 적금 계산 끝
 			
@@ -151,7 +147,6 @@ public class MokdonService {
 			if(finCo.getKorCoNm().contains("주식회사")) {
 				korCoNm = finCo.getKorCoNm().replace("주식회사", "").trim(); // (1) 주식회사 단어 없애고, (2) 공백 없애기
 			}
-			System.out.println(korCoNm+"의 평균 예금금리 : "+depositAvgRate);
 			System.out.println(korCoNm+"의 평균 적금금리 : "+savingsAvgRate);
 			
 			// 4. ★★★ 데이터 담기 - {은행명, 평균금리}
