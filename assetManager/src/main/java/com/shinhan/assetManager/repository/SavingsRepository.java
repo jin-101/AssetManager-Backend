@@ -18,5 +18,5 @@ public interface SavingsRepository
 	public SavingsDTO findByFinPrdtCd(String finPrdtCd); 
 	
 	//
-	public List<DepositDTO> findByFinCo(FinancialCompanyDTO finCo);
+	public List<SavingsDTO> findByFinCo(FinancialCompanyDTO finCo);
 }
