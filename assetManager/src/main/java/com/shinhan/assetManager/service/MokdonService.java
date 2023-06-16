@@ -50,22 +50,15 @@ public class MokdonService {
 	Double d = 0.0;
 
 	// A. 목돈 계산하기
-	public MokdonDTO calculate(MokdonDTO mokdonDto) {
-		mokdonDto.setRateType("단리"); // 테스트용
+	public MokdonDTO mokdonCalculate(MokdonDTO mokdonDto) {
 		type = mokdonDto.getType();
 		rateType = mokdonDto.getRateType();
+		
+		// 일단 목돈계산은 단리만 적용
 		if (type.equals("적금")) {
-			if (rateType.equals("단리")) {
-				mokdonDto = service.simpleInterestSavings(mokdonDto); // 단리
-			} else if (rateType.equals("복리")) {
-				mokdonDto = service.compoundInterestSavings(mokdonDto); // 복리
-			}
+			mokdonDto = service.simpleInterestSavings(mokdonDto); // 단리
 		} else if (type.equals("예금")) {
-			if (rateType.equals("단리")) {
-				mokdonDto = service.simpleInterestDeposit(mokdonDto); // 단리
-			} else if (rateType.equals("복리")) {
-				mokdonDto = service.compoundInterestDeposit(mokdonDto); // 복리
-			}
+			mokdonDto = service.simpleInterestDeposit(mokdonDto); // 단리
 		}
 
 		// ★ 15.4%, 9.5?% 세금 떼는 경우는 어떻게 해서 할까??
@@ -171,14 +164,13 @@ public class MokdonService {
 	
 	// 자유롭게 선택시
 
-	// (1) 예금 - 단리
+	// (A) 예금 - 단리
 	public MokdonDTO simpleInterestDeposit(MokdonDTO mokdonDto) {
 		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
 		avgRate = mokdonDto.getAvgRate();
-		avgRate = "10.0"; // ★ 평균금리를 얻었으면 => 계산할땐 100을 나눈 값으로 계산할 것
 		Double rate = Double.parseDouble(avgRate);
 		Double period = Double.parseDouble(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
@@ -187,20 +179,19 @@ public class MokdonService {
 		r0 = rate / 100; // %이므로 100으로 나누기
 		r1 = (period / 12) * r0; // 연이율 환산
 		principal = amount / (1 + r1); // ★예금계산
-		String roundedPrincipal = getRoundedNum(principal);
+		String roundedPrincipal = getRoundedNum(principal, 1);
 		mokdonDto.setRoundedPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
 
-	// (2) 적금 - 단리
+	// (A) 적금 - 단리
 	public MokdonDTO simpleInterestSavings(MokdonDTO mokdonDto) {
 		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
 		avgRate = mokdonDto.getAvgRate();
-		avgRate = "10.0"; // ★ 평균금리를 얻었으면 => 계산할땐 100을 나눈 값으로 계산할 것
 		Double rate = Double.parseDouble(avgRate);
 		Integer period = Integer.parseInt(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
@@ -219,20 +210,19 @@ public class MokdonService {
 			totalRate += eachRate;
 		}
 		principal = (amount / (totalRate + period));
-		String roundedPrincipal = getRoundedNum(principal);
+		String roundedPrincipal = getRoundedNum(principal, 1);
 		mokdonDto.setRoundedPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
 
-	// (3) 예금 - 복리 (월복리)
+	// (A) 예금 - 복리 (월복리)
 	public MokdonDTO compoundInterestDeposit(MokdonDTO mokdonDto) {
 		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
 		avgRate = mokdonDto.getAvgRate();
-		avgRate = "10.0"; // ★ 평균금리를 얻었으면 => 계산할땐 100을 나눈 값으로 계산할 것
 		Double rate = Double.parseDouble(avgRate);
 		Double period = Double.parseDouble(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
@@ -242,20 +232,19 @@ public class MokdonService {
 		r1 = (r0 / 12); // 월이율
 		Double denominator = Math.pow((1 + r1), period); // 분모
 		principal = amount / denominator; // 필요원금 = 분자 / 분모
-		String roundedPrincipal = getRoundedNum(principal);
+		String roundedPrincipal = getRoundedNum(principal, 1);
 		mokdonDto.setRoundedPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
 
-	// (4) 적금 - 복리 (월복리)
+	// (A) 적금 - 복리 (월복리)
 	public MokdonDTO compoundInterestSavings(MokdonDTO mokdonDto) {
 		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
 		targetPeriod = mokdonDto.getTargetPeriod();
 		type = mokdonDto.getType();
 		bank = mokdonDto.getBank();
 		avgRate = mokdonDto.getAvgRate();
-		avgRate = "10.0"; // ★ 평균금리를 얻었으면 => 계산할땐 100을 나눈 값으로 계산할 것
 		Double rate = Double.parseDouble(avgRate);
 		Integer period = Integer.parseInt(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
@@ -274,62 +263,125 @@ public class MokdonService {
 		}
 		// principal = (amount / (totalRate + period));
 		principal = (amount / totalDenominator); // 단리 계산 때처럼 괄호 안의 기간 분리가 안되므로......
-		String roundedPrincipal = getRoundedNum(principal);
+		String roundedPrincipal = getRoundedNum(principal, 1);
 		mokdonDto.setRoundedPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
 
-	// 공통 - 소수점 첫째자리까지 반올림
-	public String getRoundedNum(Double principal) {
-		String roundedPrincipal = String.format("%.1f", principal);
+	// (A,B) 공통 메소드 - 소수점 첫째자리까지 반올림
+	public String getRoundedNum(Double principal, int decimalPlace) {
+		String roundedPrincipal = String.format("%."+decimalPlace+"f", principal);
 		System.out.println(roundedPrincipal);
 
 		return roundedPrincipal;
 	}
 	
-	// 은행별 예적금 평균 금리 조회 (땜빵용 ㅠㅠ)
-	public Map<String, String> getAvgRatePlz() {
-		Map<String, String> avgRateMap = new HashMap<>();
+	// B. 이자 계산하기
+	public MokdonDTO interestCalculate(MokdonDTO mokdonDto) {
+		type = mokdonDto.getType();
+		rateType = mokdonDto.getRateType();
 		
-		// (1) 예금 평균금리 구한 뒤 Map에 
-		Double totalIntr1 = 0.0;
-		Double avgIntr1 = 0.0;
-		int count1 = 0;
-		
-		Iterator<DepositOptionDTO> dIterator =	depositOptionRepo.findAll().iterator();
-		while(dIterator.hasNext()) {
-			DepositOptionDTO depositOption = dIterator.next();
-			Double intrRate = depositOption.getIntrRate();
-			if(intrRate != null) {
-				totalIntr1 += intrRate;
-				count1++;
+		// 일단 목돈계산은 단리만 적용
+		if (type.equals("적금")) {
+			if(rateType.equals("단리")) {
+				mokdonDto = service.calcIntrCiSavings(mokdonDto); // 예금 단리
+			}else {
+				mokdonDto = service.calcIntrSiSavings(mokdonDto); // 예금 복리
+			}
+		} else if (type.equals("예금")) {
+			if(rateType.equals("단리")) {
+				mokdonDto = service.calcIntrCiDeposit(mokdonDto); // 적금 단리
+			}else {
+				mokdonDto = service.calcIntrSiDeposit(mokdonDto); // 적금 복리
 			}
 		}
-		avgIntr1 = totalIntr1 / count1;
-		String depositAvgIntr = String.format("%.2f", avgIntr1);
-		avgRateMap.put("deposit", depositAvgIntr);
+
+		return mokdonDto; 
+	}
+	
+	// (B) 예금 - 단리
+	public MokdonDTO calcIntrCiDeposit(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
+		targetPeriod = mokdonDto.getTargetPeriod();
+		avgRate = mokdonDto.getAvgRate();
+		type = mokdonDto.getType(); // 예금, 적금
+		rateType = mokdonDto.getRateType(); // 단리, 복리
+		Double arPercent = Double.parseDouble(avgRate);
+		Double period = Double.parseDouble(targetPeriod);
+		Double amount = Double.parseDouble(targetAmount);
 		
+		Double ar = arPercent / 100;
+		 
+		// 이자 계산식
+		Double interest = amount * ar * (period/12);
+		String netIntr0_0 = taxation(interest, 0.0);
+		String netIntr15_4 = taxation(interest, 15.4);
+		String netIntr9_5 = taxation(interest, 9.5);
+		String netIntr1_4 = taxation(interest, 1.4);
 		
-		// (2) 적금 평균금리 구한 뒤 Map에 
-		Double totalIntr2 = 0.0;
-		Double avgIntr2 = 0.0;
-		int count2 = 0;
+		mokdonDto.setNetIntr0_0(netIntr0_0);
+		mokdonDto.setNetIntr15_4(netIntr15_4);
+		mokdonDto.setNetIntr9_5(netIntr9_5);
+		mokdonDto.setNetIntr1_4(netIntr1_4);
 		
-		Iterator<SavingsOptionDTO> sIterator =	savingsOptionRepo.findAll().iterator();
-		while(sIterator.hasNext()) {
-			SavingsOptionDTO savingsOption = sIterator.next();
-			Double intrRate = savingsOption.getIntrRate();
-			if(intrRate != null) {
-				totalIntr2 += intrRate;
-				count2++;
-			}
-		}
-		avgIntr2 = totalIntr2 / count2;
-		String savingsAvgIntr = String.format("%.2f", avgIntr2);
-		avgRateMap.put("savings", savingsAvgIntr);
+		return mokdonDto;
+	}
+	
+	// (B) 예금 - 복리
+	public MokdonDTO calcIntrSiDeposit(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
+		targetPeriod = mokdonDto.getTargetPeriod();
+		avgRate = mokdonDto.getAvgRate();
+		type = mokdonDto.getType(); // 예금, 적금
+		rateType = mokdonDto.getRateType(); // 단리, 복리
+		Double arPercent = Double.parseDouble(avgRate);
+		Double period = Double.parseDouble(targetPeriod);
+		Double amount = Double.parseDouble(targetAmount);
 		
-		return avgRateMap;
+		Double ar = arPercent / 100;
+		
+		return mokdonDto;
+	}
+	
+	// (B) 적금 - 단리
+	public MokdonDTO calcIntrCiSavings(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
+		targetPeriod = mokdonDto.getTargetPeriod();
+		avgRate = mokdonDto.getAvgRate();
+		type = mokdonDto.getType(); // 예금, 적금
+		rateType = mokdonDto.getRateType(); // 단리, 복리
+		Double arPercent = Double.parseDouble(avgRate);
+		Double period = Double.parseDouble(targetPeriod);
+		Double amount = Double.parseDouble(targetAmount);
+		
+		Double ar = arPercent / 100;
+	
+	return mokdonDto;
+	}
+	
+	// (B) 적금 - 복리
+	public MokdonDTO calcIntrSiSavings(MokdonDTO mokdonDto) {
+		targetAmount = mokdonDto.getTargetAmount().replace(",", "");
+		targetPeriod = mokdonDto.getTargetPeriod();
+		avgRate = mokdonDto.getAvgRate();
+		type = mokdonDto.getType(); // 예금, 적금
+		rateType = mokdonDto.getRateType(); // 단리, 복리
+		Double arPercent = Double.parseDouble(avgRate);
+		Double period = Double.parseDouble(targetPeriod);
+		Double amount = Double.parseDouble(targetAmount);
+		
+		Double ar = arPercent / 100;
+	
+	return mokdonDto;
+	}
+	
+	// (B) 공통 메소드 - 세후 이자 계산
+	public String taxation(Double interest, Double taxRate) {
+		Double afterTaxInterest = interest * (1-(taxRate / 100)) * 100; // 만원 => 원
+		//String netInterest = String.format("%.2f", afterTaxInterest);
+		String netInterest = getRoundedNum(afterTaxInterest, 2);
+		return netInterest;
 	}
 
 }
