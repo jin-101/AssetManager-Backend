@@ -1,9 +1,9 @@
 package com.shinhan.assetManager.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +35,11 @@ public class LoginAndSignUpController {
 
 	// 로그인
 	@PostMapping
-	@RequestMapping(value = "/login", consumes = "application/json", produces = "text/plain;charset=UTF-8")
-	public String login(@RequestBody UserDTO userDto) {
-		String result = service.login(userDto);
-
+	@RequestMapping(value = "/login", consumes = "application/json")
+	public Map<String,String> login(@RequestBody UserDTO userDto) {
+		Map<String,String> result = service.login(userDto);
+//		loginInfo.put("recentlyDate", ""); //추후 칼럼추가
+		
 		return result;
 	}
 

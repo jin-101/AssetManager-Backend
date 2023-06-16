@@ -41,7 +41,9 @@ public class UserDTO {
 	private String ssn; // 주민번호 (Social Security Number)
 	private String userEmail; 
 	private String phoneNumber;  
-	private String userAddress;    
+	private String zipCode; 
+	private String userAddress;  
+	private String userDetailAddress;    
 	private String salt; // 암호화를 위한 salt
 	
 	// 로그인 시도 횟수 제한 관련 field 
