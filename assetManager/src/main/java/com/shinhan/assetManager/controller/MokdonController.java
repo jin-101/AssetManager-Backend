@@ -23,23 +23,24 @@ public class MokdonController {
 	
 	// 목돈 계산하기
 	@PostMapping 
-	@RequestMapping(value = "/calculate", consumes = "application/json", produces = "application/json")
-	public MokdonDTO calculate(@RequestBody MokdonDTO mokdonDto) {
+	@RequestMapping(value = "/mokdonCalculate", consumes = "application/json", produces = "application/json")
+	public MokdonDTO mokdonCalculate(@RequestBody MokdonDTO mokdonDto) {
+		mokdonDto = service.mokdonCalculate(mokdonDto);
 		System.out.println(mokdonDto);
-		mokdonDto = service.calculate(mokdonDto);
 		System.out.println("calculate에서 계산한 원금 : " + principal);
 		
 		return mokdonDto; 
 	}
 	
-	// 은행별 예적금 평균 금리 조회 (땜빵용)
-	@GetMapping
-	@RequestMapping(value = "/getAvgRatePlz", produces = "application/json") // consumes = "application/json",
-	public Map<String, String> getAvgRatePlz() {
-		Map<String, String> avgRate = service.getAvgRatePlz(); 
-		//Map<String, Object> bankAndAvgRate = service.getAvgRate();
+	// 이자 계산하기
+	@PostMapping 
+	@RequestMapping(value = "/interestCalculate", consumes = "application/json", produces = "application/json")
+	public MokdonDTO interestCalculate(@RequestBody MokdonDTO mokdonDto) {
+		mokdonDto = service.interestCalculate(mokdonDto);
+		System.out.println(mokdonDto);
+		System.out.println("calculate에서 계산한 이자 : " + mokdonDto.getNetIntr0_0());
 		
-		return avgRate; 
+		return mokdonDto; 
 	}
 	
 	// 은행별 예적금 평균 금리 조회 (원래 구현하려던 거)
