@@ -1,17 +1,19 @@
 package com.shinhan.assetManager.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.RestController;
 
 import com.shinhan.assetManager.service.DepositService;
 import com.shinhan.assetManager.deposit.DepositDtoForReact;
 
-@Controller
+@RestController
 @RequestMapping("/deposit")
 public class DepositController {
 	
@@ -26,4 +28,11 @@ public class DepositController {
 		return result;
 	}
 		
+	//은행 리스트 받아오기
+	@GetMapping(value = "/bankList.do")
+	@ResponseBody
+	public List<String> getBankList(){
+		List<String> list = service.getBankList();
+		return list;
+	}
 }
