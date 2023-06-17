@@ -23,11 +23,10 @@ public class CarController {
 		//차량번호로 조회 클릭시 => 
 		@PostMapping(value = "/mySearch.do/{carNo}")
 		@ResponseBody
-		public Map<String,String> searchMyCarAndInsert(@PathVariable String carNo) {
-			Map<String,String> obj = service.searchMyCarAndInsert(carNo);
-			System.out.println(obj); //obj를 넘겨서 front에서 정상 저장되었는지 판단한다.
-		
-			return obj;
+		public String searchMyCarAndInsert(@PathVariable String carNo) {
+			String str = service.searchMyCarAndInsert(carNo);
+			System.out.println(str); //저장관련 멘트 전달
+			return str;
 		}
 		
 		//직접입력으로 클릭시 => 
@@ -39,10 +38,8 @@ public class CarController {
 				@PathVariable("carYear") String carYear) {
 			System.out.println(carCompany +  " " +carModel+  " " +carYear);
 			String result = service.carInsert(carCompany, carModel, carYear);
-			System.out.println(result);
+			System.out.println(result); //저장관련 멘트 전달
 			
-			//데이터가 올바르게 넘어왔으면 저장은 여기서... => className으로 제조사 조회한다.
-		
 			return result;
 		}
 		
