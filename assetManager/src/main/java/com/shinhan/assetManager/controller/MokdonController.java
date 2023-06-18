@@ -27,7 +27,6 @@ public class MokdonController {
 	public MokdonDTO mokdonCalculate(@RequestBody MokdonDTO mokdonDto) {
 		mokdonDto = service.mokdonCalculate(mokdonDto);
 		System.out.println(mokdonDto);
-		System.out.println("calculate에서 계산한 원금 : " + principal);
 		
 		return mokdonDto; 
 	}
