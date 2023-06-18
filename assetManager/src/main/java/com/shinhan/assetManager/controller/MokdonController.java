@@ -38,7 +38,6 @@ public class MokdonController {
 	public MokdonDTO interestCalculate(@RequestBody MokdonDTO mokdonDto) {
 		mokdonDto = service.interestCalculate(mokdonDto);
 		System.out.println(mokdonDto);
-		System.out.println("calculate에서 계산한 이자 : " + mokdonDto.getNetIntr0_0());
 		
 		return mokdonDto; 
 	}
