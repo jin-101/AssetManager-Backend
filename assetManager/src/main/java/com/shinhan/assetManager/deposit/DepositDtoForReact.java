@@ -13,6 +13,8 @@ import lombok.ToString;
 @AllArgsConstructor
 public class DepositDtoForReact {
 	private String depositType;
+	private String bank;
+	private String productName;
 	private String startDate;
 	private String endDate;
 	private String price;
