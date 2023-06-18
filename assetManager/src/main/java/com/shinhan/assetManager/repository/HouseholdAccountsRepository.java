@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.shinhan.assetManager.dto.HouseholdAccountsDTO;
 
-public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAccountsDTO, String>{
+public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAccountsDTO, Integer>{
 	
 	//public List<HouseholdAccountsDTO> findAllByOrderByExchangeDateDesc();
 	

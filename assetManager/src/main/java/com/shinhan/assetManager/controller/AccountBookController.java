@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +53,12 @@ public class AccountBookController {
 	public void listsave(@RequestBody List<HouseholdAccountsDTO> itemlist) {
 		System.out.println("item 리스트!!!!!!" + itemlist);
 		accountRepo.saveAll(itemlist);
+	}
+	
+	@DeleteMapping(value = "/deletelist.do/{detailCode}", produces = "text/plain;charset=utf-8") //한건 삭제하기
+	public void listsave(@PathVariable Integer detailCode) {
+		System.out.println("디테일 코드 넘어 오는지!!!!!!" + detailCode);
+		accountRepo.deleteById(detailCode);
 	}
 	
 	@PostMapping("/filesave.do")
