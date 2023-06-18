@@ -37,8 +37,10 @@ public class MokdonService {
 	SavingsOptionRepository savingsOptionRepo;
 	@Autowired
 	MokdonService service;
-	Double principal = null; // 목표금액을 모으는 데 필요한 원금
-	// Double interest = null; // 목표금액을 모으는 데 필요한 이자
+	Double requiredPrincipal = null; // 목표금액을 모으는 데 필요한 원금
+	String income = "";
+	Integer incomes = null; // 
+	Double lackingAmount = 0.0;
 	String targetAmount = "";
 	String targetPeriod = "";
 	String avgRate = "";
@@ -55,13 +57,12 @@ public class MokdonService {
 		rateType = mokdonDto.getRateType();
 		
 		// 일단 목돈계산은 단리만 적용
-		if (type.equals("적금")) {
-			mokdonDto = service.simpleInterestSavings(mokdonDto); // 단리
-		} else if (type.equals("예금")) {
+		if (type.equals("예금")) {
 			mokdonDto = service.simpleInterestDeposit(mokdonDto); // 단리
-		}
-
-		// ★ 15.4%, 9.5?% 세금 떼는 경우는 어떻게 해서 할까??
+		} else if (type.equals("적금")) {
+			mokdonDto = service.simpleInterestSavings(mokdonDto); // 단리
+		} 
+		
 		return mokdonDto; 
 	}
 	
@@ -166,8 +167,6 @@ public class MokdonService {
 		
 		return avgRateMap;
 	}
-	
-	// 자유롭게 선택시
 
 	// (A) 예금 - 단리
 	public MokdonDTO simpleInterestDeposit(MokdonDTO mokdonDto) {
@@ -180,13 +179,39 @@ public class MokdonService {
 		Double period = Double.parseDouble(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
 
-		// 계산식
+		// 목돈 계산식
+		// (1) 필요원금 계산
 		r0 = rate / 100; // %이므로 100으로 나누기
 		r1 = (period / 12) * r0; // 연이율 환산
-		principal = amount / (1 + r1); // ★예금계산
-		String roundedPrincipal = getRoundedNum(principal, 1);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
-
+		requiredPrincipal = amount / (1 + r1); // ★ 필요원금 계산
+		String roundedPrincipal = getRoundedNum(requiredPrincipal); 
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
+		
+		// (2) 총 원리금 및 부족액 계산
+		income = mokdonDto.getIncome();
+		if(!income.equals("")) {
+			incomes = Integer.parseInt(income);
+			Double principalAndInterest = incomes * (1 + r1);
+			String pai = getRoundedNum(principalAndInterest);
+			mokdonDto.setTotalPai(pai);
+			if(principalAndInterest >= amount) { // 저축 원리금 >= 목표금액의 경우
+				mokdonDto.setLackingAmount("");
+				mokdonDto.setRequiredPrincipal("");
+			}else { // 저축 원리금 < 목표금액의 경우
+				lackingAmount = amount - principalAndInterest;
+				String la = getRoundedNum(lackingAmount);
+				
+				requiredPrincipal = lackingAmount / (1 + r1); // ★ 필요원금 계산
+				roundedPrincipal = getRoundedNum(requiredPrincipal); 
+				
+				mokdonDto.setRequiredPrincipal(roundedPrincipal);
+				mokdonDto.setLackingAmount(la);
+			}
+		}else {
+			mokdonDto.setTotalPai("");
+			mokdonDto.setLackingAmount("");
+		}
+		
 		return mokdonDto;
 	}
 
@@ -201,12 +226,9 @@ public class MokdonService {
 		Integer period = Integer.parseInt(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
 
-		// 계산식
+		// 목돈 계산식
+		// (1) 필요원금 계산
 		r0 = rate / 100; // %이므로 100으로 나누기
-		// r1 = (period/12)*r0; // 연이율 환산
-		// principal = amount/(1+r1);
-
-		// 총 이자율 계산
 		Double totalRate = 0.0;
 		Double eachRate = 0.0;
 		for (int i = period; i > 0; i--) { // 12개월이면 12~1개월까지
@@ -214,9 +236,37 @@ public class MokdonService {
 			eachRate = ((j / 12) * r0);
 			totalRate += eachRate;
 		}
-		principal = (amount / (totalRate + period));
-		String roundedPrincipal = getRoundedNum(principal, 1);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		requiredPrincipal = (amount / (totalRate + period));
+		String roundedPrincipal = getRoundedNum(requiredPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
+		
+		// (2) 총 원리금 및 부족액 계산
+		income = mokdonDto.getIncome(); 
+		if(!income.equals("")) {
+			incomes = Integer.parseInt(income);
+			Double period2 = (double) period;
+			Double interest = incomes * period2 * r0 * ((period2+1)/24); // 이자 계산
+			Double principal = (double) (incomes * period);
+			Double principalAndInterest = principal + interest;
+			String pai = getRoundedNum(principalAndInterest);
+			mokdonDto.setTotalPai(pai);
+			if(principalAndInterest >= amount) { // 저축 원리금 >= 목표금액의 경우
+				mokdonDto.setLackingAmount("");
+				mokdonDto.setRequiredPrincipal("");
+			}else {
+				lackingAmount = amount - principalAndInterest;
+				String la = getRoundedNum(lackingAmount);
+				
+				requiredPrincipal = (lackingAmount / (totalRate + period)); // ★ 필요원금 계산
+				roundedPrincipal = getRoundedNum(requiredPrincipal);
+				
+				mokdonDto.setRequiredPrincipal(roundedPrincipal);
+				mokdonDto.setLackingAmount(la);
+			}
+		}else {
+			mokdonDto.setTotalPai("");
+			mokdonDto.setLackingAmount("");
+		}
 
 		return mokdonDto;
 	}
@@ -232,13 +282,13 @@ public class MokdonService {
 		Double period = Double.parseDouble(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
 
-		// 계산식
+		// 목돈 계산식
 		r0 = rate / 100; // 연이율
 		r1 = (r0 / 12); // 월이율
 		Double denominator = Math.pow((1 + r1), period); // 분모
-		principal = amount / denominator; // 필요원금 = 분자 / 분모
-		String roundedPrincipal = getRoundedNum(principal, 1);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		requiredPrincipal = amount / denominator; // 필요원금 = 분자 / 분모
+		String roundedPrincipal = getRoundedNum(requiredPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
@@ -254,7 +304,7 @@ public class MokdonService {
 		Integer period = Integer.parseInt(targetPeriod); // 목표기간
 		Double amount = Double.parseDouble(targetAmount); // 목표금액
 
-		// 계산식
+		// 목돈 계산식
 		r0 = rate / 100;
 		System.out.println("r0(연이율) : " + r0);
 		r1 = r0 / 12;
@@ -267,17 +317,16 @@ public class MokdonService {
 			totalDenominator += denominator;
 		}
 		// principal = (amount / (totalRate + period));
-		principal = (amount / totalDenominator); // 단리 계산 때처럼 괄호 안의 기간 분리가 안되므로......
-		String roundedPrincipal = getRoundedNum(principal, 1);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		requiredPrincipal = (amount / totalDenominator); // 단리 계산 때처럼 괄호 안의 기간 분리가 안되므로......
+		String roundedPrincipal = getRoundedNum(requiredPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
 
-	// (A,B) 공통 메소드 - 소수점 첫째자리까지 반올림
-	public String getRoundedNum(Double principal, int decimalPlace) {
-		String roundedPrincipal = String.format("%."+decimalPlace+"f", principal);
-		System.out.println(roundedPrincipal);
+	// (A,B) 공통 메소드 - 소수점 ??째자리까지 반올림
+	public String getRoundedNum(Double principal) {
+		String roundedPrincipal = String.format("%.2f", principal*100); // *100 : 만원 => 원 (소수점 둘째자리로 하고 String으로 바꿔버리니까 자연스레 100이 곱해진 것처럼 돼버려서..)
 
 		return roundedPrincipal;
 	}
@@ -434,9 +483,8 @@ public class MokdonService {
 	
 	// (B) 공통 메소드 - 세후 이자 계산
 	public String taxation(Double interest, Double taxRate) {
-		Double afterTaxInterest = interest * (1-(taxRate / 100)) * 100; // 만원 => 원
-		//String netInterest = String.format("%.2f", afterTaxInterest);
-		String netInterest = getRoundedNum(afterTaxInterest, 2);
+		Double afterTaxInterest = interest * (1-(taxRate / 100));
+		String netInterest = getRoundedNum(afterTaxInterest);
 		return netInterest;
 	}
 
