@@ -22,7 +22,10 @@ public class MokdonDTO {
 	private String rateType; // 단리, 복리 타입
 	
 	// 목돈 계산기
-	private String roundedPrincipal; // 목표금액을 모으는 데 필요한 원금
+	private String requiredPrincipal; // 목표금액을 모으는 데 필요한 원금
+	private String income; // 매달 저축금액
+	private String totalPai; // 총 원리금
+	private String lackingAmount; // 부족한 금액
 	
 	// 이자 계산기
 	private String netIntr0_0; // 비과세
