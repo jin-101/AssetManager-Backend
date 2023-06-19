@@ -1,8 +1,7 @@
 package com.shinhan.assetManager;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,9 @@ import com.shinhan.assetManager.apt.AdministrativeDistrictDTO;
 import com.shinhan.assetManager.apt.ApiAptTrade;
 import com.shinhan.assetManager.apt.AptDTO;
 import com.shinhan.assetManager.apt.AptParamList;
+import com.shinhan.assetManager.apt.AptRecentTradeDTO;
 import com.shinhan.assetManager.repository.AdministrativeDistrictRepo;
+import com.shinhan.assetManager.repository.AptRecentTradeRepo;
 import com.shinhan.assetManager.repository.AptTradeRepo;
 
 import lombok.extern.java.Log;
@@ -26,9 +27,61 @@ public class AptTest {
 	AptTradeRepo tRepo;
 	@Autowired
 	AdministrativeDistrictRepo dRepo;
+	@Autowired
+	AptRecentTradeRepo artRepo; 
 	
 	@Autowired
 	ApiAptTrade aptTrade;	
+	
+	// 0. apt_recent_trade 테스트 (★★)
+	@Test
+	void selectAndInsertApt() {
+		
+		// (2) tradeNo 167649L(22년 1월 데이터)부터 시작
+		List<AptDTO> aptList = tRepo.findByTradeNoGreaterThanEqual(167649L);
+		for(int i=0; i<aptList.size(); i++) {
+			AptDTO apt = aptList.get(i);
+			Long tradeNo = apt.getTradeNo();
+			String aptName = apt.getAptName(); 
+			String areaCode = apt.getAreaCode();
+			String netLeasableArea = apt.getNetLeasableArea();
+			System.out.println(tradeNo + " " + aptName + " " + areaCode + " " + netLeasableArea);
+			
+			AptRecentTradeDTO artDto = AptRecentTradeDTO.builder()
+					.tradeNo(apt.getTradeNo())
+					.aptName(apt.getAptName())
+					.areaCode(apt.getAreaCode())
+					.dong(apt.getDong())
+					.netLeasableArea(apt.getNetLeasableArea())
+					.price(apt.getPrice())
+					.tradeDate(apt.getTradeDate())
+					.build();
+			artRepo.save(artDto);
+		}
+		
+		// (1) tradeNo 1번부터 시작
+//		Iterator<AptDTO> aptIterator = tRepo.findAll().iterator();
+//		while(aptIterator.hasNext()) {
+//			AptDTO apt = aptIterator.next();
+//			Long tradeNo = apt.getTradeNo();
+//			String aptName = apt.getAptName(); 
+//			String areaCode = apt.getAreaCode();
+//			String netLeasableArea = apt.getNetLeasableArea();
+//			System.out.println(tradeNo + " " + aptName + " " + areaCode + " " + netLeasableArea);
+//			
+//			//List<AptDTO> aptList = tRepo.findByAptNameAndAreaCodeAndNetLeasableArea(aptName, areaCode, netLeasableArea);
+//			AptRecentTradeDTO artDto = AptRecentTradeDTO.builder()
+//					.tradeNo(apt.getTradeNo())
+//					.aptName(apt.getAptName())
+//					.areaCode(apt.getAreaCode())
+//					.dong(apt.getDong())
+//					.netLeasableArea(apt.getNetLeasableArea())
+//					.price(apt.getPrice())
+//					.tradeDate(apt.getTradeDate())
+//					.build();
+//			artRepo.save(artDto);
+//		}
+	}
 	
 	// 1. 아파트 리스트 insert (★★★)
 	//@Test
