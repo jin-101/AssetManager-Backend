@@ -10,7 +10,9 @@ import com.shinhan.assetManager.dto.CarModelDTO;
 public interface CarModelPRepository 
 		extends CrudRepository<CarModelDTO, Integer>, 
 			QuerydslPredicateExecutor<CarModelDTO>{
-
+	 
+	
+	public CarModelDTO findFirstByClassNameContaining(String className);
 	public CarModelDTO findByClassNameAndCarNameAndModelName(String className, String carName, String modelName);
 	public List<CarModelDTO> findByCarCompanyCompanyId(Integer companyId);
 }
