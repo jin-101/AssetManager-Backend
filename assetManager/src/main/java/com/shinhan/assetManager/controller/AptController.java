@@ -62,4 +62,6 @@ public class AptController {
 		
 		return aptMap;
 	}
+	
+	// 자산 탭 - 아파트 자산 조회 (수익률, 현재시세, 평단가)
 }
