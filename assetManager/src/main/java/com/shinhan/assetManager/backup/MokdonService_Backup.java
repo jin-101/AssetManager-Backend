@@ -183,7 +183,7 @@ public class MokdonService_Backup {
 		r1 = (period / 12) * r0; // 연이율 환산
 		principal = amount / (1 + r1); // ★예금계산
 		String roundedPrincipal = getRoundedNum(principal);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
@@ -215,7 +215,7 @@ public class MokdonService_Backup {
 		}
 		principal = (amount / (totalRate + period));
 		String roundedPrincipal = getRoundedNum(principal);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
@@ -238,7 +238,7 @@ public class MokdonService_Backup {
 		Double denominator = Math.pow((1 + r1), period); // 분모
 		principal = amount / denominator; // 필요원금 = 분자 / 분모
 		String roundedPrincipal = getRoundedNum(principal);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
@@ -270,7 +270,7 @@ public class MokdonService_Backup {
 		// principal = (amount / (totalRate + period));
 		principal = (amount / totalDenominator); // 단리 계산 때처럼 괄호 안의 기간 분리가 안되므로......
 		String roundedPrincipal = getRoundedNum(principal);
-		mokdonDto.setRoundedPrincipal(roundedPrincipal);
+		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
 	}
