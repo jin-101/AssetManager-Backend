@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity 
 @Table(name = "apt_recent_trade")
 @IdClass(MultikeyForAptRecent.class)
 public class AptRecentTradeDTO {
@@ -29,7 +29,7 @@ public class AptRecentTradeDTO {
 	private String netLeasableArea; // 전용면적  
 	@Id 
 	private String areaCode; // 지역코드
-	
+	 
 	private Long tradeNo; // 세부코드를 위한 넘버
 	
 	private String dong; // 법정동 
