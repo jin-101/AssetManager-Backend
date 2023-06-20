@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,38 @@ public class AccountBookController {
 	public void listsave(@PathVariable Integer detailCode) {
 		System.out.println("디테일 코드 넘어 오는지!!!!!!" + detailCode);
 		accountRepo.deleteById(detailCode);
+	}
+	
+	@PostMapping(value = "/saveoneaccount.do", consumes = "application/json") //가계부 한건 작성하기
+	public void saveone(@RequestBody HouseholdAccountsDTO dto) {
+		System.out.println("한건 내역 오는지!!!!!" + dto);
+		System.out.println(dto.getWithdraw());
+		accountRepo.save(dto);
+		List<HouseholdAccountsDTO> lista = accountRepo.getFilteredAccounts();
+		List<HouseholdAccountsDTO> listb = accountRepo.getLastBalance();
+		
+		//새로 삽입된 건의 위의 내역들에 입력된 금액만큼 더하거나 빼주기 
+		for(HouseholdAccountsDTO a:lista) {
+			System.out.println(a);
+			if(dto.getWithdraw() == 0) {
+				int sum = a.getBalance() + dto.getDeposit();
+				a.setBalance(sum);
+			} else {
+				int sum = a.getBalance() - dto.getWithdraw();
+				a.setBalance(sum);
+			}
+			accountRepo.save(a); //백만 업데이트의 주범
+			//System.out.println(a);
+		}
+		
+		System.out.println(listb.get(0).getBalance());
+		if(dto.getWithdraw() == 0) {
+			dto.setBalance(listb.get(0).getBalance() + dto.getDeposit());
+		} else {
+			dto.setBalance(listb.get(0).getBalance() - dto.getWithdraw());
+		}
+		
+		accountRepo.save(dto);
 	}
 	
 	@PostMapping("/filesave.do")
@@ -151,18 +186,23 @@ public class AccountBookController {
             }
 
             // excelDataList를 활용하여 필요한 로직을 수행하거나 데이터베이스에 저장
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+       
+            
+            
             for (ExcelDTO excelData : excelDataList) {
             	HouseholdAccountsDTO houseDto = new HouseholdAccountsDTO();
             	
             	houseDto.setMemberId(memberId); 
             	houseDto.setAccountNumber(excelData.get계좌번호());
-            	houseDto.setExchangeDate(LocalDate.parse(excelData.get거래일자()));
-            	houseDto.setExchangeTime(LocalTime.parse(excelData.get거래시간()));
+            	houseDto.setExchangeDate(LocalDateTime.parse(excelData.get거래일자() + " " + excelData.get거래시간(),formatter));
+            	//houseDto.setExchangeTime(LocalTime.parse(excelData.get거래시간()));
             	houseDto.setWithdraw(Integer.parseInt(excelData.get출금()));
             	houseDto.setDeposit(Integer.parseInt(excelData.get입금()));
             	houseDto.setContent(excelData.get내용());
             	houseDto.setBalance(Integer.parseInt(excelData.get잔액()));   
             	
+            	System.out.println(houseDto);
             	accountRepo.save(houseDto);
             }
             return "File uploaded: " + originalFilename;
