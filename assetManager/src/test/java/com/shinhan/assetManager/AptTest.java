@@ -1,8 +1,7 @@
 package com.shinhan.assetManager;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,9 @@ import com.shinhan.assetManager.apt.AdministrativeDistrictDTO;
 import com.shinhan.assetManager.apt.ApiAptTrade;
 import com.shinhan.assetManager.apt.AptDTO;
 import com.shinhan.assetManager.apt.AptParamList;
+import com.shinhan.assetManager.apt.AptRecentTradeDTO;
 import com.shinhan.assetManager.repository.AdministrativeDistrictRepo;
+import com.shinhan.assetManager.repository.AptRecentTradeRepo;
 import com.shinhan.assetManager.repository.AptTradeRepo;
 
 import lombok.extern.java.Log;
@@ -26,9 +27,48 @@ public class AptTest {
 	AptTradeRepo tRepo;
 	@Autowired
 	AdministrativeDistrictRepo dRepo;
+	@Autowired
+	AptRecentTradeRepo artRepo; 
 	
 	@Autowired
 	ApiAptTrade aptTrade;	
+	
+	//@Test
+	void selectAndInsertApt2() {
+		Long startNo = 1L;
+		Long endNo = 167648L;
+		tRepo.findByTradeNoBetween(startNo, endNo);
+	}
+	
+	// 0. apt_recent_trade 테스트 (★★) 
+	@Test
+	void selectAndInsertApt() {  
+		
+		// (2) tradeNo 167649L(22년 1월 데이터)부터 시작
+		List<AptDTO> aptList = tRepo.findByTradeNoGreaterThanEqual(405799L);
+		for(int i=0; i<aptList.size(); i++) {
+			AptDTO apt = aptList.get(i);
+			Long tradeNo = apt.getTradeNo();
+			String aptName = apt.getAptName(); 
+			String areaCode = apt.getAreaCode();
+			String netLeasableArea = apt.getNetLeasableArea();
+			String dong = apt.getDong();
+			String price = apt.getPrice();
+			String tradeDate = apt.getTradeDate();
+			System.out.println(tradeNo + " " + aptName + " " + areaCode + " " + netLeasableArea);
+			
+			AptRecentTradeDTO artDto = AptRecentTradeDTO.builder()
+					.tradeNo(tradeNo)
+					.aptName(aptName)
+					.areaCode(areaCode)
+					.dong(dong)
+					.netLeasableArea(netLeasableArea)
+					.price(price)
+					.tradeDate(tradeDate)
+					.build();
+			artRepo.save(artDto);
+		}
+	}
 	
 	// 1. 아파트 리스트 insert (★★★)
 	//@Test

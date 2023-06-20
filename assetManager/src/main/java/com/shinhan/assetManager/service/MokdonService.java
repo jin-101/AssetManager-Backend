@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.dto.AvgRateDTO;
 import com.shinhan.assetManager.dto.DepositDTO;
 import com.shinhan.assetManager.dto.DepositOptionDTO;
@@ -37,6 +38,8 @@ public class MokdonService {
 	SavingsOptionRepository savingsOptionRepo;
 	@Autowired
 	MokdonService service;
+	@Autowired
+	DecimalFormatForCurrency dfc;
 	Double requiredPrincipal = null; // 목표금액을 모으는 데 필요한 원금
 	String income = "";
 	Integer incomes = null; // 
@@ -184,7 +187,7 @@ public class MokdonService {
 		r0 = rate / 100; // %이므로 100으로 나누기
 		r1 = (period / 12) * r0; // 연이율 환산
 		requiredPrincipal = amount / (1 + r1); // ★ 필요원금 계산
-		String roundedPrincipal = getRoundedNum(requiredPrincipal); 
+		String roundedPrincipal = dfc.currencyAndSymbol_10000(requiredPrincipal); 
 		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 		
 		// (2) 총 원리금 및 부족액 계산
@@ -192,17 +195,17 @@ public class MokdonService {
 		if(!income.equals("")) {
 			incomes = Integer.parseInt(income);
 			Double principalAndInterest = incomes * (1 + r1);
-			String pai = getRoundedNum(principalAndInterest);
+			String pai = dfc.currencyAndSymbol_10000(principalAndInterest);
 			mokdonDto.setTotalPai(pai);
 			if(principalAndInterest >= amount) { // 저축 원리금 >= 목표금액의 경우
 				mokdonDto.setLackingAmount("");
 				mokdonDto.setRequiredPrincipal("");
 			}else { // 저축 원리금 < 목표금액의 경우
 				lackingAmount = amount - principalAndInterest;
-				String la = getRoundedNum(lackingAmount);
+				String la = dfc.currencyAndSymbol_10000(lackingAmount);
 				
 				requiredPrincipal = lackingAmount / (1 + r1); // ★ 필요원금 계산
-				roundedPrincipal = getRoundedNum(requiredPrincipal); 
+				roundedPrincipal = dfc.currencyAndSymbol_10000(requiredPrincipal); 
 				
 				mokdonDto.setRequiredPrincipal(roundedPrincipal);
 				mokdonDto.setLackingAmount(la);
@@ -237,7 +240,7 @@ public class MokdonService {
 			totalRate += eachRate;
 		}
 		requiredPrincipal = (amount / (totalRate + period));
-		String roundedPrincipal = getRoundedNum(requiredPrincipal);
+		String roundedPrincipal = dfc.currencyAndSymbol_10000(requiredPrincipal);
 		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 		
 		// (2) 총 원리금 및 부족액 계산
@@ -248,17 +251,17 @@ public class MokdonService {
 			Double interest = incomes * period2 * r0 * ((period2+1)/24); // 이자 계산
 			Double principal = (double) (incomes * period);
 			Double principalAndInterest = principal + interest;
-			String pai = getRoundedNum(principalAndInterest);
+			String pai = dfc.currencyAndSymbol_10000(principalAndInterest);
 			mokdonDto.setTotalPai(pai);
 			if(principalAndInterest >= amount) { // 저축 원리금 >= 목표금액의 경우
 				mokdonDto.setLackingAmount("");
 				mokdonDto.setRequiredPrincipal("");
 			}else {
 				lackingAmount = amount - principalAndInterest;
-				String la = getRoundedNum(lackingAmount);
+				String la = dfc.currencyAndSymbol_10000(lackingAmount);
 				
 				requiredPrincipal = (lackingAmount / (totalRate + period)); // ★ 필요원금 계산
-				roundedPrincipal = getRoundedNum(requiredPrincipal);
+				roundedPrincipal = dfc.currencyAndSymbol_10000(requiredPrincipal);
 				
 				mokdonDto.setRequiredPrincipal(roundedPrincipal);
 				mokdonDto.setLackingAmount(la);
@@ -287,7 +290,7 @@ public class MokdonService {
 		r1 = (r0 / 12); // 월이율
 		Double denominator = Math.pow((1 + r1), period); // 분모
 		requiredPrincipal = amount / denominator; // 필요원금 = 분자 / 분모
-		String roundedPrincipal = getRoundedNum(requiredPrincipal);
+		String roundedPrincipal = dfc.currencyAndSymbol_10000(requiredPrincipal);
 		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
@@ -318,7 +321,7 @@ public class MokdonService {
 		}
 		// principal = (amount / (totalRate + period));
 		requiredPrincipal = (amount / totalDenominator); // 단리 계산 때처럼 괄호 안의 기간 분리가 안되므로......
-		String roundedPrincipal = getRoundedNum(requiredPrincipal);
+		String roundedPrincipal = dfc.currencyAndSymbol_10000(requiredPrincipal);
 		mokdonDto.setRequiredPrincipal(roundedPrincipal);
 
 		return mokdonDto;
@@ -484,7 +487,7 @@ public class MokdonService {
 	// (B) 공통 메소드 - 세후 이자 계산
 	public String taxation(Double interest, Double taxRate) {
 		Double afterTaxInterest = interest * (1-(taxRate / 100));
-		String netInterest = getRoundedNum(afterTaxInterest);
+		String netInterest = dfc.currencyAndSymbol_10000(afterTaxInterest);
 		return netInterest;
 	}
 
