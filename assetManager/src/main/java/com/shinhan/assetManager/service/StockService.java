@@ -135,6 +135,8 @@ public class StockService implements AssetService{
 			eachStock.put("market", market);
 			eachStock.put("stockPrice", stockPrice);
 			eachStock.put("gain", Math.round(capitalGain*1000)/1000.0);
+			eachStock.put("investedAmount", totalAmountByStockCode.get(stockCode));
+			eachStock.put("totalShares", totalSharesByStockCode.get(stockCode));
 			stockId++;
 			
 			averageStockPriceByStockName.put(eachStock);
