@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +22,12 @@ public class DepositController {
 	DepositService service;
 	
 	//예적금 추가 버튼 클릭시 => 
-	@PostMapping(value = "/add.do")
+	@PostMapping(value = "/add.do/{userId}")
 	@ResponseBody
-	public String addDeposit(@RequestBody DepositDtoForReact[] depositList) {
-		String result = service.addDeposit(depositList);
+	public String addDeposit(
+			@RequestBody DepositDtoForReact[] depositList, 
+			@PathVariable("userId") String userId) {
+		String result = service.addDeposit(depositList, userId);
 		return result;
 	}
 		
