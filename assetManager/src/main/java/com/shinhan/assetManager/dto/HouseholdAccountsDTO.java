@@ -38,8 +38,7 @@ public class HouseholdAccountsDTO {
 	private String memberId;
 	private String accountNumber;
 	private String bank;
-	private LocalDate exchangeDate;
-	private LocalTime exchangeTime;
+	private LocalDateTime exchangeDate;
 	private Integer withdraw;
 	private Integer deposit;
 	private String content;
