@@ -21,23 +21,26 @@ public class CarController {
 		CarService service;
 		
 		//차량번호로 조회 클릭시 => 
-		@PostMapping(value = "/mySearch.do/{carNo}")
+		@PostMapping(value = "/mySearch.do/{carNo}/{userId}")
 		@ResponseBody
-		public String searchMyCarAndInsert(@PathVariable String carNo) {
-			String str = service.searchMyCarAndInsert(carNo);
+		public String searchMyCarAndInsert(
+				@PathVariable("carNo") String carNo,
+				@PathVariable("userId") String userId) {
+			String str = service.searchMyCarAndInsert(carNo, userId);
 			System.out.println(str); //저장관련 멘트 전달
 			return str;
 		}
 		
 		//직접입력으로 클릭시 => 
-		@PostMapping(value = "/insert.do/{carCompany}/{carModel}/{carYear}")
+		@PostMapping(value = "/insert.do/{carCompany}/{carModel}/{carYear}/{userId}")
 		@ResponseBody
 		public String carInsert(
 				@PathVariable("carCompany") String carCompany,
 				@PathVariable("carModel") String carModel,
-				@PathVariable("carYear") String carYear) {
+				@PathVariable("carYear") String carYear,
+				@PathVariable("userId") String userId) {
 			System.out.println(carCompany +  " " +carModel+  " " +carYear);
-			String result = service.carInsert(carCompany, carModel, carYear);
+			String result = service.carInsert(carCompany, carModel, carYear, userId);
 			System.out.println(result); //저장관련 멘트 전달
 			
 			return result;
