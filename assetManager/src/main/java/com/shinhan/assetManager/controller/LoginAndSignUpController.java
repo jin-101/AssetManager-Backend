@@ -111,9 +111,9 @@ public class LoginAndSignUpController {
 	}
 	
 	// 총자산 얻기 
-	@GetMapping
-	@RequestMapping(value = "/getTotalAsset", produces = "text/plain;charset=UTF-8")
-	public void getTotalAsset(@RequestParam String userId) {
-		service.getTotalAsset(userId);
-	}
+//	@GetMapping
+//	@RequestMapping(value = "/getTotalAsset", produces = "text/plain;charset=UTF-8")
+//	public void getTotalAsset(@RequestParam String userId) {
+//		service.getTotalAsset(userId);
+//	}
 }
