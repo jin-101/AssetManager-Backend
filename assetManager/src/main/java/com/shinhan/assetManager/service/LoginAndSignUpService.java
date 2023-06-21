@@ -11,9 +11,13 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.shinhan.assetManager.coin.CoinBithumbDTO;
+import com.shinhan.assetManager.coin.CoinUpbitDTO;
+import com.shinhan.assetManager.deposit.DepositSavingsDTO;
 import com.shinhan.assetManager.repository.AptRecentTradeRepo;
 import com.shinhan.assetManager.repository.CoinBithumbRepo;
 import com.shinhan.assetManager.repository.CoinUpbitRepo;
+import com.shinhan.assetManager.repository.DepositDTORepo;
 import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
 import com.shinhan.assetManager.repository.StockRepo;
 import com.shinhan.assetManager.repository.UserAssetRepo;
@@ -54,6 +58,12 @@ public class LoginAndSignUpService {
 	StockRepo sRepo; // C1 : 주식
 	@Autowired
 	HouseholdAccountsRepository haRepo; // A1 : 가계부잔액
+	@Autowired
+	DepositDTORepo depositDtoRepo;
+	@Autowired
+	GoldService goldService;
+	@Autowired
+	CurrencyService currencyService;
 	
 	String exchangeAssetCode = "A2";
 	String depositAssetCode = "B1";
@@ -354,6 +364,9 @@ public class LoginAndSignUpService {
 		Long totalStockAsset = lasService.getTotalStock(userId);
 		
 		// (2) 총 코인 자산
+		getTotalCoin(userId);
+		
+		getTotalDepositAndSavings(userId);
 	}
 	
 	// (1) 총 주식 자산
@@ -364,36 +377,71 @@ public class LoginAndSignUpService {
 		JSONArray jsonArr = new JSONArray(response);
 		System.out.println(jsonArr);
 		
-		Long totalStockAsset = 0L;
+		Long total = 0L;
 		Long eachStockAsset = 0L;
 		for(int i=0; i<jsonArr.length(); i++) {
 			JSONObject jsonObj = (JSONObject) jsonArr.get(i);
 			Integer stockPrice = (Integer) jsonObj.get("stockPrice");
 			Integer totalShares = (Integer) jsonObj.get("totalShares");
 			eachStockAsset = (long) (stockPrice * totalShares);
-			totalStockAsset += eachStockAsset;
+			total += eachStockAsset;
 		}
-		System.out.println("총 주식 합계 : " + totalStockAsset);
+		System.out.println("총 주식 자산 : " + total);
 		
-		return totalStockAsset;
+		return total;
 	}
 	
 	// (2) 총 코인 자산
 	public void getTotalCoin(String userId) {
 		UserDTO user = uRepo.findById(userId).get();
-		List<UserAssetDTO> coinAssetList = uaRepo.findByUserAndAssetCode(user, coinAssetCode); // C2
+		List<UserAssetDTO> coinList = uaRepo.findByUserAndAssetCode(user, coinAssetCode); // coinAssetCode == C2
 		
-		System.out.println("총 코인 List 수 : " + coinAssetList.size());
+		System.out.println("총 코인 List 수 : " + coinList.size());
 		
-		for(int i=0; i<coinAssetList.size(); i++) {
-			UserAssetDTO coinAssetDto = coinAssetList.get(i);
+		Double totalCoinAsset = 0.0;
+		Double eachUpbitCoin = 0.0;
+		Double eachBithumbCoin = 0.0;
+		for(int i=0; i<coinList.size(); i++) {
+			// 수량(quantity) 얻기
+			UserAssetDTO coinAssetDto = coinList.get(i);
 			Double quantity = Double.parseDouble(coinAssetDto.getQuantity());
+			
+			// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
+			String detailCode = coinAssetDto.getDetailCode();
+			CoinUpbitDTO upbitCoin = upbitRepo.findById(detailCode).orElse(null);
+			if(upbitCoin != null) { // ★ 가끔 코인이 상장폐지가 되는 경우가 있는데, null 처리 안해주면 나중에 에러날 수도
+				String price = upbitCoin.getPrev_closing_price();
+				Double prev_closing_price = Double.parseDouble(price);
+				eachUpbitCoin = prev_closing_price * quantity;
+				totalCoinAsset += eachUpbitCoin;
+			}
+			CoinBithumbDTO bithumbCoin = bithumbRepo.findById(detailCode).orElse(null);
+			if(bithumbCoin != null) { // ★ 가끔 코인이 상장폐지가 되는 경우가 있는데, null 처리 안해주면 나중에 에러날 수도
+				String price = bithumbCoin.getPrev_closing_price();
+				Double prev_closing_price = Double.parseDouble(price);
+				eachBithumbCoin = prev_closing_price * quantity;
+				totalCoinAsset += eachBithumbCoin;
+			}
 		}
+		System.out.println("총 코인 자산 : " + totalCoinAsset);
 	}
 	
 	// (3) 총 예적금 자산
-	public void getTotalDepositAndSavings() {
+	public void getTotalDepositAndSavings(String userId) {
+		UserDTO user = uRepo.findById(userId).get();
+		List<UserAssetDTO> depositAndSavingsList = uaRepo.findByUserAndAssetCodeStartingWith(user, "B"); // B1, B2
 		
+		System.out.println("총 예적금 List 수 : " + depositAndSavingsList.size());
+		
+		Long total = 0L;
+		for(int i=0; i<depositAndSavingsList.size(); i++) {
+			UserAssetDTO depositAndSavingsDto = depositAndSavingsList.get(i);
+			Long detailCode = Long.parseLong(depositAndSavingsDto.getDetailCode());
+			DepositSavingsDTO depositSavingsDto = depositDtoRepo.findByDetailCode(detailCode);
+			Integer price = Integer.parseInt(depositSavingsDto.getPrice());
+			total += price;
+		}
+		System.out.println("총 예적금 자산 : " + total);
 	}
 	
 	// (4) 총 부동산 자산
