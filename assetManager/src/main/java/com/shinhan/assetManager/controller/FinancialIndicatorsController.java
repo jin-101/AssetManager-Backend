@@ -15,10 +15,14 @@ public class FinancialIndicatorsController {
 	FinancialIndicatorsService service;
 	
 	@GetMapping(value = "/finRatio/{token}") // consumes = "application/json", produces = "text/plain;charset=utf-8" 
-	public void addUpbit(@PathVariable String token) { 
-		UserDTO user = service.getUser(token);
+	public void addUpbit(@PathVariable("token") String userId) { 
+		UserDTO user = service.getUser(userId);
 		service.getTotalAsset(user);
-		System.out.println("로그인한 userId : "+token);
+		System.out.println("로그인한 userId : "+userId);
+		
+		service.bb(userId); 
+		service.cc(userId); 
+		service.dd(userId); 
   
 		//return result;
 	}
