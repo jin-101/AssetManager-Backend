@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shinhan.assetManager.service.LoginAndSignUpService;
 import com.shinhan.assetManager.service.StockService;
+import com.shinhan.assetManager.service.TotalService;
 import com.shinhan.assetManager.user.UserDTO;
 
 @RestController
@@ -24,6 +25,8 @@ public class LoginAndSignUpController {
 
 	@Autowired
 	LoginAndSignUpService service;
+	@Autowired
+	TotalService totalService;
 
 	// 이메일 체크
 	@GetMapping
@@ -111,9 +114,11 @@ public class LoginAndSignUpController {
 	}
 	
 	// 총자산 얻기 
-//	@GetMapping
-//	@RequestMapping(value = "/getTotalAsset", produces = "text/plain;charset=UTF-8")
-//	public void getTotalAsset(@RequestParam String userId) {
-//		service.getTotalAsset(userId);
-//	}
+	@GetMapping
+	@RequestMapping(value = "/getTotalAsset", produces = "text/plain;charset=UTF-8")
+	public String getTotalAsset(@RequestParam String userId) {
+		String totalAsset = totalService.getTotalAsset(userId);
+		
+		return totalAsset;
+	}
 }

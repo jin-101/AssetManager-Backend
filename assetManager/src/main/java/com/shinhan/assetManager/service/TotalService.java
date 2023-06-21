@@ -11,6 +11,7 @@ import com.shinhan.assetManager.coin.CoinBithumbDTO;
 import com.shinhan.assetManager.coin.CoinUpbitDTO;
 import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.deposit.DepositSavingsDTO;
+import com.shinhan.assetManager.dto.HouseholdAccountsDTO;
 import com.shinhan.assetManager.repository.AptRecentTradeRepo;
 import com.shinhan.assetManager.repository.CarDTOrepo;
 import com.shinhan.assetManager.repository.CoinBithumbRepo;
@@ -241,7 +242,7 @@ public class TotalService {
 	
 	// (7) 총 가계부잔액
 	public void getTotalHouseholds(String userId) {
-		//haRepo
+		List<HouseholdAccountsDTO> list = haRepo.findByMemberId(userId);
 	}
 
 }
