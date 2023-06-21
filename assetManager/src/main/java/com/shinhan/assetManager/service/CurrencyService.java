@@ -67,7 +67,7 @@ public class CurrencyService implements AssetService {
 			String currency =  asset.getDetailCode();
 			double buyPrice = Double.parseDouble(asset.getPurchasePrice());
 			double buyQuantity = Double.parseDouble(asset.getQuantity());
-			
+			 
 			if(currency.equals("jpy")) {
 				buyPrice = buyPrice/100.0;
 			}

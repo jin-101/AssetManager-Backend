@@ -11,22 +11,11 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.shinhan.assetManager.coin.CoinBithumbDTO;
-import com.shinhan.assetManager.coin.CoinUpbitDTO;
-import com.shinhan.assetManager.deposit.DepositSavingsDTO;
-import com.shinhan.assetManager.repository.AptRecentTradeRepo;
-import com.shinhan.assetManager.repository.CoinBithumbRepo;
-import com.shinhan.assetManager.repository.CoinUpbitRepo;
-import com.shinhan.assetManager.repository.DepositDTORepo;
-import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
-import com.shinhan.assetManager.repository.StockRepo;
-import com.shinhan.assetManager.repository.UserAssetRepo;
-import com.shinhan.assetManager.repository.UserLiabilityRepo;
+import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.AES256;
 import com.shinhan.assetManager.user.SHA256;
 import com.shinhan.assetManager.user.Salt;
-import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
 
 @Service
@@ -41,38 +30,7 @@ public class LoginAndSignUpService {
 	@Autowired
 	AES256 aes256; // 양방향
 	@Autowired
-	LoginAndSignUpService lasService;
-	@Autowired
-	StockService stockService;
-	@Autowired
-	UserAssetRepo uaRepo; // 자산
-	@Autowired
-	UserLiabilityRepo ulRepo; // 부채 
-	@Autowired
-	AptRecentTradeRepo artRepo; // E1 : 부동산
-	@Autowired
-	CoinUpbitRepo upbitRepo; // C2 : 코인
-	@Autowired
-	CoinBithumbRepo bithumbRepo; // C2 : 코인
-	@Autowired
-	StockRepo sRepo; // C1 : 주식
-	@Autowired
-	HouseholdAccountsRepository haRepo; // A1 : 가계부잔액
-	@Autowired
-	DepositDTORepo depositDtoRepo;
-	@Autowired
-	GoldService goldService;
-	@Autowired
-	CurrencyService currencyService;
-	
-	String exchangeAssetCode = "A2";
-	String depositAssetCode = "B1";
-	String savingsAssetCode = "B2";
-	String stockAssetCode = "C1";
-	String coinAssetCode = "C2";
-	String aptAssetCode = "E1";
-	String carAssetCode = "E2";
-	String goldAssetCode = "E3";
+	TotalService totalService;
 
 	// 이메일 체크
 	public String checkEmail(UserDTO userDto) {
@@ -140,14 +98,12 @@ public class LoginAndSignUpService {
 			try {
 				String encryptedText = aes256.encryptAES256(text);
 				if (encryptedText.equals(encryptedPw)) { // (ii) 비밀번호 맞은 경우
-					// ★ 로그인 성공시 JWT 토큰 생성해서 리액트로 보냄
-
-					//JavaJwt jwt = new JavaJwt();
-					//String token = jwt.createToken(userId); 
 					result = "로그인성공";
 					loginInfo.put("result", result);
 					loginInfo.put("userName", user.getUserName());
-					//session.setAttribute(userId, user);
+					
+					String totalAsset = totalService.getTotalAsset(userId); // 총자산
+					loginInfo.put("totalAsset", totalAsset);
 
 				} else { // (iii) 비밀번호 틀린 경우
 					int loginFailCount = user.getLoginFailCount();
@@ -358,105 +314,5 @@ public class LoginAndSignUpService {
 		return result;
 	}
 	
-	// 총자산 얻기
-	public void getTotalAsset(String userId) {
-		// (1) 총 주식 자산
-		Long totalStockAsset = lasService.getTotalStock(userId);
-		
-		// (2) 총 코인 자산
-		getTotalCoin(userId);
-		
-		getTotalDepositAndSavings(userId);
-	}
-	
-	// (1) 총 주식 자산
-	public Long getTotalStock(String userId) {
-		String response = stockService.showHoldingStocks(userId); // userId
-		System.out.println(response);
-		
-		JSONArray jsonArr = new JSONArray(response);
-		System.out.println(jsonArr);
-		
-		Long total = 0L;
-		Long eachStockAsset = 0L;
-		for(int i=0; i<jsonArr.length(); i++) {
-			JSONObject jsonObj = (JSONObject) jsonArr.get(i);
-			Integer stockPrice = (Integer) jsonObj.get("stockPrice");
-			Integer totalShares = (Integer) jsonObj.get("totalShares");
-			eachStockAsset = (long) (stockPrice * totalShares);
-			total += eachStockAsset;
-		}
-		System.out.println("총 주식 자산 : " + total);
-		
-		return total;
-	}
-	
-	// (2) 총 코인 자산
-	public void getTotalCoin(String userId) {
-		UserDTO user = uRepo.findById(userId).get();
-		List<UserAssetDTO> coinList = uaRepo.findByUserAndAssetCode(user, coinAssetCode); // coinAssetCode == C2
-		
-		System.out.println("총 코인 List 수 : " + coinList.size());
-		
-		Double totalCoinAsset = 0.0;
-		Double eachUpbitCoin = 0.0;
-		Double eachBithumbCoin = 0.0;
-		for(int i=0; i<coinList.size(); i++) {
-			// 수량(quantity) 얻기
-			UserAssetDTO coinAssetDto = coinList.get(i);
-			Double quantity = Double.parseDouble(coinAssetDto.getQuantity());
-			
-			// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
-			String detailCode = coinAssetDto.getDetailCode();
-			CoinUpbitDTO upbitCoin = upbitRepo.findById(detailCode).orElse(null);
-			if(upbitCoin != null) { // ★ 가끔 코인이 상장폐지가 되는 경우가 있는데, null 처리 안해주면 나중에 에러날 수도
-				String price = upbitCoin.getPrev_closing_price();
-				Double prev_closing_price = Double.parseDouble(price);
-				eachUpbitCoin = prev_closing_price * quantity;
-				totalCoinAsset += eachUpbitCoin;
-			}
-			CoinBithumbDTO bithumbCoin = bithumbRepo.findById(detailCode).orElse(null);
-			if(bithumbCoin != null) { // ★ 가끔 코인이 상장폐지가 되는 경우가 있는데, null 처리 안해주면 나중에 에러날 수도
-				String price = bithumbCoin.getPrev_closing_price();
-				Double prev_closing_price = Double.parseDouble(price);
-				eachBithumbCoin = prev_closing_price * quantity;
-				totalCoinAsset += eachBithumbCoin;
-			}
-		}
-		System.out.println("총 코인 자산 : " + totalCoinAsset);
-	}
-	
-	// (3) 총 예적금 자산
-	public void getTotalDepositAndSavings(String userId) {
-		UserDTO user = uRepo.findById(userId).get();
-		List<UserAssetDTO> depositAndSavingsList = uaRepo.findByUserAndAssetCodeStartingWith(user, "B"); // B1, B2
-		
-		System.out.println("총 예적금 List 수 : " + depositAndSavingsList.size());
-		
-		Long total = 0L;
-		for(int i=0; i<depositAndSavingsList.size(); i++) {
-			UserAssetDTO depositAndSavingsDto = depositAndSavingsList.get(i);
-			Long detailCode = Long.parseLong(depositAndSavingsDto.getDetailCode());
-			DepositSavingsDTO depositSavingsDto = depositDtoRepo.findByDetailCode(detailCode);
-			Integer price = Integer.parseInt(depositSavingsDto.getPrice());
-			total += price;
-		}
-		System.out.println("총 예적금 자산 : " + total);
-	}
-	
-	// (4) 총 부동산 자산
-	public void getTotalApt() {
-		
-	}
-	
-	// (5) 총 금, 외환 자산
-	public void getTotalGoldAndExchange() {
-		
-	}
-	
-	// (6) 총 자동차 자산
-	public void getTotalCar() {
-		
-	}
 
 }
