@@ -35,7 +35,7 @@ public class HouseholdAccountsDTO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer detailCode;
-	private String memberId;
+	private String memberId; //내일 동열이한테 테이블 연결 물어보기
 	private String accountNumber;
 	private String bank;
 	private LocalDateTime exchangeDate;

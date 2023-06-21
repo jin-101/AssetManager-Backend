@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.shinhan.assetManager.dto.AccountbookDTO;
+import com.shinhan.assetManager.dto.CashReceiptDTO;
+import com.shinhan.assetManager.dto.CashReceiptExcelDTO;
 import com.shinhan.assetManager.dto.ExcelDTO;
 import com.shinhan.assetManager.dto.HouseholdAccountsCategoryDTO;
 import com.shinhan.assetManager.dto.HouseholdAccountsDTO;
@@ -60,6 +63,20 @@ public class AccountBookController {
 	
 	@DeleteMapping(value = "/deletelist.do/{detailCode}", produces = "text/plain;charset=utf-8") //한건 삭제하기
 	public void listsave(@PathVariable Integer detailCode) {
+		List<HouseholdAccountsDTO> upList = accountRepo.getUpListWhenDelete(detailCode);
+		Optional<HouseholdAccountsDTO> deleteList = accountRepo.findById(detailCode);
+		HouseholdAccountsDTO deleteTarget = deleteList.get();
+		
+		//삭제된 건의 위에 내역들에 삭제한 금액만큼 조정해주기
+		for(HouseholdAccountsDTO up : upList) {
+			System.out.println(up);
+			if(deleteTarget.getWithdraw() > 0 ) {
+				up.setBalance(up.getBalance() + deleteTarget.getWithdraw()); //위에 건에서는 deposit이 삭제되면 잔액에 - deposit
+			} else {
+				up.setBalance(up.getBalance() - deleteTarget.getDeposit()); //withdraw가 삭제되면 잔액에 + withdraw
+			}					
+		}
+		
 		System.out.println("디테일 코드 넘어 오는지!!!!!!" + detailCode);
 		accountRepo.deleteById(detailCode);
 	}
@@ -86,9 +103,10 @@ public class AccountBookController {
 			//System.out.println(a);
 		}
 		
-		System.out.println(listb.get(0).getBalance());
+		//삽입된 건의 아래내역 
+		System.out.println(listb.get(0).getBalance()); //삽입된 건의 바로 아래 내역 하나 건 추출
 		if(dto.getWithdraw() == 0) {
-			dto.setBalance(listb.get(0).getBalance() + dto.getDeposit());
+			dto.setBalance(listb.get(0).getBalance() + dto.getDeposit()); //그 전건의 내역에 더하거나 빼서 조정
 		} else {
 			dto.setBalance(listb.get(0).getBalance() - dto.getWithdraw());
 		}
@@ -212,12 +230,108 @@ public class AccountBookController {
         }
     }
 	
+	@PostMapping("/cashreceiptfilesave.do")
+    public String cashReceiptFileUpload(@RequestPart("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return "No file uploaded.";
+            }
+
+            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+            String storageDirectory = "C:\\Upload\\"; // 저장할 디렉토리 경로
+
+            // 저장할 파일 경로 생성
+            String filePath = storageDirectory + originalFilename;
+
+            // 파일 저장
+            file.transferTo(new File(filePath));
+            
+            //파일 이름에서 아이디 추출
+            int index = originalFilename.indexOf("_");
+            String memberId = "";
+            if(index != -1) {
+            	memberId = originalFilename.substring(0, index);
+            }
+            
+            // 파일 내 데이터 추출하여 저장
+            List<String[]> data = readCSV(filePath);
+
+            List<CashReceiptExcelDTO> excelDataList = new ArrayList<>();
+            String[] headers = data.get(1);
+            
+            for (int i = 4; i < data.size(); i++) {
+                String[] row = data.get(i);
+                CashReceiptExcelDTO excelData = new CashReceiptExcelDTO();
+                for (int j = 0; j < headers.length; j++) {
+                    String header = headers[j];
+                    String value = row[j];
+                    System.out.println(headers);
+                    
+                    // 헤더와 필드명이 일치할 경우 필드에 값을 할당
+                    switch (header) {
+                    
+                        case "거래일시":
+                        	excelData.set거래일시(value);                       	
+                        	break;
+                        	
+                        case "가맹점명":
+                        	excelData.set가맹점명(value);                 	
+                        	break;
+                        	
+                        case "사용금액":
+                        	String trimmedValue1 = value.replace(",", "").replace("\"", "");
+                        	if(trimmedValue1.equals("")) {
+                        		trimmedValue1 = "0";
+                        	}
+                        	excelData.set사용금액(trimmedValue1);
+                        	break;
+                        		                    
+                    }
+                    //System.out.println(excelData);
+                }
+                excelDataList.add(excelData);
+               
+            }
+
+            // excelDataList를 활용하여 필요한 로직을 수행하거나 데이터베이스에 저장
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            
+            for (CashReceiptExcelDTO excelData : excelDataList) {
+            	CashReceiptDTO cashDto = new CashReceiptDTO();
+            	//System.out.println(excelData);
+            	
+            	cashDto.setMemberId(memberId);
+            	cashDto.setUsedDate(LocalDateTime.parse(excelData.get거래일시() ,formatter));
+            	cashDto.setContent(excelData.get가맹점명());
+            	cashDto.setUsedCash(Integer.parseInt(excelData.get사용금액()));
+            	
+            	//System.out.println(cashDto);
+            	//accountRepo.save(houseDto);
+            }
+            return "File uploaded: " + originalFilename;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error uploading file: " + e.getMessage();
+        }
+    }
+	
+	// 입력받은 연봉 salary
+	// 이 부분에 컨트롤러 만들자
+//	@PostMapping(value = "/listsave.do", consumes = "application/json")
+//	public void listsave(@RequestBody List<HouseholdAccountsDTO> itemlist) {
+//		System.out.println("item 리스트!!!!!!" + itemlist);
+//		accountRepo.saveAll(itemlist);
+//	}
+	
+	
+	
 	private List<String[]> readCSV(String filePath) throws IOException {
         List<String[]> data = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(filePath));
         String line;
         while ((line = br.readLine()) != null) {
-            String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+        	//금액 같은 경우 "10,000" 이런식으로 적혀 있는데 CSV 파일은 콤마로 구분하기 때문에 "" 안에 있는 콤마는 무시해주는 정규표현식
+            String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1); 
             data.add(row);
         }
         br.close();
