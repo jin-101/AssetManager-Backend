@@ -101,9 +101,6 @@ public class LoginAndSignUpService {
 					result = "로그인성공";
 					loginInfo.put("result", result);
 					loginInfo.put("userName", user.getUserName());
-					
-					String totalAsset = totalService.getTotalAsset(userId); // 총자산
-					loginInfo.put("totalAsset", totalAsset);
 
 				} else { // (iii) 비밀번호 틀린 경우
 					int loginFailCount = user.getLoginFailCount();
