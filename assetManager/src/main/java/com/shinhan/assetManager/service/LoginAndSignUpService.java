@@ -1,22 +1,28 @@
 package com.shinhan.assetManager.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.shinhan.assetManager.jwt.JavaJwt;
+import com.shinhan.assetManager.repository.AptRecentTradeRepo;
+import com.shinhan.assetManager.repository.CoinBithumbRepo;
+import com.shinhan.assetManager.repository.CoinUpbitRepo;
+import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
+import com.shinhan.assetManager.repository.StockRepo;
+import com.shinhan.assetManager.repository.UserAssetRepo;
+import com.shinhan.assetManager.repository.UserLiabilityRepo;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.AES256;
 import com.shinhan.assetManager.user.SHA256;
 import com.shinhan.assetManager.user.Salt;
+import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
 
 @Service
@@ -30,6 +36,33 @@ public class LoginAndSignUpService {
 	SHA256 sha256; // 단방향
 	@Autowired
 	AES256 aes256; // 양방향
+	@Autowired
+	LoginAndSignUpService lasService;
+	@Autowired
+	StockService stockService;
+	@Autowired
+	UserAssetRepo uaRepo; // 자산
+	@Autowired
+	UserLiabilityRepo ulRepo; // 부채 
+	@Autowired
+	AptRecentTradeRepo artRepo; // E1 : 부동산
+	@Autowired
+	CoinUpbitRepo upbitRepo; // C2 : 코인
+	@Autowired
+	CoinBithumbRepo bithumbRepo; // C2 : 코인
+	@Autowired
+	StockRepo sRepo; // C1 : 주식
+	@Autowired
+	HouseholdAccountsRepository haRepo; // A1 : 가계부잔액
+	
+	String exchangeAssetCode = "A2";
+	String depositAssetCode = "B1";
+	String savingsAssetCode = "B2";
+	String stockAssetCode = "C1";
+	String coinAssetCode = "C2";
+	String aptAssetCode = "E1";
+	String carAssetCode = "E2";
+	String goldAssetCode = "E3";
 
 	// 이메일 체크
 	public String checkEmail(UserDTO userDto) {
@@ -313,6 +346,69 @@ public class LoginAndSignUpService {
 			result = "최대 3개의 계정만 가질 수 있습니다. 기존 ID를 삭제해주세요";
 		}
 		return result;
+	}
+	
+	// 총자산 얻기
+	public void getTotalAsset(String userId) {
+		// (1) 총 주식 자산
+		Long totalStockAsset = lasService.getTotalStock(userId);
+		
+		// (2) 총 코인 자산
+	}
+	
+	// (1) 총 주식 자산
+	public Long getTotalStock(String userId) {
+		String response = stockService.showHoldingStocks(userId); // userId
+		System.out.println(response);
+		
+		JSONArray jsonArr = new JSONArray(response);
+		System.out.println(jsonArr);
+		
+		Long totalStockAsset = 0L;
+		Long eachStockAsset = 0L;
+		for(int i=0; i<jsonArr.length(); i++) {
+			JSONObject jsonObj = (JSONObject) jsonArr.get(i);
+			Integer stockPrice = (Integer) jsonObj.get("stockPrice");
+			Integer totalShares = (Integer) jsonObj.get("totalShares");
+			eachStockAsset = (long) (stockPrice * totalShares);
+			totalStockAsset += eachStockAsset;
+		}
+		System.out.println("총 주식 합계 : " + totalStockAsset);
+		
+		return totalStockAsset;
+	}
+	
+	// (2) 총 코인 자산
+	public void getTotalCoin(String userId) {
+		UserDTO user = uRepo.findById(userId).get();
+		List<UserAssetDTO> coinAssetList = uaRepo.findByUserAndAssetCode(user, coinAssetCode); // C2
+		
+		System.out.println("총 코인 List 수 : " + coinAssetList.size());
+		
+		for(int i=0; i<coinAssetList.size(); i++) {
+			UserAssetDTO coinAssetDto = coinAssetList.get(i);
+			Double quantity = Double.parseDouble(coinAssetDto.getQuantity());
+		}
+	}
+	
+	// (3) 총 예적금 자산
+	public void getTotalDepositAndSavings() {
+		
+	}
+	
+	// (4) 총 부동산 자산
+	public void getTotalApt() {
+		
+	}
+	
+	// (5) 총 금, 외환 자산
+	public void getTotalGoldAndExchange() {
+		
+	}
+	
+	// (6) 총 자동차 자산
+	public void getTotalCar() {
+		
 	}
 
 }

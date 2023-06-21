@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.repository.UserAssetRepo;
+import com.shinhan.assetManager.repository.UserLiabilityRepo;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
+import com.shinhan.assetManager.user.UserLiabilityDTO;
 
 @Service
 public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 재무지표 한눈에 보기)
@@ -19,9 +21,17 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	@Autowired
 	UserAssetRepo userAssetRepo;
 	@Autowired
+	UserLiabilityRepo userLiabilityRepo;
+	@Autowired
 	UserRepo userRepo;
 	@Autowired
 	DecimalFormatForCurrency dfc;
+	
+	Double loanAmount = 0.0;
+	Double totalLoanAmount = 0.0;
+	
+	// String indicator; // 지표
+	// Double loanAmount; // 대출금액
 	
 	// ★ 1-1 ~ 2-3 : '총소득'이 필요하므로 1년치 소득을 입력받을 컴포넌트가 필요할 듯.. (추가로 총소득을 얻는 공통 메소드 필요)
 	
@@ -55,8 +65,18 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	// 2-3. 거주주택마련부채상환지표 : 거주주택마련부채상환액 / 총소득
 	public void ee(String userId) {
 		// 총소득 얻기
+		UserDTO user = service.getUser(userId);
 		
 		// 거주주택마련부채상환액 얻기 : '원리금상환액'을 의미(잔액X), 만기일 데이터를 바탕으로 원리금 대략 계산해서 보여주면 될 듯!
+		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
+		for(int i=0; i<liabDtoList.size(); i++) {
+			UserLiabilityDTO liabDto = liabDtoList.get(i);
+			liabDto.getLoanAmount();
+			liabDto.getRate();
+			liabDto.getMaturityDate();
+			
+			// ★ 이제 총 원리금 계산한 다음, 연도별로 보여주면 될 듯 
+		}
 	}
 	
 	
@@ -69,6 +89,17 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		Double totalAsset = service.getTotalAsset(user);
 		
 		// 총부채 얻기 : user 1개 이용해서 총 loanAmount 합산하면 될 듯
+		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUser(user);
+		for(int i=0; i<liabDtoList.size(); i++) {
+			UserLiabilityDTO liabDto = liabDtoList.get(i);
+			loanAmount = Double.parseDouble(liabDto.getLoanAmount());
+			totalLoanAmount += loanAmount;
+		}
+		
+		// 지표계산
+		Double abcd = totalLoanAmount / totalAsset;
+		String indicator = dfc.percent(abcd);
+		System.out.println("총부채부담지표 : " + indicator);
 	}
 	
 	// 2-5. 거주주택마련부채부담지표 : 거주주택마련부채잔액 / 총자산
@@ -78,9 +109,23 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		Double totalAsset = service.getTotalAsset(user);
 		
 		// 주택마련부채 얻기 : '잔액'을 의미(원리금상환액X) user랑 liabilityCode 2개 이용해서 find하면 될 듯??
+		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
+		for(int i=0; i<liabDtoList.size(); i++) {
+			UserLiabilityDTO liabDto = liabDtoList.get(i);
+			loanAmount = Double.parseDouble(liabDto.getLoanAmount());
+			totalLoanAmount += loanAmount;
+		}
+		
+		// 지표계산
+		Double percent = totalLoanAmount / totalAsset;
+		String indicator = dfc.percent(percent);
+		System.out.println("거주주택마련부채부담지표 : " + indicator);
 	}
 	
 	// 3-3. 금융투자성향지표 : 금융투자 / 저축 및 투자 
+	public void hh(String userId) {
+		
+	}
 	
 	// 3-4. 금융자산비중지표 : 금융자산 / 총자산
 	public void cc(String userId) {
@@ -89,6 +134,18 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		Double totalAsset = service.getTotalAsset(user);
 		
 		// 금융자산 얻기 : user랑 AssetCode(C로 시작하는 놈들) 2개 이용해서 find하면 될 듯
+		Double totalFinancialAsset = 0.0;
+		List<UserAssetDTO> assetDtoList = userAssetRepo.findByUserAndAssetCodeStartingWith(user, "C");
+		for(int i=0; i<assetDtoList.size(); i++) {
+			UserAssetDTO dto = assetDtoList.get(i);
+			Double purchasePrice = Double.parseDouble(dto.getPurchasePrice());
+			Double quantity = Double.parseDouble(dto.getQuantity());
+			
+			totalFinancialAsset = purchasePrice * quantity;
+		}
+		System.out.println("총 금융자산 : " + totalFinancialAsset);
+		
+		// 지표계산
 	}
 
 	
@@ -112,7 +169,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 			totalAsset += subTotal;
 		}
 		String totalAssetTest = dfc.currency(totalAsset);
-		System.out.println(user.getUserId()+"의 총 자산 : "+totalAssetTest);
+		System.out.println(user.getUserId()+"의 총 자산 : "+totalAssetTest); 
 		
 		return totalAsset;
 	}

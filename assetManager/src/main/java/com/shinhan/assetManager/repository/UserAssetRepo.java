@@ -24,4 +24,9 @@ public interface UserAssetRepo extends CrudRepository<UserAssetDTO, MultikeyForU
 	public List<UserAssetDTO> findByUser(UserDTO user); // ★★ 엔티티에 UserDTO user 로 매핑되어 있으므로 findByUser를 해야 에러 발생 X 
 	                                                    // 비록 DB에는 user_id로 생성했지만, @Entity를 선언한 자바 객체에서는 user라는 변수를 쓰고 있으므로 이를 따라야 함          
  
+	// 자산군 얻기 메소드 (ex. 금융자산(C), 예적금(B),  
+	public List<UserAssetDTO> findByUserAndAssetCodeStartingWith(UserDTO user, String assetCodeStartingWith);
+	
+	// 자산 얻기 메소드 (ex. 코인(C2), 부동산(E1), 자동차(E2), 금(E3), 외환(A2))
+	public List<UserAssetDTO> findByUserAndAssetCode(UserDTO user, String assetCode);
 }
