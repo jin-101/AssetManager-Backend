@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.service.LoginAndSignUpService;
 import com.shinhan.assetManager.service.StockService;
 import com.shinhan.assetManager.service.TotalService;
@@ -27,6 +28,8 @@ public class LoginAndSignUpController {
 	LoginAndSignUpService service;
 	@Autowired
 	TotalService totalService;
+	@Autowired
+	DecimalFormatForCurrency dfc;
 
 	// 이메일 체크
 	@GetMapping
@@ -117,7 +120,10 @@ public class LoginAndSignUpController {
 	@GetMapping
 	@RequestMapping(value = "/getTotalAsset", produces = "text/plain;charset=UTF-8")
 	public String getTotalAsset(@RequestParam String userId) {
-		String totalAsset = totalService.getTotalAsset(userId);
+		Double total = totalService.getTotalAsset(userId);
+		
+		String totalAsset = dfc.currency(total);
+		System.out.println("★총자산 : " + totalAsset);
 		
 		return totalAsset;
 	}

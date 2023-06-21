@@ -69,7 +69,7 @@ public class TotalService {
 	String goldAssetCode = "E3";
 	
 	// 총자산 얻기
-	public String getTotalAsset(String userId) {
+	public Double getTotalAsset(String userId) {
 		Double total = 0.0;
 		
 		// (1) 총 주식 자산
@@ -88,10 +88,8 @@ public class TotalService {
 		Integer totalAccountBalance = getTotalAccountBalance(userId);
 		
 		total = totalStock+totalCoin+totalDepositAndSavings+totalApt+totalGoldAndExchange+totalCar+totalAccountBalance;
-		String totalAsset = dfc.currency(total);
-		System.out.println("★총자산 : " + totalAsset);
 		
-		return totalAsset; 
+		return total; 
 	}
 
 	// (1) 총 주식 자산
