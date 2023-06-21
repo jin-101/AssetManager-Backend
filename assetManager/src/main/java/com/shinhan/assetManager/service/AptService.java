@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.shinhan.assetManager.apt.AptDtoForReact;
-import com.shinhan.assetManager.controller.AdministrativeDistrictGuRepo;
+import com.shinhan.assetManager.apt.AptRecentTradeDTO;
+import com.shinhan.assetManager.repository.AdministrativeDistrictGuRepo;
 import com.shinhan.assetManager.repository.AdministrativeDistrictRepo;
+import com.shinhan.assetManager.repository.AptRecentTradeRepo;
 import com.shinhan.assetManager.repository.AptTradeRepo;
 import com.shinhan.assetManager.repository.UserAssetRepo;
 import com.shinhan.assetManager.repository.UserLiabilityRepo;
@@ -25,6 +27,8 @@ public class AptService implements AssetService {
 	@Autowired
 	AptTradeRepo tRepo;
 	@Autowired
+	AptRecentTradeRepo artRepo;
+	@Autowired
 	AdministrativeDistrictRepo dRepo;
 	@Autowired
 	AdministrativeDistrictGuRepo guRepo;
@@ -33,17 +37,29 @@ public class AptService implements AssetService {
 	@Autowired
 	UserLiabilityRepo liabilityRepo;
 	
+	String aptAssetCode = "E1";
+	String aptLiabilityCode = "L1";
+	String aptDetailCode = "주택담보대출";
+	
 	// 아파트 자산 추가
 	public String addApt(AptDtoForReact apt, String token) {
-		StringBuilder sb = new StringBuilder();
 		UserDTO user = uRepo.findById(token).get();
+		StringBuilder sb = new StringBuilder();
 		String purchasePrice = apt.getPurchasePrice().replace(",", "");
+		String aptName = apt.getAptName();
+		String dong = apt.getDong();
+		String netLeasableArea = apt.getNetLeasableArea();
+		
+		// 최근거래내역 테이블로부터 tradeNo 가져오기
+		AptRecentTradeDTO artDto = artRepo.findByAptNameAndDongAndNetLeasableArea(aptName, dong, netLeasableArea);
+		String tradeNo = artDto.getTradeNo().toString();
+		System.out.println("테스트 결과 : " + " 아파트이름 : " + aptName + " / 전용면적 : " + netLeasableArea + " / 동: " + dong);
 		
 		// 자산 save
 		UserAssetDTO assetDto = UserAssetDTO.builder()
 				.user(user)
-				.assetCode("E1")
-				.detailCode("여기에 거래내역 테이블 ID를 넣어줘야 하는데..") // ★★★
+				.assetCode(aptAssetCode) // E1
+				.detailCode(tradeNo) // ★★★
 				.purchasePrice(purchasePrice)
 				.purchaseDate(apt.getPurchaseDate())
 				.quantity("1")
@@ -58,8 +74,8 @@ public class AptService implements AssetService {
 		if(loanAmount != "" && rate != "" && maturityDate != "") {
 			UserLiabilityDTO liabilityDto = UserLiabilityDTO.builder()
 					.user(user)
-					.liabiltyCode("주담대면 L1 이런 식으로")
-					.detailCode("여기엔 주담대, 신용대출 등의 대출 이름을 기입")
+					.liabilityCode(aptLiabilityCode) // L1
+					.detailCode(aptDetailCode) // 주택담보대출
 					.loanAmount(apt.getLoanAmount())
 					.rate(apt.getRate())
 					.maturityDate(apt.getMaturityDate())
