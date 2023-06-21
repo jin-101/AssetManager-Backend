@@ -36,4 +36,12 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 			"ORDER BY ha.exchangeDate DESC")
 	public List<HouseholdAccountsDTO> getLastBalance();
 	
+	//삭제한 건의 윗부분 내역
+	@Query("select ha "
+			+ "from HouseholdAccountsDTO ha "
+			+ "where exchangeDate > (select ha2.exchangeDate "
+			+ "					   	  from HouseholdAccountsDTO ha2 "
+			+ "					      where detailCode = ?1) "
+			+ "order by ha.exchangeDate desc")
+	public List<HouseholdAccountsDTO> getUpListWhenDelete(int detailCode); 
 }
