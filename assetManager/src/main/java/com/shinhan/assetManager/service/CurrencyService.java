@@ -121,6 +121,7 @@ public class CurrencyService implements AssetService {
 			eachCurrency.put("marketPrice", marketPrice);
 			eachCurrency.put("gain", gain);
 			eachCurrency.put("investedAmount",totalAmountByCurrency.get(currency));
+			eachCurrency.put("totalShares", totalSharesByCurrency.get(currency));
 			
 			buyCurrency.put(eachCurrency);
 			
