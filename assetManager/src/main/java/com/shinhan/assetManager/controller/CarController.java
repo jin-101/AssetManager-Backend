@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shinhan.assetManager.car.CarDTO;
 import com.shinhan.assetManager.service.CarService;
 
 @RestController
@@ -19,6 +21,13 @@ public class CarController {
 	
 		@Autowired
 		CarService service;
+		
+		@GetMapping("/carCrud")
+		@ResponseBody
+		public List<CarDTO> myCarInfo(@RequestParam String userId) {
+			List<CarDTO> response = service.myCarInfo(userId);
+			return response;
+		}
 		
 		//차량번호로 조회 클릭시 => 
 		@PostMapping(value = "/mySearch.do/{carNo}/{userId}")

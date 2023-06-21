@@ -40,6 +40,20 @@ public class CarService implements AssetService{
 	@Autowired
 	private UserAssetRepo userAssetRepo;
 	
+	public List<CarDTO> myCarInfo(String userId) {
+		Optional<UserDTO> user = userRepo.findById(userId);
+		List<UserAssetDTO> userCars = userAssetRepo.getSpecificUserAssets(user.get(),assetCode);
+//		System.out.println("list: "+ userCars);
+		
+		List<CarDTO> list = new ArrayList<>();
+	
+		for(UserAssetDTO asset:userCars) {
+			Optional<CarDTO> useCar = carDTOrepo.findById(Long.parseLong(asset.getDetailCode()));
+			list.add(useCar.get());
+		}
+		return list;
+	}
+	
 	//차량번호로 조회 클릭시 => 
 	public String searchMyCarAndInsert(String carNo, String userId) {
 		CrawlingSelenium selenium = new CrawlingSelenium();
