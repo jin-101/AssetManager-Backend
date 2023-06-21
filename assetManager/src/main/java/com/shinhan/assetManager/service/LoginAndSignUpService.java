@@ -6,12 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.AES256;
 import com.shinhan.assetManager.user.SHA256;

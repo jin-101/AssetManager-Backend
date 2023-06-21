@@ -26,6 +26,8 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	UserRepo userRepo;
 	@Autowired
 	DecimalFormatForCurrency dfc;
+	@Autowired
+	TotalService totalService; // 총자산 얻기
 	
 	Double loanAmount = 0.0;
 	Double totalLoanAmount = 0.0;
@@ -85,10 +87,10 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	// 2-4. 총부채부담지표 : 총부채 / 총자산
 	public void dd(String userId) {
 		// 총자산 얻기
-		UserDTO user = service.getUser(userId);
-		Double totalAsset = service.getTotalAsset(user);
+		Double totalAsset = totalService.getTotalAsset(userId);
 		
 		// 총부채 얻기 : user 1개 이용해서 총 loanAmount 합산하면 될 듯
+		UserDTO user = service.getUser(userId);
 		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUser(user);
 		for(int i=0; i<liabDtoList.size(); i++) {
 			UserLiabilityDTO liabDto = liabDtoList.get(i);
@@ -105,10 +107,10 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	// 2-5. 거주주택마련부채부담지표 : 거주주택마련부채잔액 / 총자산
 	public void bb(String userId) {
 		// 총자산 얻기
-		UserDTO user = service.getUser(userId);
-		Double totalAsset = service.getTotalAsset(user);
+		Double totalAsset = totalService.getTotalAsset(userId);
 		
 		// 주택마련부채 얻기 : '잔액'을 의미(원리금상환액X) user랑 liabilityCode 2개 이용해서 find하면 될 듯??
+		UserDTO user = service.getUser(userId);
 		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
 		for(int i=0; i<liabDtoList.size(); i++) {
 			UserLiabilityDTO liabDto = liabDtoList.get(i);
@@ -130,11 +132,11 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	// 3-4. 금융자산비중지표 : 금융자산 / 총자산
 	public void cc(String userId) {
 		// 총자산 얻기
-		UserDTO user = service.getUser(userId);
-		Double totalAsset = service.getTotalAsset(user);
+		Double totalAsset = totalService.getTotalAsset(userId);
 		
 		// 금융자산 얻기 : user랑 AssetCode(C로 시작하는 놈들) 2개 이용해서 find하면 될 듯
 		Double totalFinancialAsset = 0.0;
+		UserDTO user = service.getUser(userId);
 		List<UserAssetDTO> assetDtoList = userAssetRepo.findByUserAndAssetCodeStartingWith(user, "C");
 		for(int i=0; i<assetDtoList.size(); i++) {
 			UserAssetDTO dto = assetDtoList.get(i);
@@ -146,6 +148,9 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		System.out.println("총 금융자산 : " + totalFinancialAsset);
 		
 		// 지표계산
+		Double percent = totalFinancialAsset / totalAsset;
+		String indicator = dfc.percent(percent);
+		System.out.println("금융자산비중지표 : " + indicator);
 	}
 
 	
@@ -155,26 +160,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 	}
 	
-	// B. 총자산 얻기 (from user_asset 테이블)
-	public Double getTotalAsset(UserDTO user) {
-		// ★ (1) user_asset 테이블에 있는 총자산(원금) 그대로를 갖다 쓰는게 맞을까??
-		//   (2) 아니면 현재 시세를 반영한 총자산을 쓰는게 맞을까??
-		Double totalAsset = 0.0;
-		List<UserAssetDTO> userAssetList = userAssetRepo.findByUser(user); 
-		for(int i=0; i<userAssetList.size(); i++) {
-			UserAssetDTO dto = userAssetList.get(i);
-			Double purchasePrice = Double.parseDouble(dto.getPurchasePrice());
-			Double quantity = Double.parseDouble(dto.getQuantity());
-			Double subTotal = purchasePrice * quantity; // subTotal : 소계
-			totalAsset += subTotal;
-		}
-		String totalAssetTest = dfc.currency(totalAsset);
-		System.out.println(user.getUserId()+"의 총 자산 : "+totalAssetTest); 
-		
-		return totalAsset;
-	}
-	
-	// C. userId로부터 UserDTO 얻기
+	// B. userId로부터 UserDTO 얻기
 	public UserDTO getUser(String userId) {
 		// ID로부터 UserDTO 얻기 (★★UserAsset 엔티티의 user_id 부분이 UserDTO user 로 지정돼있으므로)
 		UserDTO user = userRepo.findById(userId).get();
