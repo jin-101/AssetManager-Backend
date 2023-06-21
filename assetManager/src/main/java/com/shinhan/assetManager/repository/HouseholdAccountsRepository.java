@@ -43,5 +43,9 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 			+ "					   	  from HouseholdAccountsDTO ha2 "
 			+ "					      where detailCode = ?1) "
 			+ "order by ha.exchangeDate desc")
-	public List<HouseholdAccountsDTO> getUpListWhenDelete(int detailCode); 
+	public List<HouseholdAccountsDTO> getUpListWhenDelete(int detailCode);
+	
+	// 총자산 얻기 中 가계부잔액 얻기
+	public List<HouseholdAccountsDTO> findByMemberIdOrderByExchangeDateDesc(String memberId); // OrderBy컬럼명Desc(Asc)
+	
 }

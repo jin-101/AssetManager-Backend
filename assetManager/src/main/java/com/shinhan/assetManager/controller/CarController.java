@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shinhan.assetManager.car.CarDTO;
 import com.shinhan.assetManager.service.CarService;
 
 @RestController
@@ -20,24 +22,34 @@ public class CarController {
 		@Autowired
 		CarService service;
 		
-		//차량번호로 조회 클릭시 => 
-		@PostMapping(value = "/mySearch.do/{carNo}")
+		@GetMapping("/carCrud")
 		@ResponseBody
-		public String searchMyCarAndInsert(@PathVariable String carNo) {
-			String str = service.searchMyCarAndInsert(carNo);
+		public List<CarDTO> myCarInfo(@RequestParam String userId) {
+			List<CarDTO> response = service.myCarInfo(userId);
+			return response;
+		}
+		
+		//차량번호로 조회 클릭시 => 
+		@PostMapping(value = "/mySearch.do/{carNo}/{userId}")
+		@ResponseBody
+		public String searchMyCarAndInsert(
+				@PathVariable("carNo") String carNo,
+				@PathVariable("userId") String userId) {
+			String str = service.searchMyCarAndInsert(carNo, userId);
 			System.out.println(str); //저장관련 멘트 전달
 			return str;
 		}
 		
 		//직접입력으로 클릭시 => 
-		@PostMapping(value = "/insert.do/{carCompany}/{carModel}/{carYear}")
+		@PostMapping(value = "/insert.do/{carCompany}/{carModel}/{carYear}/{userId}")
 		@ResponseBody
 		public String carInsert(
 				@PathVariable("carCompany") String carCompany,
 				@PathVariable("carModel") String carModel,
-				@PathVariable("carYear") String carYear) {
+				@PathVariable("carYear") String carYear,
+				@PathVariable("userId") String userId) {
 			System.out.println(carCompany +  " " +carModel+  " " +carYear);
-			String result = service.carInsert(carCompany, carModel, carYear);
+			String result = service.carInsert(carCompany, carModel, carYear, userId);
 			System.out.println(result); //저장관련 멘트 전달
 			
 			return result;

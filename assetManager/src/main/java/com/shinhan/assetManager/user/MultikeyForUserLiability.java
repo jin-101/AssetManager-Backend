@@ -11,10 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class MultikeyForUserLiabiltiy implements Serializable {
+public class MultikeyForUserLiability implements Serializable {
 
 	private String user; // ★ 이것도 name을 서로 맞춰줘야 에러 안 나는 듯
-	private String liabiltyCode;
+	private String liabilityCode;
 	private String detailCode; 
  
 }

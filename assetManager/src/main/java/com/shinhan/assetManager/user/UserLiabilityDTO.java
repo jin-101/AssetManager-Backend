@@ -26,7 +26,7 @@ import lombok.ToString;
 @Table(name = "user_liability")
 @Entity
 @Component 
-@IdClass(MultikeyForUserLiabiltiy.class)
+@IdClass(MultikeyForUserLiability.class)
 public class UserLiabilityDTO { // 개인 부채 테이블
 
 	@Id
@@ -34,9 +34,9 @@ public class UserLiabilityDTO { // 개인 부채 테이블
 	@JoinColumn(name = "user_id") 
 	private UserDTO user; // 1. 회원 아이디
 	
-	@Id
-	@Column(length = 50, name = "liabilty_code")
-	private String liabiltyCode; // 2. 부채코드 (ex. S1, L1 ...)
+	@Id  
+	@Column(length = 50, name = "liability_code")
+	private String liabilityCode; // 2. 부채코드 (ex. S1, L1 ...)
 	
 	@Id
 	@Column(length = 50, name = "detail_code")

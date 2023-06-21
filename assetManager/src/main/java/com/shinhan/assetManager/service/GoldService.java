@@ -94,6 +94,7 @@ public class GoldService implements AssetService{
 		userGold.put("gold99k",gold99k);
 		userGold.put("returnBygold99k", returnBygold99k);
 		userGold.put("returnByminiGold", returnByminiGold);
+		userGold.put("totalGram", totalGram);
 		
 		
 		

@@ -1,18 +1,14 @@
 package com.shinhan.assetManager.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.shinhan.assetManager.jwt.JavaJwt;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.AES256;
 import com.shinhan.assetManager.user.SHA256;
@@ -30,6 +26,8 @@ public class LoginAndSignUpService {
 	SHA256 sha256; // 단방향
 	@Autowired
 	AES256 aes256; // 양방향
+	@Autowired
+	TotalService totalService;
 
 	// 이메일 체크
 	public String checkEmail(UserDTO userDto) {
@@ -97,14 +95,9 @@ public class LoginAndSignUpService {
 			try {
 				String encryptedText = aes256.encryptAES256(text);
 				if (encryptedText.equals(encryptedPw)) { // (ii) 비밀번호 맞은 경우
-					// ★ 로그인 성공시 JWT 토큰 생성해서 리액트로 보냄
-
-					//JavaJwt jwt = new JavaJwt();
-					//String token = jwt.createToken(userId); 
 					result = "로그인성공";
 					loginInfo.put("result", result);
 					loginInfo.put("userName", user.getUserName());
-					//session.setAttribute(userId, user);
 
 				} else { // (iii) 비밀번호 틀린 경우
 					int loginFailCount = user.getLoginFailCount();
@@ -314,5 +307,6 @@ public class LoginAndSignUpService {
 		}
 		return result;
 	}
+	
 
 }

@@ -25,6 +25,7 @@ public class AptController {
 	// 아파트 자산 추가
 	@PostMapping(value = "/add/{token}", consumes = "application/json", produces = "text/plain;charset=utf-8")
 	public String addApt(@RequestBody AptDtoForReact apt, @PathVariable String token) {
+		System.out.println("리액트에서 들어온 아파트 자산 추가 : "+apt);
 		String result = service.addApt(apt, token);
 		System.out.println(apt);
 		

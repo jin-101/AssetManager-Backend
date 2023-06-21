@@ -34,14 +34,38 @@ public class AptTest {
 	ApiAptTrade aptTrade;	
 	
 	//@Test
-	void selectAndInsertApt2() {
+	void selectAndInsertApt2() throws InterruptedException {
 		Long startNo = 1L;
 		Long endNo = 167648L;
-		tRepo.findByTradeNoBetween(startNo, endNo);
+		List<AptDTO> aptList = tRepo.findByTradeNoBetween(startNo, endNo);
+		for(int i=0; i<aptList.size(); i++) {
+			Thread.sleep(100);
+			AptDTO apt = aptList.get(i);
+			Long tradeNo = apt.getTradeNo();
+			String aptName = apt.getAptName();  
+			String areaCode = apt.getAreaCode();
+			String netLeasableArea = apt.getNetLeasableArea();
+			String dong = apt.getDong();
+			String price = apt.getPrice();
+			String tradeDate = apt.getTradeDate();
+			System.out.println(tradeNo + " " + aptName + " " + areaCode + " " + netLeasableArea);
+			
+			AptRecentTradeDTO artDto = AptRecentTradeDTO.builder()
+					.tradeNo(tradeNo)
+					.aptName(aptName)
+					.areaCode(areaCode)
+					.dong(dong)
+					.netLeasableArea(netLeasableArea)
+					.price(price)
+					.tradeDate(tradeDate)
+					.build();
+			artRepo.save(artDto);
+		}
 	}
+
 	
 	// 0. apt_recent_trade 테스트 (★★) 
-	@Test
+	//@Test
 	void selectAndInsertApt() {  
 		
 		// (2) tradeNo 167649L(22년 1월 데이터)부터 시작

@@ -30,5 +30,13 @@ public class DecimalFormatForCurrency {
 		
 		return fmtNumber;
 	}
+	
+	// % 표시 (소수점 첫째자리까지)
+	public String percent(Double number) {
+		DecimalFormat df = new DecimalFormat("#.#%");
+		String fmtNumber = df.format(number);
+		
+		return fmtNumber;
+	}
 
 }

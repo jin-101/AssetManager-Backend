@@ -1,32 +1,61 @@
 package com.shinhan.assetManager.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.shinhan.assetManager.car.CarDTO;
 import com.shinhan.assetManager.car.CrawlingSelenium;
 import com.shinhan.assetManager.dto.CarCompanyDTO;
 import com.shinhan.assetManager.dto.CarModelDTO;
 import com.shinhan.assetManager.repository.CarCompanyRepository;
+import com.shinhan.assetManager.repository.CarDTOrepo;
 import com.shinhan.assetManager.repository.CarModelPRepository;
+import com.shinhan.assetManager.repository.UserAssetRepo;
+import com.shinhan.assetManager.repository.UserRepo;
+import com.shinhan.assetManager.user.UserAssetDTO;
+import com.shinhan.assetManager.user.UserDTO;
 import com.shinhan.assetManager.repository.CarInfomationRepository;
 
 @Service
 public class CarService implements AssetService{
 
+	private String assetCode = "E2";
+	
 	@Autowired
-	CarCompanyRepository carCompanyRepo;
+	private CarCompanyRepository carCompanyRepo;
 	@Autowired
-	CarModelPRepository carModelRepo;
+	private CarModelPRepository carModelRepo;
 	@Autowired
-	CarInfomationRepository carInfoRepo;
+	private CarInfomationRepository carInfoRepo;
+	@Autowired
+	private CarDTOrepo carDTOrepo;
+	
+	@Autowired
+	private UserRepo userRepo;
+	@Autowired
+	private UserAssetRepo userAssetRepo;
+	
+	public List<CarDTO> myCarInfo(String userId) {
+		Optional<UserDTO> user = userRepo.findById(userId);
+		List<UserAssetDTO> userCars = userAssetRepo.getSpecificUserAssets(user.get(),assetCode);
+//		System.out.println("list: "+ userCars);
+		
+		List<CarDTO> list = new ArrayList<>();
+	
+		for(UserAssetDTO asset:userCars) {
+			Optional<CarDTO> useCar = carDTOrepo.findById(Long.parseLong(asset.getDetailCode()));
+			list.add(useCar.get());
+		}
+		return list;
+	}
 	
 	//차량번호로 조회 클릭시 => 
-	public String searchMyCarAndInsert(String carNo) {
+	public String searchMyCarAndInsert(String carNo, String userId) {
 		CrawlingSelenium selenium = new CrawlingSelenium();
 		System.out.println("carNo: "+ carNo);
 		Map<String,String> obj = selenium.process(carNo);
@@ -64,22 +93,44 @@ public class CarService implements AssetService{
 		//데이터 (모델명,가격,연식 / 제조사)
 		System.out.println("제조사:"+ dto.getCarCompany().getCompanyName() +  ", 모델명:" +obj.get("className")+  ", 연식:" + obj.get("year") + ", 가격:"+ obj.get("price"));
 		//데이터가 올바르게 넘어왔으면 저장은 여기서... 가격없어도 저장
-	
+		CarDTO inputCarInfo = CarDTO.builder()
+				.company(dto.getCarCompany().getCompanyName())
+				.model(obj.get("className"))
+				.year(obj.get("year"))
+				.price(obj.get("price"))
+				.build();
+		carDTOrepo.save(inputCarInfo);
+		System.out.println(inputCarInfo.getDetailCode()+"  "+userId);
+		Optional<UserDTO> user = userRepo.findById(userId);
+		UserAssetDTO userAssetDto = new UserAssetDTO(user.get(), assetCode,  Long.toString(inputCarInfo.getDetailCode()), obj.get("price"), obj.get("year"), "1");
+		userAssetRepo.save(userAssetDto);
+		
+		
 		return "차량등록을 완료하였습니다.";
 	}
 	
 	//직접입력 클릭시 => 
-	public String carInsert(String carCompany, String carModel, String carYear) {
+	public String carInsert(String carCompany, String carModel, String carYear, String userId) {
 		System.out.println(carCompany +  " " +carModel+  " " +carYear);
 		CarCompanyDTO carCo = carCompanyRepo.findByCompanyName(carCompany);
 		
 		CarModelDTO dto=carModelRepo.findFirstByClassNameContaining(carModel);
-//		System.out.println(dto==null);
 		
 		Integer price=carInfoRepo.getAveragePrice(carCo.getCompanyId(),carModel,carYear);
 		System.out.println("제조사:"+ carCompany +  ", 모델명:" +carModel+  ", 연식:" + carYear + ", 가격:"+ price);
 		//데이터가 올바르게 넘어왔으면 저장은 여기서... 가격 없어도 저장
-	
+		
+		CarDTO inputCarInfo = CarDTO.builder()
+				.company(carCompany)
+				.model(carModel)
+				.year(carYear)
+				.price(price+"")
+				.build();
+		carDTOrepo.save(inputCarInfo);
+		Optional<UserDTO> user = userRepo.findById(userId);
+		UserAssetDTO userAssetDto = new UserAssetDTO(user.get(), assetCode,  Long.toString(inputCarInfo.getDetailCode()), price.toString(), carYear, "1");
+		userAssetRepo.save(userAssetDto);
+		
 		return "차량등록을 완료하였습니다.";
 	}
 	
