@@ -85,12 +85,13 @@ public class TotalService {
 		// (6) 총 자동차
 		Long totalCar = getTotalCar(userId);
 		//( 7) 총 가계부잔액
+		Integer totalAccountBalance = getTotalAccountBalance(userId);
 		
-		total = totalStock+totalCoin+totalDepositAndSavings+totalApt+totalGoldAndExchange+totalCar;
+		total = totalStock+totalCoin+totalDepositAndSavings+totalApt+totalGoldAndExchange+totalCar+totalAccountBalance;
 		String totalAsset = dfc.currency(total);
 		System.out.println("★총자산 : " + totalAsset);
 		
-		return totalAsset;
+		return totalAsset; 
 	}
 
 	// (1) 총 주식 자산
@@ -241,8 +242,14 @@ public class TotalService {
 	}
 	
 	// (7) 총 가계부잔액
-	public void getTotalHouseholds(String userId) {
-		List<HouseholdAccountsDTO> list = haRepo.findByMemberId(userId);
+	public Integer getTotalAccountBalance(String userId) {
+		// 거래내역 내림차순
+		List<HouseholdAccountsDTO> accountBalanceList = haRepo.findByMemberIdOrderByExchangeDateDesc(userId);
+		
+		// 내림차순의 0번째를 통해 가장 최신 데이터 이용
+		Integer balance = accountBalanceList.get(0).getBalance();
+		
+		return balance;
 	}
 
 }

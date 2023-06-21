@@ -37,6 +37,6 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 	public List<HouseholdAccountsDTO> getLastBalance();
 	
 	// 총자산 얻기 中 가계부잔액 얻기
-	public List<HouseholdAccountsDTO> findByMemberId(String memberId);
+	public List<HouseholdAccountsDTO> findByMemberIdOrderByExchangeDateDesc(String memberId); // OrderBy컬럼명Desc(Asc)
 	
 }
