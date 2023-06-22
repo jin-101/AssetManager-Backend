@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shinhan.assetManager.coin.CoinAssetDTO;
 import com.shinhan.assetManager.coin.CoinBithumbDTO;
 import com.shinhan.assetManager.coin.CoinDtoForReact;
 import com.shinhan.assetManager.coin.CoinUpbitDTO;
-import com.shinhan.assetManager.jwt.JavaJwt;
 import com.shinhan.assetManager.repository.CoinBithumbRepo;
 import com.shinhan.assetManager.repository.CoinUpbitRepo;
 import com.shinhan.assetManager.service.CoinService;
@@ -56,5 +55,13 @@ public class CoinController {
 		coinMap = service.getCoinList(coin);
 		
 		return coinMap;
+	}
+	
+	// 자산 탭 - 코인 자산 조회
+	@GetMapping("/coinCrud")
+	@ResponseBody
+	public List<CoinAssetDTO> myCoinInfo(@RequestParam String userId) {
+		List<CoinAssetDTO> response = service.myCoinInfo(userId);
+		return response;
 	}
 }
