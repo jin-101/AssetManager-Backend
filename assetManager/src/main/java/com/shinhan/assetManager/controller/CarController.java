@@ -2,6 +2,7 @@ package com.shinhan.assetManager.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shinhan.assetManager.car.CarDTO;
+import com.shinhan.assetManager.dto.CarInfomationDTO;
 import com.shinhan.assetManager.service.CarService;
 
 @RestController
@@ -22,6 +24,28 @@ public class CarController {
 		@Autowired
 		CarService service;
 		
+
+		@GetMapping("/typeList")
+		@ResponseBody
+		public Set<String> carTypeList(@RequestParam String carCompany){
+			Set<String> response = service.carTypeList(carCompany);
+			return response;
+		}
+		@GetMapping("/recomand")
+		@ResponseBody
+		public List<CarInfomationDTO> carRecomand(
+				@RequestParam String carCompany,
+				@RequestParam String type,
+				@RequestParam Integer minPrice,
+				@RequestParam Integer maxPrice
+				) {
+			List<CarInfomationDTO> response = service.carRecomand(carCompany,type,minPrice,maxPrice);
+			return response;
+		}
+		
+		
+		
+		//소유 차량 정보
 		@GetMapping("/carCrud")
 		@ResponseBody
 		public List<CarDTO> myCarInfo(@RequestParam String userId) {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,26 @@ public class DepositController {
 	
 	@Autowired
 	DepositService service;
+	
+	@DeleteMapping("depositDelete")
+	public String depositDelete(@RequestParam String userId, @RequestParam String detailCode) {
+		
+		return "삭제완료 되었습니다.";
+	}
+	
+	@GetMapping("/depositUpdate")
+	@ResponseBody
+	public List<DepositSavingsDTO> depositInfo(@RequestParam String userId){
+		List<DepositSavingsDTO> list = service.depositInfo(userId);
+		return list;
+	}
+	
+	@GetMapping("/savingsUpdate")
+	@ResponseBody
+	public List<DepositSavingsDTO> savingsInfo(@RequestParam String userId){
+		List<DepositSavingsDTO> list = service.savingsInfo(userId);
+		return list;
+	}
 	
 	@GetMapping("/depositCrud")
 	@ResponseBody
