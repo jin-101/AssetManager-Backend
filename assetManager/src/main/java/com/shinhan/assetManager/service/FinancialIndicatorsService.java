@@ -30,15 +30,11 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	@Autowired
 	TotalService totalService; // 총자산 얻기
 	
-	Double loanAmount = 0.0;
-	Double totalLoanAmount = 0.0;
-	
 	// 모든 지표 얻는 메소드
 	public FinancialIndicatorDTO getTotalIndicator(String userId) {
 		// 총자산 얻기
 		Double totalAsset = totalService.getTotalAsset(userId);
 		String totalAssetInString = dfc.currency(totalAsset);
-		System.out.println("★총자산 : " + totalAssetInString);
 		
 		FinancialIndicatorDTO fiIndDto = FinancialIndicatorDTO.builder()
 				.householdInd(getHouseholdInd(userId))
@@ -68,6 +64,12 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		return null;
 	}
+	
+	
+	// 부채상환 원금 구하기
+	
+	// 부채상환 이자 구하기 
+	
 	
 	// 2. 부채지표
 	// 2-1. 총부채상환지표 : 총부채상환액 / 총소득
@@ -118,9 +120,10 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		// 총부채 얻기 : user 1개 이용해서 총 loanAmount 합산하면 될 듯
 		UserDTO user = service.getUser(userId);
 		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUser(user);
+		Double totalLoanAmount = 0.0;
 		for(int i=0; i<liabDtoList.size(); i++) {
 			UserLiabilityDTO liabDto = liabDtoList.get(i);
-			loanAmount = Double.parseDouble(liabDto.getLoanAmount());
+			Double loanAmount = Double.parseDouble(liabDto.getLoanAmount());
 			totalLoanAmount += loanAmount;
 		}
 		
@@ -137,9 +140,10 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		// 주택마련부채 얻기 : '잔액'을 의미(원리금상환액X) user랑 liabilityCode 2개 이용해서 find하면 될 듯??
 		UserDTO user = service.getUser(userId);
 		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
+		Double totalLoanAmount = 0.0;
 		for(int i=0; i<liabDtoList.size(); i++) {
 			UserLiabilityDTO liabDto = liabDtoList.get(i);
-			loanAmount = Double.parseDouble(liabDto.getLoanAmount());
+			Double loanAmount = Double.parseDouble(liabDto.getLoanAmount());
 			totalLoanAmount += loanAmount;
 		}
 		
@@ -153,24 +157,28 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	// 3-3. 금융투자성향지표 : 금융투자 / 저축 및 투자 
 	public String getFiInvestInd(String userId, Double totalAsset) {
+		// 금융자산 얻기
+		Double totalFinancialAsset = 0.0;
+		Long totalStock = totalService.getTotalStock(userId);
+		Double totalCoin = totalService.getTotalCoin(userId);
+		Long totalDepositAndSavings = totalService.getTotalDepositAndSavings(userId);
+		totalFinancialAsset = totalStock + totalCoin;
 		
-		return null;
+		// 지표계산
+		Double numerator = totalFinancialAsset; // 분자
+		Double denominator = totalStock + totalCoin + totalDepositAndSavings; // 분모 : 예적금, 펀드, 주식, 장기저축성보험, 노후대비를 위한 연금불입금 등
+		String indicator = dfc.percent(numerator/denominator);
+		
+		return indicator;
 	}
 	
 	// 3-4. 금융자산비중지표 : 금융자산 / 총자산
 	public String getFiAssetInd(String userId, Double totalAsset) {
-		// 금융자산 얻기 : user랑 AssetCode(C로 시작하는 놈들) 2개 이용해서 find하면 될 듯
+		// 금융자산 얻기
 		Double totalFinancialAsset = 0.0;
-		UserDTO user = service.getUser(userId);
-		List<UserAssetDTO> assetDtoList = userAssetRepo.findByUserAndAssetCodeStartingWith(user, "C");
-		for(int i=0; i<assetDtoList.size(); i++) {
-			UserAssetDTO dto = assetDtoList.get(i);
-			Double purchasePrice = Double.parseDouble(dto.getPurchasePrice());
-			Double quantity = Double.parseDouble(dto.getQuantity());
-			
-			totalFinancialAsset = purchasePrice * quantity;
-		}
-		System.out.println("총 금융자산 : " + totalFinancialAsset);
+		Long totalStock = totalService.getTotalStock(userId);
+		Double totalCoin = totalService.getTotalCoin(userId); 
+		totalFinancialAsset = totalStock + totalCoin;
 		
 		// 지표계산
 		Double percent = totalFinancialAsset / totalAsset;
@@ -194,6 +202,17 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		return user;
 	}
+	
+	// 금융자산 얻기 : user랑 AssetCode(C로 시작하는 놈들) 2개 이용해서 find하면 될 듯
+//	List<UserAssetDTO> assetList = userAssetRepo.findByUserAndAssetCodeStartingWith(user, "C");
+//	for(int i=0; i<assetList.size(); i++) {
+//		UserAssetDTO dto = assetList.get(i);
+//		Double purchasePrice = Double.parseDouble(dto.getPurchasePrice());
+//		Double quantity = Double.parseDouble(dto.getQuantity());
+//		
+//		totalFinancialAsset = purchasePrice * quantity;
+//	}
+//	System.out.println("총 금융자산 : " + totalFinancialAsset);
 } 
 
 
