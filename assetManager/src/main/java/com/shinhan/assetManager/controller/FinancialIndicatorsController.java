@@ -23,6 +23,7 @@ public class FinancialIndicatorsController {
 	@GetMapping(value = "/getFiInd", produces = "application/json") 
 	public FinancialIndicatorDTO getFiInd(@RequestParam String userId) { 
 		FinancialIndicatorDTO fiIndDto = service.getTotalIndicator(userId);
+		service.getTotalDebtRepaymentInd(userId);
    
 		return fiIndDto; 
 	}
