@@ -37,5 +37,14 @@ public class GoldController {
 		return response;
 	}
 	
+	@GetMapping("/goldGraph")
+	@ResponseBody
+	public String handleGraphRequest() {
+		
+		String response =  goldService.getReadyGraph();
+		
+		return response;
+	}
+	
 	
 }

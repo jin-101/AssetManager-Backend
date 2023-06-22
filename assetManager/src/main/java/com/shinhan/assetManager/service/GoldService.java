@@ -1,6 +1,7 @@
 package com.shinhan.assetManager.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,6 +100,29 @@ public class GoldService implements AssetService{
 		
 		
 		return userGold.toString();
+	}
+	
+	
+	public String getReadyGraph() {
+		Iterable<RealAssetDTO>  realAssetDtos = realAssetRepo.findAll();
+		List<JSONObject> response = new ArrayList<>();
+		List<JSONObject> goldList = new ArrayList<>();
+		
+		
+		realAssetDtos.forEach(dto ->{
+			JSONObject data = new JSONObject();
+			data.put("gold99k", dto.getGold99k());
+			data.put("mini", dto.getMinigold100g());
+			goldList.add(data);
+		});
+		
+		for(int i=0;i<goldList.size();i+=25) {
+			response.add(goldList.get(i));
+		}
+		
+		
+		
+		return response.toString();
 	}
 	
 	
