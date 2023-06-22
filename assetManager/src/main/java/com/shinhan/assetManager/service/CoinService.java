@@ -1,13 +1,19 @@
 package com.shinhan.assetManager.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.shinhan.assetManager.coin.CoinAssetDTO;
 import com.shinhan.assetManager.coin.CoinBithumbDTO;
 import com.shinhan.assetManager.coin.CoinDtoForReact;
 import com.shinhan.assetManager.coin.CoinUpbitDTO;
@@ -90,6 +96,53 @@ public class CoinService implements AssetService {
 		System.out.println(coinMap);
 		
 		return coinMap;
+	}
+	
+	// 자산 탭 - 코인 자산 조회
+	public List<CoinAssetDTO> myCoinInfo(String userId) {
+		List<CoinAssetDTO> myCoinList = new ArrayList<>();
+		UserDTO user = uRepo.findById(userId).get();
+		List<UserAssetDTO> coinList = assetRepo.findByUserAndAssetCode(user, "C2"); // coinAssetCode == C2
+		for(int i=0; i<coinList.size(); i++) {
+			String detailCode = coinList.get(i).getDetailCode();
+			CoinUpbitDTO upbitCoin = upbitRepo.findById(detailCode).orElse(null);
+			if (upbitCoin != null) {
+				// 거래소
+				String market = "업비트";
+				// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
+				Double currentPrice = Double.parseDouble(upbitCoin.getPrev_closing_price());
+				// 매수가 
+//				Double purchasePrice = 
+				// 수익률
+				
+			}
+		}
+		
+		Double total = 0.0;
+		for (int i = 0; i < coinList.size(); i++) {
+			UserAssetDTO coinAssetDto = coinList.get(i);
+			String detailCode = coinAssetDto.getDetailCode();
+			CoinUpbitDTO upbitCoin = upbitRepo.findById(detailCode).orElse(null);
+			if (upbitCoin != null) {
+				// 거래소
+				String market = "업비트";
+				// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
+				Double currentPrice = Double.parseDouble(upbitCoin.getPrev_closing_price());
+				// 매수가 
+//				Double purchasePrice = 
+				// 수익률
+				
+			}
+//			CoinBithumbDTO bithumbCoin = bitRepo.findById(detailCode).orElse(null);
+//			if (bithumbCoin != null) { // ★ 가끔 코인이 상장폐지가 되는 경우가 있는데, null 처리 안해주면 나중에 에러날 수도
+//				// 거래소
+//				String market = "빗썸";
+//				// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
+//				Double currentPrice = Double.parseDouble(bithumbCoin.getPrev_closing_price());
+//			}
+		}
+		
+		return myCoinList;
 	}
 
 	@Override
