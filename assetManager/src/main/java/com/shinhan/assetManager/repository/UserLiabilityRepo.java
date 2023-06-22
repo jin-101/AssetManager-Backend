@@ -17,4 +17,7 @@ public interface UserLiabilityRepo extends CrudRepository<UserLiabilityDTO, Mult
 	
 	// 총부채 얻는 메소드
 	public List<UserLiabilityDTO> findByUser(UserDTO user); 
+	
+	// 소비생활부채 얻기 (주담대(L1) 제외하고 모두)
+	public List<UserLiabilityDTO> findByUserAndLiabilityCodeNot(UserDTO user, String liabilityCode);
 }

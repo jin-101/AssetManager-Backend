@@ -68,8 +68,34 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	
 	// 부채상환 원금 구하기
-	
-	// 부채상환 이자 구하기 
+	public Long getLoanPrincipal(List<UserLiabilityDTO> list) {
+		Long totalLoanPrincipal = 0L;
+		for(int i=0; i<list.size(); i++) {
+			UserLiabilityDTO dto = list.get(i);
+			Long maturityYear = Long.parseLong(dto.getLoanMaturity());
+			Long loanAmount = Long.parseLong(dto.getLoanAmount());
+			Long loanPrincipal = loanAmount / maturityYear;
+			totalLoanPrincipal += loanPrincipal;
+		}
+		System.out.println("총 부채상환원금(1년) : " + totalLoanPrincipal);
+		
+		return totalLoanPrincipal;
+	}
+	// 부채상환 이자 구하기
+	public Double getLoanInterest(List<UserLiabilityDTO> list) {
+		Double totalLoanInterest = 0.0;
+		for(int i=0; i<list.size(); i++) {
+			UserLiabilityDTO dto = list.get(i);
+			Long maturityYear = Long.parseLong(dto.getLoanMaturity());
+			Long loanAmount = Long.parseLong(dto.getLoanAmount());
+			Double rate = Double.parseDouble(dto.getRate()) / 100;
+			Double loanInterest = loanAmount * rate;
+			totalLoanInterest += loanInterest;
+		}
+		System.out.println("총 부채상환이자(1년) : " + totalLoanInterest);
+		
+		return totalLoanInterest;
+	}
 	
 	
 	// 2. 부채지표
@@ -79,8 +105,11 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		// 총부채상환액 얻기 : user의 loanAmount * rate ????
 		// (총부채상환액이란 '부채를 상환하기 위해 지출하는 모든 금액, 즉 모든 부채의 원리금상환액')
+		UserDTO user = userRepo.findById(userId).get();
+		List<UserLiabilityDTO> liabilityList = userLiabilityRepo.findByUser(user);
+		Long totalLoanPrincipal = getLoanPrincipal(liabilityList); //원금
 		
-		// ★ 1년치 총부채상환액 / 1년치 총소득 (=> 부득이한 경우라면 1년치가 아닌 1달치로 변경해서??)
+		// 지표 계산식
 		
 		return null;
 	}
@@ -90,6 +119,11 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		// 총소득 얻기
 		
 		// 소비생활부채상환액 얻기 : ????
+		UserDTO user = userRepo.findById(userId).get();
+		List<UserLiabilityDTO> liabilityList = userLiabilityRepo.findByUserAndLiabilityCodeNot(user, "L1"); // ★ 메소드 바꿔줘야 함
+		Long totalLoanPrincipal = getLoanPrincipal(liabilityList); //원금
+		
+		// 지표 계산식 
 		
 		return null;
 	}
@@ -100,15 +134,8 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		UserDTO user = service.getUser(userId);
 		
 		// 거주주택마련부채상환액 얻기 : '원리금상환액'을 의미(잔액X), 만기일 데이터를 바탕으로 원리금 대략 계산해서 보여주면 될 듯!
-		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
-		for(int i=0; i<liabDtoList.size(); i++) {
-			UserLiabilityDTO liabDto = liabDtoList.get(i);
-			liabDto.getLoanAmount();
-			liabDto.getRate();
-			liabDto.getMaturityDate();
-			
-			// ★ 이제 총 원리금 계산한 다음, 연도별로 보여주면 될 듯 
-		}
+		List<UserLiabilityDTO> liabilityList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
+		Long totalLoanPrincipal = getLoanPrincipal(liabilityList); //원금
 		
 		return null;
 	}

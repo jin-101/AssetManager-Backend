@@ -48,8 +48,8 @@ public class UserLiabilityDTO { // 개인 부채 테이블
 	@Column(length = 50, name = "rate")
 	private String rate; // 5. 대출금리
 	
-	@Column(length = 50, name = "maturity_date")
-	private String maturityDate; // 6. 대출만기
+	@Column(length = 50, name = "loan_maturity")
+	private String loanMaturity; // 6. 대출만기 (년)
 	
 	// ★ 굳이 UserAssetDTO와 연관관계를 맺진 않아도 될 듯..? => (정정) 하는게 맞는 거 같음. 부채 데이터 넣을 때마다 detail_code를 일일이 얻는게 말이 안되지 않나?
 	@ManyToOne
