@@ -134,13 +134,22 @@ public class CurrencyService implements AssetService {
 	
 	public String getReadyGraph() {
 		Iterable<RealAssetDTO>  realAssetDtos = realAssetRepo.findAll();
-		List<Double> cnhList = new ArrayList<>();
-		List<Double> response = new ArrayList<>();
+		List<JSONObject> response = new ArrayList<>();
+		List<JSONObject> currencyList = new ArrayList<>();
 		
-		realAssetDtos.forEach(realAsset ->cnhList.add(realAsset.getCnh()));
 		
-		for(int i=0;i<cnhList.size();i++) {
-			response.add(cnhList.get(i));
+		realAssetDtos.forEach(dto ->{
+			JSONObject data = new JSONObject();
+			data.put("usd", dto.getUsd());
+			data.put("jpy", dto.getJpy());
+			data.put("gbp", dto.getGbp());
+			data.put("cnh", dto.getCnh());
+			data.put("eur", dto.getEur());
+			currencyList.add(data);
+		});
+		
+		for(int i=0;i<currencyList.size();i+=25) {
+			response.add(currencyList.get(i));
 		}
 		
 		
