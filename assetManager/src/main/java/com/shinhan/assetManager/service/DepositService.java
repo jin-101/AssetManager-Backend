@@ -33,7 +33,36 @@ public class DepositService implements AssetService {
 	@Autowired
 	private UserAssetRepo userAssetRepo;
 	
+	public String depositDelete(String userId, String detailCode) {
+		
+		return "삭제완료 되었습니다.";
+	}
 	
+	// 사용자 적금 불러오기
+	public List<DepositSavingsDTO> depositInfo(String userId){
+		Optional<UserDTO> user = userRepo.findById(userId);
+		List<UserAssetDTO> userDeposit = userAssetRepo.getSpecificUserAssets(user.get(), assetDepositCode);
+		List<DepositSavingsDTO> depositList = new ArrayList<>();
+		for(UserAssetDTO deposit:userDeposit) {
+			Optional<DepositSavingsDTO> singleDeposit = depositDTOrepo.findById(Long.parseLong(deposit.getDetailCode()));
+			depositList.add(singleDeposit.get());
+		}
+		return depositList;
+	}
+	
+	// 사용자 예금 불러오기
+	public List<DepositSavingsDTO> savingsInfo(String userId){
+		Optional<UserDTO> user = userRepo.findById(userId);
+		List<UserAssetDTO> userSavings = userAssetRepo.getSpecificUserAssets(user.get(), assetSavingsCode);
+		List<DepositSavingsDTO> savingsList = new ArrayList<>();
+		for(UserAssetDTO savings:userSavings) {
+			Optional<DepositSavingsDTO> singleSavings = depositDTOrepo.findById(Long.parseLong(savings.getDetailCode()));
+			savingsList.add(singleSavings.get());
+		}
+		return savingsList;
+	}
+	
+	// 사용자 예적금 통합 불러오기
 	public Map<String,List<DepositSavingsDTO>> myDepositInfo(String userId) {
 		System.out.println(userId);
 		Optional<UserDTO> user = userRepo.findById(userId);
