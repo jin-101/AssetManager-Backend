@@ -36,7 +36,8 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		Double totalAsset = totalService.getTotalAsset(userId);
 		String totalAssetInString = dfc.currency(totalAsset);
 		
-		FinancialIndicatorDTO fiIndDto = FinancialIndicatorDTO.builder()
+		FinancialIndicatorDTO fiIndDto = new FinancialIndicatorDTO();
+		fiIndDto = FinancialIndicatorDTO.builder()
 				.householdInd(getHouseholdInd(userId))
 				.totalDebtRepaymentInd(getTotalDebtRepaymentInd(userId))
 				.consumeDebtRepaymentInd(getConsumeDebtRepaymentInd(userId))
