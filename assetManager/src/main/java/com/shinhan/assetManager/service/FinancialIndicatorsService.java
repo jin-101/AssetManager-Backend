@@ -65,6 +65,12 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		return null;
 	}
 	
+	
+	// 부채상환 원금 구하기
+	
+	// 부채상환 이자 구하기 
+	
+	
 	// 2. 부채지표
 	// 2-1. 총부채상환지표 : 총부채상환액 / 총소득
 	public String getTotalDebtRepaymentInd(String userId) { // 아마 파라미터로 userId 받을 듯?
