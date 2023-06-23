@@ -86,7 +86,7 @@ public class AptService implements AssetService {
 					.detailCode(aptDetailCode) // 주택담보대출
 					.loanAmount(apt.getLoanAmount())
 					.rate(apt.getRate())
-					.maturityDate(apt.getMaturityDate())
+					.loanMaturity(apt.getMaturityDate())
 					.assetDetail(assetDto) // 부채(대출) 데이터를 넣을 때 => 위에서 생성한 자산 DTO도 같이 넣어주는 식
 					.build();
 			liabilityRepo.save(liabilityDto);
