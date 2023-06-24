@@ -47,7 +47,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 				.fiInvestInd(getFiInvestInd(userId, totalAsset))
 				.fiAssetInd(getFiAssetInd(userId, totalAsset))
 				.totalAsset(totalAssetInString)
-				.build(); 
+				.build();  
 		
 		return fiIndDto;
 	}
@@ -55,7 +55,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	// ★ 1-1 ~ 2-3 : '총소득'이 필요하므로 1년치 소득을 입력받을 컴포넌트가 필요할 듯.. (추가로 총소득을 얻는 공통 메소드 필요)
 	// 1-1. 가계수지지표 : 총지출 / 총소득
-	public String getHouseholdInd(String userId){ // 가계수지(household's total income and expenditure)
+	public Double getHouseholdInd(String userId){ // 가계수지(household's total income and expenditure)
 		// 총소득 얻기 
 		UserDTO user = service.getUser(userId);
 		service.getTotalIncome(user);
@@ -67,7 +67,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	// 2. 부채지표
 	// 2-1. 총부채상환지표 : 총부채상환액 / 총소득
-	public String getTotalDebtRepaymentInd(String userId) { // 아마 파라미터로 userId 받을 듯?
+	public Double getTotalDebtRepaymentInd(String userId) { // 아마 파라미터로 userId 받을 듯?
 		// 총소득 얻기
 		
 		// 총부채상환액 얻기 : user의 loanAmount * rate ????
@@ -82,7 +82,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	}
 	 
 	// 2-2. 소비생활부채상환지표 : 소비생활부채상환액 / 총소득
-	public String getConsumeDebtRepaymentInd(String userId) {
+	public Double getConsumeDebtRepaymentInd(String userId) {
 		// 총소득 얻기
 		
 		// 소비생활부채상환액 얻기 : ????
@@ -96,7 +96,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	}
 	
 	// 2-3. 거주주택마련부채상환지표 : 거주주택마련부채상환액 / 총소득
-	public String getMortgageLoanRepaymentInd(String userId) {
+	public Double getMortgageLoanRepaymentInd(String userId) {
 		// 총소득 얻기
 		UserDTO user = service.getUser(userId);
 		
@@ -110,7 +110,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	// ★ 2-4 ~ 3-4 : '총자산'이 필요하므로 총자산을 얻는 공통 메소드 만들 생각
 	// 2-4. 총부채부담지표 : 총부채 / 총자산
-	public String getTotalDebtBurdenInd(String userId, Double totalAsset) {
+	public Double getTotalDebtBurdenInd(String userId, Double totalAsset) {
 		// 총부채 얻기 : user 1개 이용해서 총 loanAmount 합산하면 될 듯
 		UserDTO user = service.getUser(userId);
 		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUser(user);
@@ -123,14 +123,14 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		// 지표계산
 		Double abcd = totalLoanAmount / totalAsset;
-		String indicator = dfc.percent(abcd);
+		String indicator = dfc.decimalPlace1(abcd);
 		System.out.println("총부채부담지표 : " + indicator);
 		
-		return indicator;
+		return Double.parseDouble(indicator);
 	}
 	
 	// 2-5. 거주주택마련부채부담지표 : 거주주택마련부채잔액 / 총자산
-	public String getMortgageLoanBurdenInd(String userId, Double totalAsset) {
+	public Double getMortgageLoanBurdenInd(String userId, Double totalAsset) {
 		// 주택마련부채 얻기 : '잔액'을 의미(원리금상환액X) user랑 liabilityCode 2개 이용해서 find하면 될 듯??
 		UserDTO user = service.getUser(userId);
 		List<UserLiabilityDTO> liabDtoList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
@@ -143,14 +143,14 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		// 지표계산
 		Double percent = totalLoanAmount / totalAsset;
-		String indicator = dfc.percent(percent);
+		String indicator = dfc.decimalPlace1(percent);
 		System.out.println("거주주택마련부채부담지표 : " + indicator);
 		 
-		return indicator;
+		return Double.parseDouble(indicator);
 	}
 	
 	// 3-3. 금융투자성향지표 : 금융투자 / 저축 및 투자 
-	public String getFiInvestInd(String userId, Double totalAsset) {
+	public Double getFiInvestInd(String userId, Double totalAsset) {
 		// 금융자산 얻기
 		Double totalFinancialAsset = 0.0;
 		Long totalStock = totalService.getTotalStock(userId);
@@ -161,13 +161,13 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		// 지표계산
 		Double numerator = totalFinancialAsset; // 분자
 		Double denominator = totalStock + totalCoin + totalDepositAndSavings; // 분모 : 예적금, 펀드, 주식, 장기저축성보험, 노후대비를 위한 연금불입금 등
-		String indicator = dfc.percent(numerator/denominator);
+		String indicator = dfc.decimalPlace1(numerator/denominator);
 		
-		return indicator;
+		return Double.parseDouble(indicator);
 	}
 	
 	// 3-4. 금융자산비중지표 : 금융자산 / 총자산
-	public String getFiAssetInd(String userId, Double totalAsset) {
+	public Double getFiAssetInd(String userId, Double totalAsset) {
 		// 금융자산 얻기
 		Double totalFinancialAsset = 0.0;
 		Long totalStock = totalService.getTotalStock(userId);
@@ -176,10 +176,10 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		// 지표계산
 		Double percent = totalFinancialAsset / totalAsset;
-		String indicator = dfc.percent(percent);
+		String indicator = dfc.decimalPlace1(percent);
 		System.out.println("금융자산비중지표 : " + indicator);
 		
-		return indicator;
+		return Double.parseDouble(indicator);
 	}
 
 	
