@@ -33,6 +33,13 @@ public class YearEndTaxController {
 		TaxRepo.saveAll(dto);
 	}
 	
+	//연말정산 정보 업데이트 
+		@PostMapping(value = "/updateTaxInformation.do", consumes = "application/json")
+		public void updateTaxInformation(@RequestBody List<YearEndTaxDTO> dto) {
+			TaxRepo.findByMemberIdAndYear("jin", 2023);
+			TaxRepo.saveAll(dto);
+		}
+	
 	//일단 진짜 대강 한글로 막 쳐서 조건문이라도 적어두자...
 	//계산해서 환급/납부액 계산하는 컨트롤러
 	@PostMapping(value = "/calculateTax.do", consumes = "application/json")
