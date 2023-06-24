@@ -8,8 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import com.shinhan.assetManager.dto.CashReceiptDTO;
 
 public interface CashReceiptRepository extends CrudRepository<CashReceiptDTO, Integer>{
-//	public List<CashReceiptDTO> findByMemberId(String memberId);
-//	
+	//public List<CashReceiptDTO> findByMemberIdAndYear(String memberId, int year);
+	
 	@Query("SELECT SUM(c.usedCash) "
 			+ "FROM CashReceiptDTO c "
 			+ "WHERE c.memberId = ?1 "

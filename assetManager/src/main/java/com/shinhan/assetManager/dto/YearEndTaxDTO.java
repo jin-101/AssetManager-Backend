@@ -26,6 +26,7 @@ public class YearEndTaxDTO {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer detailCode; //PK
 	private String memberId; //회원 아이디
+	private	Integer year; //년도 필요할 것 같음 (추가!!)
 	
 	private Integer salary; //연봉
 	private Integer nonTaxIncome; //비과세 소득
@@ -44,7 +45,7 @@ public class YearEndTaxDTO {
 	private Integer newBirthChild; //이번 해에 출생 or 입양한,  자녀 1이면 첫째, 2면 둘째, 3이면 셋째 이상(진형한테 새로 추가된거 말해주자)
 	
 	private Integer loanRepaymentPrincipal; //대출상환원금 ~원 입력받기 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
-	private Integer loanRepaymentInterest; //대출상환이자  ~원 입력받기 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
+	private Integer loanRepaymentInterest; //대출상환이자 ~원 입력받기 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
 	
 	private Integer ginapbuseaek; //기납부세액 ~원 입력받기
 	
