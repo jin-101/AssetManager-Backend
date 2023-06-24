@@ -61,7 +61,7 @@ public class AccountBookController {
 		accountRepo.saveAll(itemlist);
 	}
 	
-	@DeleteMapping(value = "/deletelist.do/{detailCode}", produces = "text/plain;charset=utf-8") //한건 삭제하기
+	@DeleteMapping(value = "/deletelist.do/{detailCode}", produces = "text/plain;charset=utf-8") //한건 삭제하기 (삭제에는 ID, 계좌 아직 못함)
 	public void listsave(@PathVariable Integer detailCode) {
 		List<HouseholdAccountsDTO> upList = accountRepo.getUpListWhenDelete(detailCode);
 		Optional<HouseholdAccountsDTO> deleteList = accountRepo.findById(detailCode);
@@ -86,8 +86,8 @@ public class AccountBookController {
 		System.out.println("한건 내역 오는지!!!!!" + dto);
 		System.out.println(dto.getWithdraw());
 		accountRepo.save(dto);
-		List<HouseholdAccountsDTO> lista = accountRepo.getFilteredAccounts();
-		List<HouseholdAccountsDTO> listb = accountRepo.getLastBalance();
+		List<HouseholdAccountsDTO> lista = accountRepo.getFilteredAccounts(dto.getMemberId(), dto.getAccountNumber());
+		List<HouseholdAccountsDTO> listb = accountRepo.getLastBalance(dto.getMemberId(), dto.getAccountNumber());
 		
 		//새로 삽입된 건의 위의 내역들에 입력된 금액만큼 더하거나 빼주기 
 		for(HouseholdAccountsDTO a:lista) {
@@ -230,7 +230,7 @@ public class AccountBookController {
         }
     }
 	
-	@PostMapping("/cashreceiptfilesave.do")
+	@PostMapping("/cashreceiptfilesave.do") //일단 이거 안되는데 db에 그냥 임포트 해서 일단 데이터 넣을 것
     public String cashReceiptFileUpload(@RequestPart("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
@@ -258,14 +258,14 @@ public class AccountBookController {
 
             List<CashReceiptExcelDTO> excelDataList = new ArrayList<>();
             String[] headers = data.get(1);
-            
+  
             for (int i = 4; i < data.size(); i++) {
                 String[] row = data.get(i);
                 CashReceiptExcelDTO excelData = new CashReceiptExcelDTO();
                 for (int j = 0; j < headers.length; j++) {
                     String header = headers[j];
                     String value = row[j];
-                    System.out.println(headers);
+                    System.out.println(Arrays.toString(headers));
                     
                     // 헤더와 필드명이 일치할 경우 필드에 값을 할당
                     switch (header) {
@@ -287,7 +287,7 @@ public class AccountBookController {
                         	break;
                         		                    
                     }
-                    //System.out.println(excelData);
+                    System.out.println(excelData);
                 }
                 excelDataList.add(excelData);
                
@@ -314,16 +314,6 @@ public class AccountBookController {
             return "Error uploading file: " + e.getMessage();
         }
     }
-	
-	// 입력받은 연봉 salary
-	// 이 부분에 컨트롤러 만들자
-//	@PostMapping(value = "/listsave.do", consumes = "application/json")
-//	public void listsave(@RequestBody List<HouseholdAccountsDTO> itemlist) {
-//		System.out.println("item 리스트!!!!!!" + itemlist);
-//		accountRepo.saveAll(itemlist);
-//	}
-	
-	
 	
 	private List<String[]> readCSV(String filePath) throws IOException {
         List<String[]> data = new ArrayList<>();

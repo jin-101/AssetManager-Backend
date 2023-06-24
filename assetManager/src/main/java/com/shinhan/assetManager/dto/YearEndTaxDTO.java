@@ -1,0 +1,51 @@
+package com.shinhan.assetManager.dto;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "Year_End_Tax")
+public class YearEndTaxDTO {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer detailCode; //PK
+	private String memberId; //회원 아이디
+	
+	private Integer salary; //연봉
+	private Integer nonTaxIncome; //비과세 소득
+	
+	private Integer spouse; //배우자
+	private Integer children; //자녀수 (직계존속) 
+	private Integer parents; //부모수 (직계비속)
+	private Integer sibling; //형제자매
+	private Integer fosterChildren; //위탁아동
+	private Integer lowIncomePeople; //기초수급자
+	
+	private Integer oldPeople; //경로우대자 
+	private Integer disabledPerson; //장애인
+	private Integer woman; //부녀자
+	private Integer oneParent; //한부모
+	
+	private Integer loanRepaymentPrincipal; //대출상환원금 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
+	private Integer loanRepaymentInterest; //대출상환이자 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
+	
+	private Integer ginapbuseaek; //기납부세액
+	
+	
+}
