@@ -209,7 +209,10 @@ public class CoinService implements AssetService {
 	
 	// (2) 코인이름, 평단가, 수익률 (계산 및 setter)
 	public List<CoinAssetDTO> calcAvgPriceAndReturn(Map<String, CoinAssetDTO> coinMap) {
+		Double totalProfit = 0.0; // 총 수익
+		Double totalInvestment = 0.0; // 총 투자금액
 		List<CoinAssetDTO> myCoinList = new ArrayList<>(); // return할 List
+		//CoinAssetDTO coinDto = null;
 		
 		Iterator<Entry<String, CoinAssetDTO>> coinMapIterator = coinMap.entrySet().iterator();
 		while(coinMapIterator.hasNext()) {
@@ -222,20 +225,28 @@ public class CoinService implements AssetService {
 			coinDto.setCoinName(coinName);
 			
 			// 평단가 (avgPrice)
+			Double currentPrice = coinDto.getCurrentPrice();
 			Double totalPurchase = coinDto.getTotalPurchase();
 			Double totalQuantity = coinDto.getQuantity();
 			Double avgPrice = totalPurchase / totalQuantity;
-			coinDto.setAvgPrice(avgPrice);
 			System.out.println("평단가 : " + avgPrice);
-			System.out.println("총 수량 : " + totalQuantity);
+			Double profit = currentPrice - avgPrice;
+			coinDto.setAvgPrice(dfc.currency(avgPrice));
+			
+			// for 전체평균수익률
+			totalProfit += profit;
+			totalInvestment += totalPurchase;
 			
 			// 수익률
-			Double currentPrice = coinDto.getCurrentPrice();
-			String rateOfReturn = dfc.percent((currentPrice - avgPrice) / avgPrice);
+			String rateOfReturn = dfc.percent(profit / avgPrice);
 			coinDto.setRateOfReturn(rateOfReturn);
 			
 			myCoinList.add(coinDto);
 		}
+		// 전체평균수익률
+		//String totalAvgRate = dfc.percent(totalProfit / totalInvestment);
+		//coinDto.setTotalAvgRate(totalAvgRate);
+		//myCoinList.add(coinDto);
 		
 		return myCoinList;
 	}
