@@ -54,7 +54,6 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	
 	// ★ 1-1 ~ 2-3 : '총소득'이 필요하므로 1년치 소득을 입력받을 컴포넌트가 필요할 듯.. (추가로 총소득을 얻는 공통 메소드 필요)
-	
 	// 1-1. 가계수지지표 : 총지출 / 총소득
 	public String getHouseholdInd(String userId){ // 가계수지(household's total income and expenditure)
 		// 총소득 얻기 
@@ -65,38 +64,6 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		
 		return null;
 	}
-	
-	
-	// 부채상환 원금 구하기
-	public Long getLoanPrincipal(List<UserLiabilityDTO> list) {
-		Long totalLoanPrincipal = 0L;
-		for(int i=0; i<list.size(); i++) {
-			UserLiabilityDTO dto = list.get(i);
-			Long maturityYear = Long.parseLong(dto.getLoanMaturity());
-			Long loanAmount = Long.parseLong(dto.getLoanAmount());
-			Long loanPrincipal = loanAmount / maturityYear;
-			totalLoanPrincipal += loanPrincipal;
-		}
-		System.out.println("총 부채상환원금(1년) : " + totalLoanPrincipal);
-		
-		return totalLoanPrincipal;
-	}
-	// 부채상환 이자 구하기
-	public Double getLoanInterest(List<UserLiabilityDTO> list) {
-		Double totalLoanInterest = 0.0;
-		for(int i=0; i<list.size(); i++) {
-			UserLiabilityDTO dto = list.get(i);
-			Long maturityYear = Long.parseLong(dto.getLoanMaturity());
-			Long loanAmount = Long.parseLong(dto.getLoanAmount());
-			Double rate = Double.parseDouble(dto.getRate()) / 100;
-			Double loanInterest = loanAmount * rate;
-			totalLoanInterest += loanInterest;
-		}
-		System.out.println("총 부채상환이자(1년) : " + totalLoanInterest);
-		
-		return totalLoanInterest;
-	}
-	
 	
 	// 2. 부채지표
 	// 2-1. 총부채상환지표 : 총부채상환액 / 총소득
@@ -142,7 +109,6 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	
 	// ★ 2-4 ~ 3-4 : '총자산'이 필요하므로 총자산을 얻는 공통 메소드 만들 생각
-	
 	// 2-4. 총부채부담지표 : 총부채 / 총자산
 	public String getTotalDebtBurdenInd(String userId, Double totalAsset) {
 		// 총부채 얻기 : user 1개 이용해서 총 loanAmount 합산하면 될 듯
@@ -231,16 +197,35 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		return user;
 	}
 	
-	// 금융자산 얻기 : user랑 AssetCode(C로 시작하는 놈들) 2개 이용해서 find하면 될 듯
-//	List<UserAssetDTO> assetList = userAssetRepo.findByUserAndAssetCodeStartingWith(user, "C");
-//	for(int i=0; i<assetList.size(); i++) {
-//		UserAssetDTO dto = assetList.get(i);
-//		Double purchasePrice = Double.parseDouble(dto.getPurchasePrice());
-//		Double quantity = Double.parseDouble(dto.getQuantity());
-//		
-//		totalFinancialAsset = purchasePrice * quantity;
-//	}
-//	System.out.println("총 금융자산 : " + totalFinancialAsset);
+	// 부채상환 원금 구하기
+	public Long getLoanPrincipal(List<UserLiabilityDTO> list) {
+		Long totalLoanPrincipal = 0L;
+		for(int i=0; i<list.size(); i++) {
+			UserLiabilityDTO dto = list.get(i);
+			Long maturityYear = Long.parseLong(dto.getLoanMaturity());
+			Long loanAmount = Long.parseLong(dto.getLoanAmount());
+			Long loanPrincipal = loanAmount / maturityYear;
+			totalLoanPrincipal += loanPrincipal;
+		}
+		System.out.println("총 부채상환원금(1년) : " + totalLoanPrincipal);
+		
+		return totalLoanPrincipal;
+	}
+	// 부채상환 이자 구하기
+	public Double getLoanInterest(List<UserLiabilityDTO> list) {
+		Double totalLoanInterest = 0.0;
+		for(int i=0; i<list.size(); i++) {
+			UserLiabilityDTO dto = list.get(i);
+			Long maturityYear = Long.parseLong(dto.getLoanMaturity());
+			Long loanAmount = Long.parseLong(dto.getLoanAmount());
+			Double rate = Double.parseDouble(dto.getRate()) / 100;
+			Double loanInterest = loanAmount * rate;
+			totalLoanInterest += loanInterest;
+		}
+		System.out.println("총 부채상환이자(1년) : " + totalLoanInterest);
+		
+		return totalLoanInterest;
+	}
 } 
 
 
