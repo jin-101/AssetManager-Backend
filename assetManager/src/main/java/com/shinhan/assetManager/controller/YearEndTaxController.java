@@ -28,7 +28,7 @@ public class YearEndTaxController {
 	HouseholdAccountsRepository accRepo;
 	
 	//연말정산을 위해 정보 입력받은 것 저장하기 
-	@PostMapping(value = "/saveTaxInformation", consumes = "application/json")
+	@PostMapping(value = "/saveTaxInformation.do", consumes = "application/json")
 	public void saveTaxInformation(@RequestBody List<YearEndTaxDTO> dto) {		 
 		TaxRepo.saveAll(dto);
 	}
