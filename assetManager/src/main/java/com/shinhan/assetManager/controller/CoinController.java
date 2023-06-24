@@ -61,7 +61,7 @@ public class CoinController {
 	@GetMapping("/coinCrud")
 	@ResponseBody
 	public List<CoinAssetDTO> myCoinInfo(@RequestParam String userId) {
-		List<CoinAssetDTO> response = service.myCoinInfo(userId);
-		return response;
+		List<CoinAssetDTO> coinAssetList = service.myCoinInfo(userId);
+		return coinAssetList;
 	}
 }
