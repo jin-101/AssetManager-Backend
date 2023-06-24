@@ -1,5 +1,6 @@
 package com.shinhan.assetManager.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shinhan.assetManager.apt.AptAssetDTO;
 import com.shinhan.assetManager.apt.AptDtoForReact;
+import com.shinhan.assetManager.car.CarDTO;
 import com.shinhan.assetManager.service.AptService;
 
 //React_WebBoardRestController 참조하여 만듦
@@ -65,4 +69,12 @@ public class AptController {
 	}
 	
 	// 자산 탭 - 아파트 자산 조회 (수익률, 현재시세, 평단가)
+	@GetMapping(value = "/aptCrud")
+	@ResponseBody
+	public List<AptAssetDTO> aptCrud(@RequestParam String userId) { // ★ @PathVariable 여려개일 때 지정해주는 법
+		List<AptAssetDTO> aptAssetList = service.aptCrud(userId);
+		System.out.println(aptAssetList);
+		
+		return aptAssetList;
+	}
 }

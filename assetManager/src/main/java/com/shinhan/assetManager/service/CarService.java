@@ -1,9 +1,11 @@
 package com.shinhan.assetManager.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.shinhan.assetManager.car.CarDTO;
 import com.shinhan.assetManager.car.CrawlingSelenium;
 import com.shinhan.assetManager.dto.CarCompanyDTO;
+import com.shinhan.assetManager.dto.CarInfomationDTO;
 import com.shinhan.assetManager.dto.CarModelDTO;
 import com.shinhan.assetManager.repository.CarCompanyRepository;
 import com.shinhan.assetManager.repository.CarDTOrepo;
@@ -39,6 +42,29 @@ public class CarService implements AssetService{
 	private UserRepo userRepo;
 	@Autowired
 	private UserAssetRepo userAssetRepo;
+	
+	public Set<String> carTypeList(String carCompany){
+		Set<String> list = new HashSet<>();
+		carInfoRepo.findAll().forEach(el -> {
+			if(el.getCarModel().getCarCompany().getCompanyName().equals(carCompany)) {
+				list.add(el.getType());
+			}
+		});
+		return list;
+	}
+	
+	public List<CarInfomationDTO> carRecomand(String carCompany, String type, Integer minPrice,Integer maxPrice ){
+		List<CarInfomationDTO> list = new ArrayList<>();
+		System.out.println(carCompany);
+		carInfoRepo.findByTypeAndPriceBetween(type,minPrice, maxPrice).forEach(el -> {
+			System.out.println(el.toString());
+			if(el.getCarModel().getCarCompany().getCompanyName().equals(carCompany)) {
+				list.add(el);
+			}
+		});
+		
+		return list;
+	}
 	
 	public List<CarDTO> myCarInfo(String userId) {
 		Optional<UserDTO> user = userRepo.findById(userId);
@@ -117,6 +143,7 @@ public class CarService implements AssetService{
 		CarModelDTO dto=carModelRepo.findFirstByClassNameContaining(carModel);
 		
 		Integer price=carInfoRepo.getAveragePrice(carCo.getCompanyId(),carModel,carYear);
+		if(price == null) price = 0;
 		System.out.println("제조사:"+ carCompany +  ", 모델명:" +carModel+  ", 연식:" + carYear + ", 가격:"+ price);
 		//데이터가 올바르게 넘어왔으면 저장은 여기서... 가격 없어도 저장
 		

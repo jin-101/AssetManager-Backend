@@ -33,9 +33,9 @@ public class AptTest {
 	@Autowired
 	ApiAptTrade aptTrade;	
 	
-	//@Test
+	@Test
 	void selectAndInsertApt2() throws InterruptedException {
-		Long startNo = 1L;
+		Long startNo = 157034L;
 		Long endNo = 167648L;
 		List<AptDTO> aptList = tRepo.findByTradeNoBetween(startNo, endNo);
 		for(int i=0; i<aptList.size(); i++) {

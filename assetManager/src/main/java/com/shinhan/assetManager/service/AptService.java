@@ -1,13 +1,19 @@
 package com.shinhan.assetManager.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.shinhan.assetManager.apt.AptAssetDTO;
+import com.shinhan.assetManager.apt.AptAssetDTO.AptAssetDTOBuilder;
 import com.shinhan.assetManager.apt.AptDtoForReact;
 import com.shinhan.assetManager.apt.AptRecentTradeDTO;
+import com.shinhan.assetManager.car.CarDTO;
+import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.repository.AdministrativeDistrictGuRepo;
 import com.shinhan.assetManager.repository.AdministrativeDistrictRepo;
 import com.shinhan.assetManager.repository.AptRecentTradeRepo;
@@ -18,7 +24,7 @@ import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
 import com.shinhan.assetManager.user.UserLiabilityDTO;
-
+ 
 @Service
 public class AptService implements AssetService {
 	
@@ -36,6 +42,8 @@ public class AptService implements AssetService {
 	UserAssetRepo assetRepo;
 	@Autowired
 	UserLiabilityRepo liabilityRepo;
+	@Autowired
+	DecimalFormatForCurrency dfc;
 	
 	String aptAssetCode = "E1";
 	String aptLiabilityCode = "L1";
@@ -78,7 +86,7 @@ public class AptService implements AssetService {
 					.detailCode(aptDetailCode) // 주택담보대출
 					.loanAmount(apt.getLoanAmount())
 					.rate(apt.getRate())
-					.maturityDate(apt.getMaturityDate())
+					.loanMaturity(apt.getMaturityDate())
 					.assetDetail(assetDto) // 부채(대출) 데이터를 넣을 때 => 위에서 생성한 자산 DTO도 같이 넣어주는 식
 					.build();
 			liabilityRepo.save(liabilityDto);
@@ -121,6 +129,48 @@ public class AptService implements AssetService {
 		}); 
 		
 		return aptMap;
+	}
+	
+	// 자산 탭 - 아파트 자산 조회 (수익률, 현재시세, 평단가)
+	public List<AptAssetDTO> aptCrud(String userId){
+		List<AptAssetDTO> aptAssetList = new ArrayList<>();
+		
+		Double eachRate = 0.0;
+		Double totalRate = 0.0;
+		Double totalCp = 0.0;
+		Double totalPp = 0.0;
+		AptAssetDTO aptAssetDto = null;
+		UserDTO user = uRepo.findById(userId).get();
+		List<UserAssetDTO> aptList = assetRepo.findByUserAndAssetCode(user, "E1"); 
+		for(int i=0; i<aptList.size(); i++) {
+			Long tradeNo = Long.parseLong(aptList.get(i).getDetailCode());
+			AptRecentTradeDTO dto = artRepo.findByTradeNo(tradeNo);
+			// (1) 현재가
+			Long currentPrice = Long.parseLong(dto.getPrice());
+			totalCp += currentPrice;
+			// (2) 매입가
+			Long purchasePrice = Long.parseLong(aptList.get(i).getPurchasePrice());
+			totalPp += purchasePrice;
+			// (3) 수익률
+			Double cp = (double)currentPrice;
+			Double pp = (double)purchasePrice;
+			eachRate = ((cp - pp) / pp);
+			totalRate += eachRate;
+			String rateOfReturn = dfc.percent(eachRate);
+			
+			aptAssetDto = AptAssetDTO.builder()
+					.currentPrice(currentPrice)
+					.purchasePrice(purchasePrice)
+					.rateOfReturn(rateOfReturn)
+					.build();
+			aptAssetList.add(aptAssetDto);
+		}
+		// (4) 평균수익률
+//		Double totalAvgRate = (totalCp - totalPp) / totalPp;
+//		aptAssetDto.setTotalAvgRate(dfc.percent(totalAvgRate));
+//		aptAssetList.add(aptAssetDto);
+		
+		return aptAssetList;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.shinhan.assetManager.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +130,31 @@ public class CurrencyService implements AssetService {
 		}
 		
 		return buyCurrency.toString();
+	}
+	
+	public String getReadyGraph() {
+		Iterable<RealAssetDTO>  realAssetDtos = realAssetRepo.findAll();
+		List<JSONObject> response = new ArrayList<>();
+		List<JSONObject> currencyList = new ArrayList<>();
+		
+		
+		realAssetDtos.forEach(dto ->{
+			JSONObject data = new JSONObject();
+			data.put("usd", dto.getUsd());
+			data.put("jpy", dto.getJpy());
+			data.put("gbp", dto.getGbp());
+			data.put("cnh", dto.getCnh());
+			data.put("eur", dto.getEur());
+			currencyList.add(data);
+		});
+		
+		for(int i=0;i<currencyList.size();i+=25) {
+			response.add(currencyList.get(i));
+		}
+		
+		
+		
+		return response.toString();
 	}
 	
 	

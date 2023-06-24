@@ -55,7 +55,7 @@ public class YearEndTaxController {
 		int spouse = informationForTaxList.get(0).getSpouse();
 		System.out.println("배우자 여부 : " + spouse);
 		
-		int children = informationForTaxList.get(0).getChildren();
+		int children = informationForTaxList.get(0).getChildren(); //만 20세 이하
 		System.out.println("직계비속(자녀수) : " + children);
 		
 		int parents = informationForTaxList.get(0).getParents();
@@ -69,6 +69,9 @@ public class YearEndTaxController {
 		
 		int lowincomepeople = informationForTaxList.get(0).getLowIncomePeople();
 		System.out.println("기초수급자 : " + lowincomepeople);
+		
+		int chulsanibyangjanyeo  = informationForTaxList.get(0).getNewBirthChild();
+		System.out.println("출산/입양 아동 (첫째, 둘째, 셋쩨 이런거): "  + chulsanibyangjanyeo);
 		
 		int sumGibongongjeCount = spouse + children + parents + sibling + fosterchildren + lowincomepeople;
 		System.out.println("기본공제 명수 합친 것 : " + sumGibongongjeCount);
@@ -235,15 +238,32 @@ public class YearEndTaxController {
 		System.out.println("특별세엑 공제 : " + teukbyeolseaekgongje);
 		
 		//자녀세액공제
-		int janyeoseaekgongje = 0;
+		
+		//기본공제대상 자녀(손자·손녀 제외)로서 7세 이상의 자녀 수에 따라 세액공제
+		int gibongongjedaesangjanyeo = 0;
 		if(children == 1) {
-			janyeoseaekgongje = 150000;
+			gibongongjedaesangjanyeo = 150000;
 		} else if (children == 2) {
-			janyeoseaekgongje = 300000;
+			gibongongjedaesangjanyeo = 300000;
 		} else if (children >= 3) {
-			janyeoseaekgongje = 300000 + (children -2) * 300000;
+			gibongongjedaesangjanyeo = 300000 + (children -2) * 300000;
 		}
-		System.out.println("자녀세액 공제 : " + janyeoseaekgongje);
+		System.out.println("기본공제대상 자녀 : " + gibongongjedaesangjanyeo);
+		
+		//출산, 입양 공제 (이번 년도에 출산하거나 입양한 자녀)
+		int chulsanibyanggongje = 0;
+		if (chulsanibyangjanyeo == 1) {
+			chulsanibyanggongje = 300000;
+		} else if (chulsanibyangjanyeo == 2) {
+			chulsanibyanggongje = 500000;
+		} else if (chulsanibyangjanyeo >= 3) {
+			chulsanibyanggongje = 700000;
+		}
+		System.out.println("출산/입양 공제 : " + chulsanibyanggongje);
+		
+		//자녀세액공제 = 기본공제대상 자녀 + 출산/입양공제
+		int janyeoseaekgongje = gibongongjedaesangjanyeo + chulsanibyanggongje;
+		System.out.println("자녀세액공제액 : " + janyeoseaekgongje);
 	
 		//월세세액공제
 		int houseWithdraw = accRepo.sumCategoryWithdraw("jin", "주거", 2023); //23년 주거비 일단 월세로 퉁침
@@ -258,7 +278,7 @@ public class YearEndTaxController {
 		///////////////////////////////4단계 끝/////////////////////////////////////
 	
 		// 납부/환급세액 = 결정세액 - 기납부세액
-		//기납부세액의 계산 방법이 너무 복잡하고 이해가 안가서 입력받아 사용하기로 결정(회사에 말하면 아마도...? 알 수 있다고 함)
+		//기납부세액의 계산 방법이 너무 복잡하고 이해가 안가서 입력받아 사용하기로 결정(회사에 말하면 알 수 있다고 함)
 		int ginapbuseaek  =  informationForTaxList.get(0).getGinapbuseaek(); //입력받은 기납부세액
 		
 		System.out.println("기납부세액 : " + ginapbuseaek);

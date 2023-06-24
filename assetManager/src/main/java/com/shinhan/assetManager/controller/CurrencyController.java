@@ -35,5 +35,14 @@ public class CurrencyController {
 		
 		return response;
 	}
+	
+	@GetMapping("/currencyGraph")
+	@ResponseBody
+	public String handleGraphRequest() {
+		
+		String response =  currencyService.getReadyGraph();
+		
+		return response;
+	}
 
 }

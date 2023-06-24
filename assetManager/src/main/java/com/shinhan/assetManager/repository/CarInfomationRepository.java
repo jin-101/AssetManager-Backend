@@ -1,5 +1,7 @@
 package com.shinhan.assetManager.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +23,7 @@ public interface CarInfomationRepository extends CrudRepository<CarInfomationDTO
 			@Param("className") String className,
 			@Param("year") String year);
 	
+	public List<CarInfomationDTO> findByTypeAndPriceBetween(String type,Integer minPrice, Integer maxPrice);
+
+//	public Iterable<String> findByTypeAndPriceBetween(String type, Integer minPrice, Integer maxPrice);
 }
