@@ -16,8 +16,11 @@ import lombok.ToString;
 public class CoinAssetDTO {
 	
 	private String market; // 거래소
-	private Long currentPrice; // 현재가
-	private Long purchasePrice; // 매입가
+	private String coinName; // 코인이름
+	private Double currentPrice; // 현재가
+	private Double totalPurchase; // 총 매입가
+	private Double avgPrice; // 평단가
+	private Double quantity; // 수량
 	private String rateOfReturn; // 수익률
 	private String totalAvgRate; // 전체평균수익률
 
