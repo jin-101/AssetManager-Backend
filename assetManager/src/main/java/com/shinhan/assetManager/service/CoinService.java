@@ -124,27 +124,25 @@ public class CoinService implements AssetService {
 			if (upbitCoin != null) {
 				// 거래소
 				String market = "업비트"; 
-				// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
+				// 현재시세(prev_closing_price) 얻기
 				Double currentPrice = Double.parseDouble(upbitCoin.getPrev_closing_price());
-				
 				// 매수가 
 				Double purchasePrice = Double.parseDouble(userAssetDto.getPurchasePrice());
 				// 매수수량
 				Double quantity = Double.parseDouble(userAssetDto.getQuantity());
-				// 
+				// 총 매수금액
 				totalPurchase = 0.0;
 				totalPurchase = purchasePrice * quantity;
 				
-				
-				// 코인 이름이 같은 놈이 있는지 체크
+				// *코인 이름이 같은 놈이 있는지 체크
 				CoinAssetDTO presentedCoinAsset = coinMap.get(detailCode);
 				if(presentedCoinAsset != null) {
-					Double presentedPrice = presentedCoinAsset.getPurchasePrice();
+					Double presentedPrice = presentedCoinAsset.getTotalPurchase();
 					Double presentedQuantity = presentedCoinAsset.getQuantity();
-					if(presentedPrice != 0.0) { // (1) 해당 코인의 값이 이미 있다면
+					if(presentedPrice != 0.0) { // (1) *해당 코인의 값이 이미 있다면
 						// DTO 세팅
 						totalPurchase += presentedPrice;
-						coinAsset.setPurchasePrice(totalPurchase);
+						coinAsset.setTotalPurchase(totalPurchase);
 						Double totalQuantity = quantity + presentedQuantity;
 						coinAsset.setQuantity(totalQuantity);
 						coinAsset.setMarket(market);
@@ -152,16 +150,53 @@ public class CoinService implements AssetService {
 						
 						coinMap.put(detailCode, coinAsset);
 					}
-				}else { // (2) 해당 코인이 처음이라면
+				}else { // (2) *해당 코인이 처음이라면
 					// DTO 세팅
 					coinAsset.setMarket(market);
 					coinAsset.setCurrentPrice(currentPrice);
-					coinAsset.setPurchasePrice(purchasePrice);
+					coinAsset.setTotalPurchase(totalPurchase);
 					coinAsset.setQuantity(quantity);
 					
 					coinMap.put(detailCode, coinAsset);
 				}
+			}else if(bithumbCoin != null) {
+				// 거래소
+				String market = "빗썸"; 
+				// 현재시세(prev_closing_price) 얻기 
+				Double currentPrice = Double.parseDouble(bithumbCoin.getPrev_closing_price());
+				// 매수가 
+				Double purchasePrice = Double.parseDouble(userAssetDto.getPurchasePrice());
+				// 매수수량
+				Double quantity = Double.parseDouble(userAssetDto.getQuantity());
+				// 총 매수금액
+				totalPurchase = 0.0;
+				totalPurchase = purchasePrice * quantity;
 				
+				// *코인 이름이 같은 놈이 있는지 체크
+				CoinAssetDTO presentedCoinAsset = coinMap.get(detailCode);
+				if(presentedCoinAsset != null) {
+					Double presentedPrice = presentedCoinAsset.getTotalPurchase();
+					Double presentedQuantity = presentedCoinAsset.getQuantity();
+					if(presentedPrice != 0.0) { // (1) *해당 코인의 값이 이미 있다면
+						// DTO 세팅
+						totalPurchase += presentedPrice;
+						coinAsset.setTotalPurchase(totalPurchase);
+						Double totalQuantity = quantity + presentedQuantity;
+						coinAsset.setQuantity(totalQuantity);
+						coinAsset.setMarket(market);
+						coinAsset.setCurrentPrice(currentPrice);
+						
+						coinMap.put(detailCode, coinAsset);
+					}
+				}else { // (2) *해당 코인이 처음이라면
+					// DTO 세팅
+					coinAsset.setMarket(market);
+					coinAsset.setCurrentPrice(currentPrice);
+					coinAsset.setTotalPurchase(totalPurchase);
+					coinAsset.setQuantity(quantity);
+					
+					coinMap.put(detailCode, coinAsset);
+				}
 			}
 		}
 		System.out.println("왜 콘솔에 안 찍히죵 ?? "+coinMap.toString());
@@ -170,57 +205,6 @@ public class CoinService implements AssetService {
 		List<CoinAssetDTO> myCoinList = calcAvgPriceAndReturn(coinMap);
 		
 		return myCoinList;
-	}
-	
-	// (1) 
-	public Map<String, CoinAssetDTO> calc(CoinUpbitDTO upbitCoin, CoinBithumbDTO bithumbCoin, UserAssetDTO userAssetDto, String detailCode) {
-		Double totalPurchase;
-		Map<String, CoinAssetDTO> coinMap = new HashMap<>(); // <코인이름, 총매수금액>
-		CoinAssetDTO coinAsset = new CoinAssetDTO(); 
-		
-		if (upbitCoin != null) {
-			// 거래소
-			String market = "업비트"; 
-			// 현재시세(prev_closing_price) 얻기 - 1)업비트, 2)빗썸
-			Double currentPrice = Double.parseDouble(upbitCoin.getPrev_closing_price());
-			
-			// 매수가 
-			Double purchasePrice = Double.parseDouble(userAssetDto.getPurchasePrice());
-			// 매수수량
-			Double quantity = Double.parseDouble(userAssetDto.getQuantity());
-			// 
-			totalPurchase = 0.0;
-			totalPurchase = purchasePrice * quantity;
-			
-			
-			// 코인 이름이 같은 놈이 있는지 체크
-			CoinAssetDTO presentedCoinAsset = coinMap.get(detailCode);
-			if(presentedCoinAsset != null) {
-				Double presentedPrice = presentedCoinAsset.getPurchasePrice();
-				Double presentedQuantity = presentedCoinAsset.getQuantity();
-				if(presentedPrice != 0.0) { // (1) 해당 코인의 값이 이미 있다면
-					// DTO 세팅
-					totalPurchase += presentedPrice;
-					coinAsset.setPurchasePrice(totalPurchase);
-					Double totalQuantity = quantity + presentedQuantity;
-					coinAsset.setQuantity(totalQuantity);
-					coinAsset.setMarket(market);
-					coinAsset.setCurrentPrice(currentPrice);
-					
-					coinMap.put(detailCode, coinAsset);
-				}
-			}else { // (2) 해당 코인이 처음이라면
-				// DTO 세팅
-				coinAsset.setMarket(market);
-				coinAsset.setCurrentPrice(currentPrice);
-				coinAsset.setPurchasePrice(purchasePrice);
-				coinAsset.setQuantity(quantity);
-				
-				coinMap.put(detailCode, coinAsset);
-			}
-			
-		}
-		return coinMap;
 	}
 	
 	// (2) 코인이름, 평단가, 수익률 (계산 및 setter)
@@ -238,9 +222,12 @@ public class CoinService implements AssetService {
 			coinDto.setCoinName(coinName);
 			
 			// 평단가 (avgPrice)
-			Double totalPurchase = coinDto.getPurchasePrice();
-			Double quantity = coinDto.getQuantity();
-			Double avgPrice = totalPurchase / quantity;
+			Double totalPurchase = coinDto.getTotalPurchase();
+			Double totalQuantity = coinDto.getQuantity();
+			Double avgPrice = totalPurchase / totalQuantity;
+			coinDto.setAvgPrice(avgPrice);
+			System.out.println("평단가 : " + avgPrice);
+			System.out.println("총 수량 : " + totalQuantity);
 			
 			// 수익률
 			Double currentPrice = coinDto.getCurrentPrice();
