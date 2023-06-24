@@ -15,6 +15,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class AptAssetDTO {
 	
+	private String aptName; // 아파트 이름
+	private String purchaseDate; // 매입시기
+	
 	private Long currentPrice; // 현재가
 	private Long purchasePrice; // 매입가
 	private String rateOfReturn; // 수익률
