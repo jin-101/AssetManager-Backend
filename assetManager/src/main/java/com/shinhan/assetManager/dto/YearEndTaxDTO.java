@@ -40,13 +40,13 @@ public class YearEndTaxDTO {
 	private Integer oldPeople; //경로우대자 
 	private Integer disabledPerson; //장애인
 	private Integer woman; //부녀자
-	private Integer oneParent; //한부모
-	private Integer newBirthChild; //이번 해에 출생 or 입양한 자녀 1이면 첫째, 2면 둘째 이런식 (진형한테 새로 추가된거 말해주자)
+	private Integer oneParent; //한부모 1이면 한부모, 0이면 한부모 아님
+	private Integer newBirthChild; //이번 해에 출생 or 입양한,  자녀 1이면 첫째, 2면 둘째, 3이면 셋째 이상(진형한테 새로 추가된거 말해주자)
 	
-	private Integer loanRepaymentPrincipal; //대출상환원금 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
-	private Integer loanRepaymentInterest; //대출상환이자 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
+	private Integer loanRepaymentPrincipal; //대출상환원금 ~원 입력받기 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
+	private Integer loanRepaymentInterest; //대출상환이자  ~원 입력받기 (용희형거에서도 입력받고 연말정산에서도 입력받기로 함)
 	
-	private Integer ginapbuseaek; //기납부세액
+	private Integer ginapbuseaek; //기납부세액 ~원 입력받기
 	
 	
 }
