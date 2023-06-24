@@ -38,5 +38,13 @@ public class DecimalFormatForCurrency {
 		
 		return fmtNumber;
 	}
+	
+	// Double 소수점 첫째자리까지 
+	public String decimalPlace1(Double number) {
+		DecimalFormat df = new DecimalFormat("#.#");
+		String fmtNumber = df.format(number*100); // %가 아니므로 직접 100 곱해줘야 하더라고
+		
+		return fmtNumber;
+	}
 
 }
