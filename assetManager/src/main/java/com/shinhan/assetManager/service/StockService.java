@@ -148,6 +148,51 @@ public class StockService implements AssetService{
 		return averageStockPriceByStockName.toString();
 	}
 	
+	public String compareReturn(String id,String stockCode,String market) {
+		List<UserDTO> usersWithSpecificStock = userAssetRepo.getEveryUserWithSpecificAssets(assetCode, stockCode);
+		long stockPrice = Long.parseLong(getPrice(market, stockCode));
+		JSONArray usersWithGain = new JSONArray();
+		
+		usersWithSpecificStock.forEach(user -> {
+			
+			 List<UserAssetDTO> userStockLogs = userAssetRepo.getSpecificUserAssets(user, assetCode, stockCode);
+			 
+			 long totalShares = 0L;
+			 long totalAmounts =0L;
+			 for(UserAssetDTO userStockLog:userStockLogs) {
+				 totalShares +=  Long.parseLong(userStockLog.getQuantity());
+				 totalAmounts += Long.parseLong(userStockLog.getPurchasePrice())* Long.parseLong(userStockLog.getQuantity());
+			 }
+			 double avergeBuyPrice = totalAmounts/totalShares;
+			 double capitalGain = ((double)stockPrice-avergeBuyPrice)/avergeBuyPrice;
+			 capitalGain = Math.round(capitalGain*1000)/1000.0;
+			 
+			 JSONObject userWithGain = new JSONObject();
+			 userWithGain.put("id", user.getUserId());
+			 userWithGain.put("gain", capitalGain);
+			 usersWithGain.put(userWithGain);			 
+			 
+		});
+		
+		/*
+		for(int i=0;i<usersWithGain.length()-1;i++) {
+			JSONObject user  = (JSONObject) usersWithGain.get(i);
+			double gain = (double) user.get("gain");
+			
+			for(int j=i+1;j<usersWithGain.length();j++) {
+				JSONObject compareUser  = (JSONObject) usersWithGain.get(j);
+				double compareGain = (double) compareUser.get("gain");
+				
+				if(gain<compareGain) {
+				}
+				
+			}
+		}
+		*/
+		
+		
+		return usersWithGain.toString();
+	}
 	
 	
 	
