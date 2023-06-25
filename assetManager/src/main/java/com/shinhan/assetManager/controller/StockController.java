@@ -45,8 +45,15 @@ public class StockController {
 	public String handleCompareReturn(@RequestParam String id,@RequestParam String code,@RequestParam String market) {
 		
 		String response =stockService.compareReturn(id,code,market);
-		System.out.println(response);
-		System.out.println(market);
+		
+		return response;
+	}
+	
+	@GetMapping("/flucRate")
+	@ResponseBody
+	public String handleYesterdayFlucRate() {
+		
+		String response =stockService.getPriceLimit();
 		
 		return response;
 	}
