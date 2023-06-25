@@ -54,26 +54,14 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 				.fiInvestInd(getFiInvestInd(userId, totalAsset))
 				.fiAssetInd(getFiAssetInd(userId, totalAsset))
 				.totalAsset(totalAssetInString)
-				.build();  
+				.build();   
 		
 		return fiIndDto;
 	}
 	
-	// 
-	public Integer getSalary(String userId) {
-		YearEndTaxDTO yetDto = yearEndTaxRepo.findByMemberId(userId);
-		Integer salary = yetDto.getSalary(); // 세전소득
-		
-		return salary;
-	}
-	
-	
-	// ★ 1-1 ~ 2-3 : '총소득'이 필요하므로 1년치 소득을 입력받을 컴포넌트가 필요할 듯.. (추가로 총소득을 얻는 공통 메소드 필요)
 	// 1-1. 가계수지지표 : 총지출 / 총소득
 	public Double getHouseholdInd(String userId){ // 가계수지(household's total income and expenditure)
-		// 총소득 얻기 
-		UserDTO user = service.getUser(userId);
-		service.getTotalIncome(user);
+		// 총소득 얻기
 		
 		// 총지출 얻기 :
 		
@@ -92,6 +80,7 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		Long totalLoanPrincipal = getLoanPrincipal(liabilityList); //원금
 		
 		// 지표 계산식
+		
 		
 		return null;
 	}
@@ -113,9 +102,9 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	// 2-3. 거주주택마련부채상환지표 : 거주주택마련부채상환액 / 총소득
 	public Double getMortgageLoanRepaymentInd(String userId) {
 		// 총소득 얻기
-		UserDTO user = service.getUser(userId);
 		
 		// 거주주택마련부채상환액 얻기 : '원리금상환액'을 의미(잔액X), 만기일 데이터를 바탕으로 원리금 대략 계산해서 보여주면 될 듯!
+		UserDTO user = userRepo.findById(userId).get();
 		List<UserLiabilityDTO> liabilityList = userLiabilityRepo.findByUserAndLiabilityCode(user, "L1");
 		Long totalLoanPrincipal = getLoanPrincipal(liabilityList); //원금
 		
@@ -199,9 +188,12 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 
 	
 	// ■ 공통메소드
-	// A. 총소득 얻기 (from ??)
-	public void getTotalIncome(UserDTO user) {
+	// A. 총소득 얻기
+	public Integer getSalary(String userId) {
+		YearEndTaxDTO yetDto = yearEndTaxRepo.findByMemberId(userId);
+		Integer salary = yetDto.getSalary(); // 세전소득
 		
+		return salary;
 	}
 	
 	// B. userId로부터 UserDTO 얻기
