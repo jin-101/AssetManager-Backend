@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,7 @@ import com.shinhan.assetManager.dto.CashReceiptExcelDTO;
 import com.shinhan.assetManager.dto.ExcelDTO;
 import com.shinhan.assetManager.dto.HouseholdAccountsCategoryDTO;
 import com.shinhan.assetManager.dto.HouseholdAccountsDTO;
+import com.shinhan.assetManager.dto.SummaryDTO;
 import com.shinhan.assetManager.repository.HouseholdAccountsCategoryRepository;
 import com.shinhan.assetManager.repository.HouseholdAccountsRepository;
 
@@ -44,8 +48,36 @@ public class AccountBookController {
 	@Autowired
 	HouseholdAccountsCategoryRepository categoryRepo;
 	
+	//전체 카드내역 불러오기 (월별 총수입 총지출)
+	@PostMapping(value = "/alllist.do", consumes = "application/json")
+	public Map<String, SummaryDTO> selectAll(@RequestBody AccountbookDTO dto) {
+	    List<HouseholdAccountsDTO> allList = accountRepo.findByMemberId(dto.getMemberId());
+	    Map<String, SummaryDTO> summaryMap = calculateMonthlySummary(allList);
+	    System.out.println(summaryMap);
+	    return summaryMap;
+	}
+
+	
+	public Map<String, SummaryDTO> calculateMonthlySummary(List<HouseholdAccountsDTO> allList) {
+	    Map<String, SummaryDTO> summaryMap = new HashMap<>();
+
+	    // 월별로 그룹화하여 총 지출과 총 수입 계산
+	    for (HouseholdAccountsDTO dto : allList) {
+	        YearMonth yearMonth = YearMonth.from(dto.getExchangeDate());
+	        String monthKey = yearMonth.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+	        SummaryDTO summary = summaryMap.getOrDefault(monthKey, new SummaryDTO(0, 0));
+	        summary.setWithdraw(summary.getWithdraw() + dto.getWithdraw());
+	        summary.setDeposit(summary.getDeposit() + dto.getDeposit());
+
+	        summaryMap.put(monthKey, summary);
+	    }
+
+	    return summaryMap;
+	}
+
 	@PostMapping(value = "/list.do", consumes = "application/json") //카드내역 불러오기
-	public List<HouseholdAccountsDTO> selectAll(@RequestBody AccountbookDTO dto) {
+	public List<HouseholdAccountsDTO> selectByMonth(@RequestBody AccountbookDTO dto) {
 		System.out.println(dto);
 		return (List<HouseholdAccountsDTO>)accountRepo.findByMonth(dto.getYear(), dto.getMonth(), dto.getMemberId());
 	}

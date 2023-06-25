@@ -13,6 +13,7 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 	//public List<HouseholdAccountsDTO> findAllByOrderByExchangeDateDesc();
 	
 	 //List<HouseholdAccountsDTO> findAllByOrderByExchangeDateDesc();
+	public List<HouseholdAccountsDTO> findByMemberId(String memberId);
 	
 	@Query("select b"
 			+ " from HouseholdAccountsDTO b"
