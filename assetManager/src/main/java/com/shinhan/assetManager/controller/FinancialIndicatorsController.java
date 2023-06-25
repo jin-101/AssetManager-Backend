@@ -27,5 +27,5 @@ public class FinancialIndicatorsController {
    
 		return fiIndDto; 
 	}
-
+	
 }
