@@ -28,23 +28,24 @@ public class YearEndTaxController {
 	HouseholdAccountsRepository accRepo;
 	
 	//연말정산을 위해 정보 입력받은 것 저장하기 
-	@PostMapping(value = "/saveTaxInformation.do", consumes = "application/json")
-	public void saveTaxInformation(@RequestBody List<YearEndTaxDTO> dto) {		 
-		TaxRepo.saveAll(dto);
+	@PostMapping(value = "/saveAndUpdateTaxInformation.do", consumes = "application/json")
+	public void saveandUpdateTaxInformation(@RequestBody YearEndTaxDTO dto, String userId) {
+		TaxRepo.save(dto);
 	}
 	
 	//연말정산 정보 업데이트 
-		@PostMapping(value = "/updateTaxInformation.do", consumes = "application/json")
-		public void updateTaxInformation(@RequestBody List<YearEndTaxDTO> dto) {
-			TaxRepo.findByMemberIdAndYear("jin", 2023);
-			TaxRepo.saveAll(dto);
-		}
+	@PostMapping(value = "/updateTaxInformation.do", consumes = "application/json")
+	public YearEndTaxDTO updateTaxInformation(@RequestBody YearEndTaxDTO dto) {
+		YearEndTaxDTO YearEndInfo = TaxRepo.findByMemberIdAndYear("jin", 2023);
+		TaxRepo.save(dto);
+		return YearEndInfo;
+	}
 	
 	//일단 진짜 대강 한글로 막 쳐서 조건문이라도 적어두자...
 	//계산해서 환급/납부액 계산하는 컨트롤러
 	@PostMapping(value = "/calculateTax.do", consumes = "application/json")
 	public int calculateTax() {
-		List<YearEndTaxDTO> informationForTaxList = TaxRepo.findByMemberId("jin"); //해당 아이디의 연말정산을 위해 입력받은 정보 리스트
+		YearEndTaxDTO informationForTaxList = TaxRepo.findByMemberId("jin"); //해당 아이디의 연말정산을 위해 입력받은 정보 리스트
 		System.out.println("연말정산 정보(from 연말정산 테이블) : " + informationForTaxList);
 		
 		int sumCashReceipt = cashRepo.sumCashReceipt("jin", 2023); //2023년 현금영수증 총액
@@ -53,31 +54,31 @@ public class YearEndTaxController {
 		int sumCardReceipt = accRepo.sumYearWithdraw("jin", 2023); //2023년 총 지출액 from 가계부
 		System.out.println("총 지출액 :" + sumCardReceipt);
 		
-		int yeonbong  =  informationForTaxList.get(0).getSalary(); //연봉(총급여액)
+		int yeonbong  =  informationForTaxList.getSalary(); //연봉(총급여액)
 		System.out.println("연봉(총급여액) : " + yeonbong);
 		
-		int bigwasesodeuk = informationForTaxList.get(0).getNonTaxIncome(); //비과세소득은 매달 달라서 사용자도 예측하기 어려움
+		int bigwasesodeuk = informationForTaxList.getNonTaxIncome(); //비과세소득은 매달 달라서 사용자도 예측하기 어려움
 		System.out.println("비과세 소득 : " + bigwasesodeuk);                 //그래서 1년 예상치 비과세 소득을 입력해 달라 해야됨
 		
-		int spouse = informationForTaxList.get(0).getSpouse();
+		int spouse = informationForTaxList.getSpouse();
 		System.out.println("배우자 여부 : " + spouse);
 		
-		int children = informationForTaxList.get(0).getChildren(); //만 20세 이하
+		int children = informationForTaxList.getChildren(); //만 20세 이하
 		System.out.println("직계비속(자녀수) : " + children);
 		
-		int parents = informationForTaxList.get(0).getParents();
+		int parents = informationForTaxList.getParents();
 		System.out.println("직계존속(부모) : " + parents);
 		
-		int sibling = informationForTaxList.get(0).getSibling();
+		int sibling = informationForTaxList.getSibling();
 		System.out.println("형재/자매 : " + sibling);
 		
-		int fosterchildren = informationForTaxList.get(0).getFosterChildren();
+		int fosterchildren = informationForTaxList.getFosterChildren();
 		System.out.println("위탁아동 : " + fosterchildren);
 		
-		int lowincomepeople = informationForTaxList.get(0).getLowIncomePeople();
+		int lowincomepeople = informationForTaxList.getLowIncomePeople();
 		System.out.println("기초수급자 : " + lowincomepeople);
 		
-		int chulsanibyangjanyeo  = informationForTaxList.get(0).getNewBirthChild();
+		int chulsanibyangjanyeo  = informationForTaxList.getNewBirthChild();
 		System.out.println("출산/입양 아동 (첫째, 둘째, 셋쩨 이런거): "  + chulsanibyangjanyeo);
 		
 		int sumGibongongjeCount = spouse + children + parents + sibling + fosterchildren + lowincomepeople;
@@ -85,16 +86,16 @@ public class YearEndTaxController {
 		
 		//추가공제 항목들
 		//경로우대자
-		int oldPeople = informationForTaxList.get(0).getOldPeople();
+		int oldPeople = informationForTaxList.getOldPeople();
 		
 		//장애인
-		int disableperson = informationForTaxList.get(0).getDisabledPerson();
+		int disableperson = informationForTaxList.getDisabledPerson();
 		
 		//부녀자
-		int woman = informationForTaxList.get(0).getWoman();
+		int woman = informationForTaxList.getWoman();
 		
 		//한부모 여부
-		int oneparent = informationForTaxList.get(0).getOneParent();
+		int oneparent = informationForTaxList.getOneParent();
 		
 		
 		int geunrosodeukgongje  = 0; //근로소득 공제
@@ -150,11 +151,11 @@ public class YearEndTaxController {
 		
 		//주택자금
 		//원리금 loanRepaymentPrincipal
-		int wonrigeum = (int) (informationForTaxList.get(0).getLoanRepaymentPrincipal() * 0.4); //용희형이 준 원리금 상환액(연말정산 테이블에 따로 칼럼 만듦)
+		int wonrigeum = (int) (informationForTaxList.getLoanRepaymentPrincipal() * 0.4); //용희형이 준 원리금 상환액(연말정산 테이블에 따로 칼럼 만듦)
 		System.out.println("주택상환 원리금 : " + wonrigeum);
 		
 		//이자비용 loanRepaymentInterest
-		int ija =  (int) (informationForTaxList.get(0).getLoanRepaymentInterest()); //용희형이 준 이자상환액(연말정산 테이블에 따로 칼럼 만듦); 
+		int ija =  (int) (informationForTaxList.getLoanRepaymentInterest()); //용희형이 준 이자상환액(연말정산 테이블에 따로 칼럼 만듦); 
 		System.out.println("주택상환 이자비용 : " + ija);
 		
 		//주택마련 저축 공제 (생략 주택청약 금액을 입력하는데가 없음)
@@ -286,7 +287,7 @@ public class YearEndTaxController {
 	
 		// 납부/환급세액 = 결정세액 - 기납부세액
 		//기납부세액의 계산 방법이 너무 복잡하고 이해가 안가서 입력받아 사용하기로 결정(회사에 말하면 알 수 있다고 함)
-		int ginapbuseaek  =  informationForTaxList.get(0).getGinapbuseaek(); //입력받은 기납부세액
+		int ginapbuseaek  =  informationForTaxList.getGinapbuseaek(); //입력받은 기납부세액
 		
 		System.out.println("기납부세액 : " + ginapbuseaek);
 		
