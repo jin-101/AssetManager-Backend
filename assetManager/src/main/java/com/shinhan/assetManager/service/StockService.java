@@ -1,5 +1,6 @@
 package com.shinhan.assetManager.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,24 +175,43 @@ public class StockService implements AssetService{
 			 
 		});
 		
-		/*
-		for(int i=0;i<usersWithGain.length()-1;i++) {
-			JSONObject user  = (JSONObject) usersWithGain.get(i);
-			double gain = (double) user.get("gain");
-			
-			for(int j=i+1;j<usersWithGain.length();j++) {
-				JSONObject compareUser  = (JSONObject) usersWithGain.get(j);
-				double compareGain = (double) compareUser.get("gain");
-				
-				if(gain<compareGain) {
-				}
-				
-			}
-		}
-		*/
 		
 		
 		return usersWithGain.toString();
+	}
+	
+	public String getPriceLimit() {
+		List<Document> priceUpperStocks = new ArrayList<>();
+		List<Document> priceLowerStocks = new ArrayList<>();
+		
+		for(int i=0;i<kospi.size();i++) {
+			Document stock = kospi.get(i);
+			String flucStr = stock.getString("flucRate");
+			double flucRate = Double.parseDouble(flucStr);
+			
+			if(flucRate>=10.0) {
+				priceUpperStocks.add(stock);
+			}else if(flucRate<=-10.0) {
+				priceLowerStocks.add(stock);
+			}
+		}
+		
+		for(int i=0;i<kosdaq.size();i++) {
+			Document stock = kosdaq.get(i);
+			String flucStr = stock.getString("flucRate");
+			double flucRate = Double.parseDouble(flucStr);
+			
+			if(flucRate>=10.0) {
+				priceUpperStocks.add(stock);
+			}else if(flucRate<=-10.0) {
+				priceLowerStocks.add(stock);
+			}
+		}
+		
+		
+		
+		
+		return priceLowerStocks.toString();
 	}
 	
 	
