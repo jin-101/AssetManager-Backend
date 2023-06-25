@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.shinhan.assetManager.common.DecimalFormatForCurrency;
 import com.shinhan.assetManager.dto.FinancialIndicatorDTO;
+import com.shinhan.assetManager.dto.YearEndTaxDTO;
 import com.shinhan.assetManager.repository.UserAssetRepo;
 import com.shinhan.assetManager.repository.UserLiabilityRepo;
 import com.shinhan.assetManager.repository.UserRepo;
@@ -34,12 +35,16 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	
 	// 모든 지표 얻는 메소드
 	public FinancialIndicatorDTO getTotalIndicator(String userId) {
+		// 총소득 얻기
+		Integer salary = getSalary(userId);
+		
 		// 총자산 얻기
 		Double totalAsset = totalService.getTotalAsset(userId);
 		String totalAssetInString = dfc.currency(totalAsset);
 		
 		FinancialIndicatorDTO fiIndDto = new FinancialIndicatorDTO();
 		fiIndDto = FinancialIndicatorDTO.builder()
+				.salary(salary)
 				.householdInd(getHouseholdInd(userId))
 				.totalDebtRepaymentInd(getTotalDebtRepaymentInd(userId))
 				.consumeDebtRepaymentInd(getConsumeDebtRepaymentInd(userId))
@@ -55,8 +60,11 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	}
 	
 	// 
-	public void asdfjkljflsk(String userId) {
-		yearEndTaxRepo.findByMemberId(userId);
+	public Integer getSalary(String userId) {
+		YearEndTaxDTO yetDto = yearEndTaxRepo.findByMemberId(userId);
+		Integer salary = yetDto.getSalary(); // 세전소득
+		
+		return salary;
 	}
 	
 	
