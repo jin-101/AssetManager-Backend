@@ -19,6 +19,7 @@ import lombok.ToString;
 public class FinancialIndicatorDTO {
 	
 	private String totalAsset; // 총자산
+	//private String 
 	
 	private Double householdInd; // 가계수지지표 
 	private Double totalDebtRepaymentInd; // 총부채상환지표
