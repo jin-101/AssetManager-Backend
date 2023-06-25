@@ -39,4 +39,15 @@ public class StockController {
 		
 		return response;
 	}
+	
+	@GetMapping("/compareReturn")
+	@ResponseBody
+	public String handleCompareReturn(@RequestParam String id,@RequestParam String code,@RequestParam String market) {
+		
+		String response =stockService.compareReturn(id,code,market);
+		System.out.println(response);
+		System.out.println(market);
+		
+		return response;
+	}
 }
