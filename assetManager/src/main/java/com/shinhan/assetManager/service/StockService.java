@@ -1,5 +1,6 @@
 package com.shinhan.assetManager.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +149,70 @@ public class StockService implements AssetService{
 		return averageStockPriceByStockName.toString();
 	}
 	
+	public String compareReturn(String id,String stockCode,String market) {
+		List<UserDTO> usersWithSpecificStock = userAssetRepo.getEveryUserWithSpecificAssets(assetCode, stockCode);
+		long stockPrice = Long.parseLong(getPrice(market, stockCode));
+		JSONArray usersWithGain = new JSONArray();
+		
+		usersWithSpecificStock.forEach(user -> {
+			
+			 List<UserAssetDTO> userStockLogs = userAssetRepo.getSpecificUserAssets(user, assetCode, stockCode);
+			 
+			 long totalShares = 0L;
+			 long totalAmounts =0L;
+			 for(UserAssetDTO userStockLog:userStockLogs) {
+				 totalShares +=  Long.parseLong(userStockLog.getQuantity());
+				 totalAmounts += Long.parseLong(userStockLog.getPurchasePrice())* Long.parseLong(userStockLog.getQuantity());
+			 }
+			 double avergeBuyPrice = totalAmounts/totalShares;
+			 double capitalGain = ((double)stockPrice-avergeBuyPrice)/avergeBuyPrice;
+			 capitalGain = Math.round(capitalGain*1000)/1000.0;
+			 
+			 JSONObject userWithGain = new JSONObject();
+			 userWithGain.put("id", user.getUserId());
+			 userWithGain.put("gain", capitalGain);
+			 usersWithGain.put(userWithGain);			 
+			 
+		});
+		
+		
+		
+		return usersWithGain.toString();
+	}
+	
+	public String getPriceLimit() {
+		List<Document> priceUpperStocks = new ArrayList<>();
+		List<Document> priceLowerStocks = new ArrayList<>();
+		
+		for(int i=0;i<kospi.size();i++) {
+			Document stock = kospi.get(i);
+			String flucStr = stock.getString("flucRate");
+			double flucRate = Double.parseDouble(flucStr);
+			
+			if(flucRate>=10.0) {
+				priceUpperStocks.add(stock);
+			}else if(flucRate<=-10.0) {
+				priceLowerStocks.add(stock);
+			}
+		}
+		
+		for(int i=0;i<kosdaq.size();i++) {
+			Document stock = kosdaq.get(i);
+			String flucStr = stock.getString("flucRate");
+			double flucRate = Double.parseDouble(flucStr);
+			
+			if(flucRate>=10.0) {
+				priceUpperStocks.add(stock);
+			}else if(flucRate<=-10.0) {
+				priceLowerStocks.add(stock);
+			}
+		}
+		
+		
+		
+		
+		return priceLowerStocks.toString();
+	}
 	
 	
 	

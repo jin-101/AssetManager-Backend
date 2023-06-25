@@ -143,10 +143,14 @@ public class AptService implements AssetService {
 		UserDTO user = uRepo.findById(userId).get();
 		List<UserAssetDTO> aptList = assetRepo.findByUserAndAssetCode(user, "E1"); 
 		for(int i=0; i<aptList.size(); i++) {
-			Long tradeNo = Long.parseLong(aptList.get(i).getDetailCode());
-			AptRecentTradeDTO dto = artRepo.findByTradeNo(tradeNo);
+			UserAssetDTO assetDto = aptList.get(i);
+			Long tradeNo = Long.parseLong(assetDto.getDetailCode());
+			AptRecentTradeDTO artDto = artRepo.findByTradeNo(tradeNo);
+			// (0) 아파트 이름, 매입시기
+			String aptName = artDto.getAptName();
+			String purchaseDate = assetDto.getPurchaseDate();
 			// (1) 현재가
-			Long currentPrice = Long.parseLong(dto.getPrice());
+			Long currentPrice = Long.parseLong(artDto.getPrice());
 			totalCp += currentPrice;
 			// (2) 매입가
 			Long purchasePrice = Long.parseLong(aptList.get(i).getPurchasePrice());
@@ -159,6 +163,8 @@ public class AptService implements AssetService {
 			String rateOfReturn = dfc.percent(eachRate);
 			
 			aptAssetDto = AptAssetDTO.builder()
+					.aptName(aptName)
+					.purchaseDate(purchaseDate)
 					.currentPrice(currentPrice)
 					.purchasePrice(purchasePrice)
 					.rateOfReturn(rateOfReturn)

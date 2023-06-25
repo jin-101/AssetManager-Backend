@@ -39,4 +39,22 @@ public class StockController {
 		
 		return response;
 	}
+	
+	@GetMapping("/compareReturn")
+	@ResponseBody
+	public String handleCompareReturn(@RequestParam String id,@RequestParam String code,@RequestParam String market) {
+		
+		String response =stockService.compareReturn(id,code,market);
+		
+		return response;
+	}
+	
+	@GetMapping("/flucRate")
+	@ResponseBody
+	public String handleYesterdayFlucRate() {
+		
+		String response =stockService.getPriceLimit();
+		
+		return response;
+	}
 }

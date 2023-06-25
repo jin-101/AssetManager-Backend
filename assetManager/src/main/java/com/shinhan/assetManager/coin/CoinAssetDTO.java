@@ -19,7 +19,7 @@ public class CoinAssetDTO {
 	private String coinName; // 코인이름
 	private Double currentPrice; // 현재가
 	private Double totalPurchase; // 총 매입가
-	private Double avgPrice; // 평단가
+	private String avgPrice; // 평단가 (String : 소수점 때문에..)
 	private Double quantity; // 수량
 	private String rateOfReturn; // 수익률
 	private String totalAvgRate; // 전체평균수익률
