@@ -116,15 +116,12 @@ public class LoginAndSignUpController {
 		return result;
 	}
 	
-	// 총자산 얻기 
+	// 홈 탭 - 총자산 얻기 
 	@GetMapping
-	@RequestMapping(value = "/getTotalAsset", produces = "text/plain;charset=UTF-8")
-	public String getTotalAsset(@RequestParam String userId) {
-		Double total = totalService.getTotalAsset(userId);
+	@RequestMapping(value = "/getTotalAsset", produces = "application/json")
+	public Map<String, Object> getTotalAsset(@RequestParam String userId) {
+		Map<String, Object> totalMap = totalService.getTotalAssetMap(userId);
 		
-		String totalAsset = dfc.currency(total);
-		System.out.println("★총자산 : " + totalAsset);
-		
-		return totalAsset;
+		return totalMap;
 	}
 }
