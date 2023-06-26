@@ -295,7 +295,11 @@ public class TotalService {
 		List<HouseholdAccountsDTO> accountBalanceList = haRepo.findByMemberIdOrderByExchangeDateDesc(userId);
 		
 		// 내림차순의 0번째를 통해 가장 최신 데이터 이용
-		Integer balance = accountBalanceList.get(0).getBalance();
+		Integer balance = 0;
+		if(accountBalanceList.size() != 0) {
+			balance = accountBalanceList.get(0).getBalance();
+		}
+		System.out.println("총 가계부잔액 : " + balance);
 		
 		return balance;
 	}
