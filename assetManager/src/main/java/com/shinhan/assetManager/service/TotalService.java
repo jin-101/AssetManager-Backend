@@ -1,6 +1,8 @@
 package com.shinhan.assetManager.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -84,12 +86,41 @@ public class TotalService {
 		Double totalGoldAndExchange = getTotalGoldAndExchange(userId);
 		// (6) 총 자동차
 		Long totalCar = getTotalCar(userId);
-		//( 7) 총 가계부잔액
+		// (7) 총 가계부잔액
 		Integer totalAccountBalance = getTotalAccountBalance(userId);
 		
 		total = totalStock+totalCoin+totalDepositAndSavings+totalApt+totalGoldAndExchange+totalCar+totalAccountBalance;
 		
 		return total; 
+	}
+	
+	// 총자산 얻기
+	public Map<String, Object> getTotalAssetMap(String userId) {
+		Map<String, Object> totalMap = new HashMap<>();
+		
+		// (1) 총 주식 자산
+		Long totalStock = getTotalStock(userId);
+		totalMap.put("totalStock", totalStock);
+		// (2) 총 코인 자산
+		Double totalCoin = getTotalCoin(userId);
+		totalMap.put("totalCoin", totalCoin);
+		// (3) 총 예적금
+		Long totalDepositAndSavings = getTotalDepositAndSavings(userId);
+		totalMap.put("totalDepositAndSavings", totalDepositAndSavings);
+		// (4) 총 부동산
+		Long totalApt = getTotalApt(userId);
+		totalMap.put("totalApt", totalApt);
+		// (5) 총 금, 외환
+		Double totalGoldAndExchange = getTotalGoldAndExchange(userId);
+		totalMap.put("totalGoldAndExchange", totalGoldAndExchange);
+		// (6) 총 자동차
+		Long totalCar = getTotalCar(userId);
+		totalMap.put("totalCar", totalCar);
+		// (7) 총 가계부잔액
+		Integer totalAccountBalance = getTotalAccountBalance(userId);
+		totalMap.put("totalAccountBalance", totalAccountBalance);
+		
+		return totalMap; 
 	}
 
 	// (1) 총 주식 자산
