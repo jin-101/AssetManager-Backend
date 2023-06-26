@@ -18,6 +18,7 @@ import lombok.ToString;
 @Component
 public class FinancialIndicatorDTO {
 	
+	private Integer age; // 나이
 	private String totalAsset; // 총자산
 	private Integer salary; // 총소득 
 	
