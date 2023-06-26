@@ -75,7 +75,7 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 			+ "where memberId = ?1 "
 			+ "and category = ?2 "
 			+ "and year(ha.exchangeDate) = ?3 ")
-	public int sumCategoryWithdraw(String memberId ,String category, int year);
+	public Integer sumCategoryWithdraw(String memberId ,String category, int year);
 	
 	
 	

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shinhan.assetManager.dto.CashReceiptDTO;
@@ -30,7 +31,8 @@ public class YearEndTaxController {
 	HouseholdAccountsRepository accRepo;
 	
 	// useEffect
-	@GetMapping(value = "/saveTaxInformation.do", consumes = "application/json")
+	@GetMapping("/saveTaxInformation.do")
+	@ResponseBody
 	public YearEndTaxDTO saveTaxInformation(@RequestParam String userId) {
 		YearEndTaxDTO YearEndInfo = taxRepo.findByMemberId(userId);
 		if(YearEndInfo != null) {
@@ -43,8 +45,13 @@ public class YearEndTaxController {
 	
 	//연말정산을 위해 정보 입력받은 것 저장하기 
 	@PostMapping(value = "/saveAndUpdateTaxInformation.do", consumes = "application/json")
-	public void saveandUpdateTaxInformation(@RequestBody YearEndTaxDTO dto, String userId) {
+	public Integer saveandUpdateTaxInformation(@RequestBody YearEndTaxDTO dto) {
 		taxRepo.save(dto);
+		Integer calculatedTax = calculateTax(dto.getMemberId());
+
+		YearEndTaxDTO YearEndInfo = taxRepo.findByMemberId(dto.getMemberId());
+		YearEndInfo.setCalculatedTax(calculatedTax);
+		return calculatedTax;
 	}
 	
 	//연말정산 정보 업데이트 
@@ -237,10 +244,20 @@ public class YearEndTaxController {
 	
 		//가계부에서 2023년, 아이디 일치하는 리스트를 다 뽑아오되, 거기에서 카테고리가 교육/학습, 의료, 보험, 기부금인 것의 withdraw만 다 더해야 한다
 		//이 네개에 대한 한도가 있지만 기준이 두개나 있고 애매하여 일단 생략하였음
-		int insuranceSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "보험", 2023) * 0.12); //개인 보험료 지출
-		int medicalSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "의료/건강", 2023) * 0.15); //의료비 지출
-		int educationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) * 0.15); //23년 교육비 지출
-		int donationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "기부금", 2023) * 0.15); // 기부금 지출
+		int insuranceSeaekgongje = 0;
+		int medicalSeaekgongje = 0;
+		int educationSeaekgongje = 0;
+		int donationSeaekgongje = 0;
+
+		if(accRepo.sumCategoryWithdraw(userId, "보험", 2023) != null) insuranceSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "보험", 2023)  * 0.12); //개인 보험료 지출
+		if(accRepo.sumCategoryWithdraw(userId, "의료/건강", 2023) != null) medicalSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "의료/건강", 2023) * 0.15); //의료비 지출
+		if(accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) != null) educationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) * 0.15); //23년 교육비 지출
+		if(accRepo.sumCategoryWithdraw(userId, "기부금", 2023) != null) donationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "기부금", 2023) * 0.15); // 기부금 지출
+		
+//		Integer insuranceSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "보험", 2023)  * 0.12); //개인 보험료 지출
+//		Integer medicalSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "의료/건강", 2023) * 0.15); //의료비 지출
+//		Integer educationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) * 0.15); //23년 교육비 지출
+//		Integer donationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "기부금", 2023) * 0.15); // 기부금 지출
 		
 		System.out.println("보험료 : " + insuranceSeaekgongje);
 		System.out.println("의료비 : " + medicalSeaekgongje);
@@ -288,7 +305,9 @@ public class YearEndTaxController {
 		System.out.println("자녀세액공제액 : " + janyeoseaekgongje);
 	
 		//월세세액공제
-		int houseWithdraw = accRepo.sumCategoryWithdraw(userId, "주거", 2023); //23년 주거비 일단 월세로 퉁침
+		int houseWithdraw = 0;
+		if(accRepo.sumCategoryWithdraw(userId, "주거", 2023) != null ) houseWithdraw = accRepo.sumCategoryWithdraw(userId, "주거", 2023); //23년 주거비 일단 월세로 퉁침
+//		int houseWithdraw = accRepo.sumCategoryWithdraw(userId, "주거", 2023); //23년 주거비 일단 월세로 퉁침
 		int wolseseaekgongje = (int) (Math.min(houseWithdraw, 7500000) * 0.10);
 		
 		System.out.println("월세세액 공제 : " + wolseseaekgongje);
