@@ -26,6 +26,7 @@ import com.shinhan.assetManager.repository.UserLiabilityRepo;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
+import com.shinhan.assetManager.user.UserLiabilityDTO;
 
 @Service
 public class TotalService {
@@ -94,7 +95,7 @@ public class TotalService {
 		return total; 
 	}
 	
-	// 총자산 얻기 - Map
+	// 총자산, 총부채 얻기 - Map
 	public Map<String, Object> getTotalAssetMap(String userId) {
 		Map<String, Object> totalMap = new HashMap<>();
 		
@@ -119,8 +120,26 @@ public class TotalService {
 		// (7) 총 가계부잔액
 		Integer totalAccountBalance = getTotalAccountBalance(userId);
 		totalMap.put("totalAccountBalance", totalAccountBalance);
+		// (8) 총 부채
+		Long totalLiability = getTotalLiability(userId);
+		totalMap.put("totalLiability", totalLiability);
 		
 		return totalMap; 
+	}
+	
+	// (8) 총 부채 얻기
+	public Long getTotalLiability(String userId) {
+		Long totalLiability = 0L;
+		
+		UserDTO user = uRepo.findById(userId).get();
+		List<UserLiabilityDTO> liabilityList = ulRepo.findByUser(user);
+		for(int i=0; i<liabilityList.size(); i++) {
+			UserLiabilityDTO dto = liabilityList.get(i);
+			Long loanAmount = Long.parseLong(dto.getLoanAmount());
+			totalLiability += loanAmount;
+		}
+		
+		return totalLiability;
 	}
 
 	// (1) 총 주식 자산
