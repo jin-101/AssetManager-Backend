@@ -1,5 +1,6 @@
 package com.shinhan.assetManager.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.shinhan.assetManager.repository.UserAssetRepo;
 import com.shinhan.assetManager.repository.UserLiabilityRepo;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.repository.YearEndTaxRepository;
+import com.shinhan.assetManager.user.AES256;
 import com.shinhan.assetManager.user.UserDTO;
 import com.shinhan.assetManager.user.UserLiabilityDTO;
 
@@ -26,6 +28,8 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 	UserLiabilityRepo userLiabilityRepo;
 	@Autowired
 	UserRepo userRepo;
+	@Autowired
+	AES256 aes256;
 	@Autowired
 	DecimalFormatForCurrency dfc;
 	@Autowired
@@ -42,6 +46,9 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 		Double totalAsset = totalService.getTotalAsset(userId);
 		String totalAssetInString = dfc.currency(totalAsset);
 		
+		// 나이 얻기
+		Integer age = getAge(userId);
+		
 		FinancialIndicatorDTO fiIndDto = new FinancialIndicatorDTO();
 		fiIndDto = FinancialIndicatorDTO.builder()
 				.salary(salary)
@@ -54,9 +61,38 @@ public class FinancialIndicatorsService { // 재무지표 (통계 탭 - 나의 �
 				.fiInvestInd(getFiInvestInd(userId, totalAsset))
 				.fiAssetInd(getFiAssetInd(userId, totalAsset))
 				.totalAsset(totalAssetInString)
+				.age(age)
 				.build();   
-		
+		getAge(userId);
 		return fiIndDto;
+	}
+	
+	// 나이 얻기
+	public Integer getAge(String userId) {
+		UserDTO user = userRepo.findById(userId).get();
+		String encryptedSsn = user.getSsn();
+		String salt = user.getSalt();
+		String ssn = null;
+		try {
+			String decryptedSsn = aes256.decryptAES256(encryptedSsn);
+			ssn = decryptedSsn.replace(salt, "");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Integer year = 0;
+		Integer startNum = Integer.parseInt(ssn.substring(0,2));
+		Integer endNum = Integer.parseInt(ssn.substring(7,8));
+		if(endNum == 1 || endNum == 2) {
+			year = 1900 + startNum;
+		}else if(endNum == 3 || endNum == 4) {
+			year = 2000 + startNum;
+		}
+		int todayYear = LocalDate.now().getYear();
+		
+		Integer age = todayYear - year + 1; 
+		
+		return age;
 	}
 	
 	// 1-1. 가계수지지표 : 총지출 / 총소득
