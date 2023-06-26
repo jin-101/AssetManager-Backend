@@ -70,7 +70,7 @@ public class TotalService {
 	String carAssetCode = "E2";
 	String goldAssetCode = "E3";
 	
-	// 총자산 얻기
+	// 총자산 얻기 - String
 	public Double getTotalAsset(String userId) {
 		Double total = 0.0;
 		
@@ -94,7 +94,7 @@ public class TotalService {
 		return total; 
 	}
 	
-	// 총자산 얻기
+	// 총자산 얻기 - Map
 	public Map<String, Object> getTotalAssetMap(String userId) {
 		Map<String, Object> totalMap = new HashMap<>();
 		
