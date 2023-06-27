@@ -180,9 +180,9 @@ public class StockService implements AssetService{
 		return usersWithGain.toString();
 	}
 	
-	public String getPriceLimit() {
-		List<Document> priceUpperStocks = new ArrayList<>();
-		List<Document> priceLowerStocks = new ArrayList<>();
+	public String getPriceLimit(String pageMode) {
+		List<String> priceUpperStocks = new ArrayList<>();
+		List<String> priceLowerStocks = new ArrayList<>();
 		
 		for(int i=0;i<kospi.size();i++) {
 			Document stock = kospi.get(i);
@@ -190,9 +190,9 @@ public class StockService implements AssetService{
 			double flucRate = Double.parseDouble(flucStr);
 			
 			if(flucRate>=10.0) {
-				priceUpperStocks.add(stock);
+				priceUpperStocks.add(stock.toJson());
 			}else if(flucRate<=-10.0) {
-				priceLowerStocks.add(stock);
+				priceLowerStocks.add(stock.toJson());
 			}
 		}
 		
@@ -202,16 +202,21 @@ public class StockService implements AssetService{
 			double flucRate = Double.parseDouble(flucStr);
 			
 			if(flucRate>=10.0) {
-				priceUpperStocks.add(stock);
+				priceUpperStocks.add(stock.toJson());
 			}else if(flucRate<=-10.0) {
-				priceLowerStocks.add(stock);
+				priceLowerStocks.add(stock.toJson());
 			}
+		
 		}
 		
 		
+		if(pageMode.equals("upper")) {
+			return priceUpperStocks.toString();
+		}else {
+			return priceLowerStocks.toString();
+		}
 		
 		
-		return priceLowerStocks.toString();
 	}
 	
 	

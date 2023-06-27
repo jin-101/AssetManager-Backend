@@ -51,9 +51,8 @@ public class StockController {
 	
 	@GetMapping("/flucRate")
 	@ResponseBody
-	public String handleYesterdayFlucRate() {
-		
-		String response =stockService.getPriceLimit();
+	public String handleYesterdayFlucRate(@RequestParam String pageMode) {
+		String response =stockService.getPriceLimit(pageMode);
 		
 		return response;
 	}

@@ -28,6 +28,8 @@ public class YearEndTaxDTO {
 	private String memberId; //회원 아이디
 	private	Integer year; //년도 필요할 것 같음 (추가!!)
 	
+	private Integer calculatedTax; // 
+	
 	private Integer salary; //연봉
 	private Integer nonTaxIncome; //비과세 소득
 	

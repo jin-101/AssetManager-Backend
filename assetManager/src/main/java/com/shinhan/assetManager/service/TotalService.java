@@ -1,6 +1,8 @@
 package com.shinhan.assetManager.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,6 +26,7 @@ import com.shinhan.assetManager.repository.UserLiabilityRepo;
 import com.shinhan.assetManager.repository.UserRepo;
 import com.shinhan.assetManager.user.UserAssetDTO;
 import com.shinhan.assetManager.user.UserDTO;
+import com.shinhan.assetManager.user.UserLiabilityDTO;
 
 @Service
 public class TotalService {
@@ -68,7 +71,7 @@ public class TotalService {
 	String carAssetCode = "E2";
 	String goldAssetCode = "E3";
 	
-	// 총자산 얻기
+	// 총자산 얻기 - String
 	public Double getTotalAsset(String userId) {
 		Double total = 0.0;
 		
@@ -84,12 +87,59 @@ public class TotalService {
 		Double totalGoldAndExchange = getTotalGoldAndExchange(userId);
 		// (6) 총 자동차
 		Long totalCar = getTotalCar(userId);
-		//( 7) 총 가계부잔액
+		// (7) 총 가계부잔액
 		Integer totalAccountBalance = getTotalAccountBalance(userId);
 		
 		total = totalStock+totalCoin+totalDepositAndSavings+totalApt+totalGoldAndExchange+totalCar+totalAccountBalance;
 		
 		return total; 
+	}
+	
+	// 총자산, 총부채 얻기 - Map
+	public Map<String, Object> getTotalAssetMap(String userId) {
+		Map<String, Object> totalMap = new HashMap<>();
+		
+		// (1) 총 주식 자산
+		Long totalStock = getTotalStock(userId);
+		totalMap.put("totalStock", totalStock);
+		// (2) 총 코인 자산
+		Double totalCoin = getTotalCoin(userId);
+		totalMap.put("totalCoin", totalCoin);
+		// (3) 총 예적금
+		Long totalDepositAndSavings = getTotalDepositAndSavings(userId);
+		totalMap.put("totalDepositAndSavings", totalDepositAndSavings);
+		// (4) 총 부동산
+		Long totalApt = getTotalApt(userId);
+		totalMap.put("totalApt", totalApt);
+		// (5) 총 금, 외환
+		Double totalGoldAndExchange = getTotalGoldAndExchange(userId);
+		totalMap.put("totalGoldAndExchange", totalGoldAndExchange);
+		// (6) 총 자동차
+		Long totalCar = getTotalCar(userId);
+		totalMap.put("totalCar", totalCar);
+		// (7) 총 가계부잔액
+		Integer totalAccountBalance = getTotalAccountBalance(userId);
+		totalMap.put("totalAccountBalance", totalAccountBalance);
+		// (8) 총 부채
+		Long totalLiability = getTotalLiability(userId);
+		totalMap.put("totalLiability", totalLiability);
+		
+		return totalMap; 
+	}
+	
+	// (8) 총 부채 얻기
+	public Long getTotalLiability(String userId) {
+		Long totalLiability = 0L;
+		
+		UserDTO user = uRepo.findById(userId).get();
+		List<UserLiabilityDTO> liabilityList = ulRepo.findByUser(user);
+		for(int i=0; i<liabilityList.size(); i++) {
+			UserLiabilityDTO dto = liabilityList.get(i);
+			Long loanAmount = Long.parseLong(dto.getLoanAmount());
+			totalLiability += loanAmount;
+		}
+		
+		return totalLiability;
 	}
 
 	// (1) 총 주식 자산
@@ -245,7 +295,11 @@ public class TotalService {
 		List<HouseholdAccountsDTO> accountBalanceList = haRepo.findByMemberIdOrderByExchangeDateDesc(userId);
 		
 		// 내림차순의 0번째를 통해 가장 최신 데이터 이용
-		Integer balance = accountBalanceList.get(0).getBalance();
+		Integer balance = 0;
+		if(accountBalanceList.size() != 0) {
+			balance = accountBalanceList.get(0).getBalance();
+		}
+		System.out.println("총 가계부잔액 : " + balance);
 		
 		return balance;
 	}
