@@ -48,7 +48,7 @@ public class AccountBookController {
 	@Autowired
 	HouseholdAccountsCategoryRepository categoryRepo;
 	
-	//전체 카드내역 불러오기 (월별 총수입 총지출)
+	//월별 총수입 총지출
 	@PostMapping(value = "/alllist.do", consumes = "application/json")
 	public Map<String, SummaryDTO> selectAll(@RequestBody AccountbookDTO dto) {
 	    List<HouseholdAccountsDTO> allList = accountRepo.findByMemberId(dto.getMemberId());

@@ -266,6 +266,8 @@ public class YearEndTaxController {
 			chulsanibyanggongje = 500000;
 		} else if (chulsanibyangjanyeo >= 3) {
 			chulsanibyanggongje = 700000;
+		} else {
+			chulsanibyanggongje = 0;
 		}
 		System.out.println("출산/입양 공제 : " + chulsanibyanggongje);
 		
