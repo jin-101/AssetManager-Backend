@@ -254,23 +254,10 @@ public class YearEndTaxController {
 		if(accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) != null) educationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) * 0.15); //23년 교육비 지출
 		if(accRepo.sumCategoryWithdraw(userId, "기부금", 2023) != null) donationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "기부금", 2023) * 0.15); // 기부금 지출
 		
-//		Integer insuranceSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "보험", 2023)  * 0.12); //개인 보험료 지출
-//		Integer medicalSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "의료/건강", 2023) * 0.15); //의료비 지출
-//		Integer educationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "교육/학습", 2023) * 0.15); //23년 교육비 지출
-//		Integer donationSeaekgongje = (int) (accRepo.sumCategoryWithdraw(userId, "기부금", 2023) * 0.15); // 기부금 지출
-		
 		System.out.println("보험료 : " + insuranceSeaekgongje);
 		System.out.println("의료비 : " + medicalSeaekgongje);
 		System.out.println("교육비 : " + educationSeaekgongje);
 		System.out.println("기부금 : " + donationSeaekgongje);
-	
-//		//보험료 등 세액공제액의 한도 
-//		int handoaek = sanchulseaek * geunrosodeukgeumaek / yeonbong;
-//		System.out.println(handoaek);
-//		
-//		//보험료 + 의료비 + 교육비 
-//		int sumHando = insuranceSeaekgongje + medicalSeaekgongje + educationSeaekgongje;
-//		System.out.println(sumHando);
 		
 		//특별세엑공제
 		int teukbyeolseaekgongje = insuranceSeaekgongje + medicalSeaekgongje + educationSeaekgongje + donationSeaekgongje;
@@ -309,7 +296,6 @@ public class YearEndTaxController {
 		//월세세액공제
 		int houseWithdraw = 0;
 		if(accRepo.sumCategoryWithdraw(userId, "주거", 2023) != null ) houseWithdraw = accRepo.sumCategoryWithdraw(userId, "주거", 2023); //23년 주거비 일단 월세로 퉁침
-//		int houseWithdraw = accRepo.sumCategoryWithdraw(userId, "주거", 2023); //23년 주거비 일단 월세로 퉁침
 		int wolseseaekgongje = (int) (Math.min(houseWithdraw, 7500000) * 0.10);
 		
 		System.out.println("월세세액 공제 : " + wolseseaekgongje);

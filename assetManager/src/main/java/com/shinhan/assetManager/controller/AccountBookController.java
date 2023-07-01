@@ -171,7 +171,10 @@ public class AccountBookController {
             
             // 파일 내 데이터 추출하여 저장
             List<String[]> data = readCSV(filePath);
-
+            for (String[] element : data) {
+                System.out.println(Arrays.toString(element));
+            }
+            
             List<ExcelDTO> excelDataList = new ArrayList<>();
             String[] headers = data.get(6);
    
@@ -252,7 +255,7 @@ public class AccountBookController {
             	houseDto.setContent(excelData.get내용());
             	houseDto.setBalance(Integer.parseInt(excelData.get잔액()));   
             	
-            	System.out.println(houseDto);
+            	//System.out.println(houseDto);
             	accountRepo.save(houseDto);
             }
             return "File uploaded: " + originalFilename;
