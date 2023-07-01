@@ -93,11 +93,13 @@ public class AccountBookController {
 		accountRepo.saveAll(itemlist);
 	}
 	
-	@DeleteMapping(value = "/deletelist.do/{detailCode}", produces = "text/plain;charset=utf-8") //한건 삭제하기 (삭제에는 ID, 계좌 아직 못함)
-	public void listsave(@PathVariable Integer detailCode) {
-		List<HouseholdAccountsDTO> upList = accountRepo.getUpListWhenDelete(detailCode);
-		Optional<HouseholdAccountsDTO> deleteList = accountRepo.findById(detailCode);
-		HouseholdAccountsDTO deleteTarget = deleteList.get();
+	@DeleteMapping(value = "/deletelist.do/{detailCode}/{accountNumber}/{memberId}", produces = "text/plain;charset=utf-8") //한건 삭제하기 (삭제에는 ID, 계좌 아직 못함)
+	public void listsave(@PathVariable Integer detailCode, @PathVariable String accountNumber, @PathVariable String memberId) {	
+		System.out.println(memberId);
+		
+		List<HouseholdAccountsDTO> upList = accountRepo.getUpListWhenDelete(detailCode, memberId, accountNumber);
+		HouseholdAccountsDTO deleteList = accountRepo.findByDetailCodeAndMemberIdAndAccountNumber(detailCode, memberId, accountNumber);
+		HouseholdAccountsDTO deleteTarget = deleteList;
 		
 		//삭제된 건의 위에 내역들에 삭제한 금액만큼 조정해주기
 		for(HouseholdAccountsDTO up : upList) {
@@ -113,37 +115,49 @@ public class AccountBookController {
 		accountRepo.deleteById(detailCode);
 	}
 	
-	@PostMapping(value = "/saveoneaccount.do", consumes = "application/json") //가계부 한건 작성하기
-	public void saveone(@RequestBody HouseholdAccountsDTO dto) {
-		System.out.println("한건 내역 오는지!!!!!" + dto);
-		System.out.println(dto.getWithdraw());
+	//가계부 한건 작성하기 (잔액보다 출금이 크면 잔액부족을 리턴하게 함!)
+	@PostMapping(value = "/saveoneaccount.do", consumes = "application/json") 
+	public String saveone(@RequestBody HouseholdAccountsDTO dto) {
 		accountRepo.save(dto);
 		List<HouseholdAccountsDTO> lista = accountRepo.getFilteredAccounts(dto.getMemberId(), dto.getAccountNumber());
 		List<HouseholdAccountsDTO> listb = accountRepo.getLastBalance(dto.getMemberId(), dto.getAccountNumber());
 		
-		//새로 삽입된 건의 위의 내역들에 입력된 금액만큼 더하거나 빼주기 
-		for(HouseholdAccountsDTO a:lista) {
-			System.out.println(a);
-			if(dto.getWithdraw() == 0) {
-				int sum = a.getBalance() + dto.getDeposit();
-				a.setBalance(sum);
-			} else {
-				int sum = a.getBalance() - dto.getWithdraw();
-				a.setBalance(sum);
+		System.out.println( "이게 최신 잔액 : " + listb.get(0).getBalance());
+		System.out.println("입력받은 출금 값 : " + dto.getWithdraw());
+		int isMinus = listb.get(0).getBalance() - dto.getWithdraw();
+		System.out.println("isMinus : " + isMinus);
+		if(isMinus >= 0) {
+			
+			//새로 삽입된 건의 위의 내역들에 입력된 금액만큼 더하거나 빼주기 
+			for(HouseholdAccountsDTO a:lista) {
+				//System.out.println(a);
+				if(dto.getWithdraw() == 0) {
+					int sum = a.getBalance() + dto.getDeposit();
+					a.setBalance(sum);
+				} else {
+					int sum = a.getBalance() - dto.getWithdraw();
+					a.setBalance(sum);
+				}
+				accountRepo.save(a); //백만 업데이트의 주범
+				//System.out.println(a);
 			}
-			accountRepo.save(a); //백만 업데이트의 주범
-			//System.out.println(a);
-		}
-		
-		//삽입된 건의 아래내역 
-		System.out.println(listb.get(0).getBalance()); //삽입된 건의 바로 아래 내역 하나 건 추출
-		if(dto.getWithdraw() == 0) {
-			dto.setBalance(listb.get(0).getBalance() + dto.getDeposit()); //그 전건의 내역에 더하거나 빼서 조정
+			
+			//삽입된 건의 아래내역 
+			//System.out.println(listb.get(0).getBalance()); //삽입된 건의 바로 아래 내역 하나 건 추출
+			if(dto.getWithdraw() == 0) {
+				dto.setBalance(listb.get(0).getBalance() + dto.getDeposit()); //그 전건의 내역에 더하거나 빼서 조정
+			} else {
+				int sum = listb.get(0).getBalance() - dto.getWithdraw();
+					dto.setBalance(sum);
+			}
+			
+			accountRepo.save(dto);
+			return "저장";
 		} else {
-			dto.setBalance(listb.get(0).getBalance() - dto.getWithdraw());
+			return "잔액부족";
 		}
 		
-		accountRepo.save(dto);
+		
 	}
 	
 	@PostMapping("/filesave.do")
