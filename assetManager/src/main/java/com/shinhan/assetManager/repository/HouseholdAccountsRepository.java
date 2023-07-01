@@ -2,6 +2,7 @@ package com.shinhan.assetManager.repository;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,6 +15,8 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 	
 	 //List<HouseholdAccountsDTO> findAllByOrderByExchangeDateDesc();
 	public List<HouseholdAccountsDTO> findByMemberId(String memberId);
+	public HouseholdAccountsDTO findByDetailCodeAndMemberIdAndAccountNumber(int detailCode, String memberId, String accountNumber);
+	public List<HouseholdAccountsDTO> findByMemberIdAndAccountNumberOrderByExchangeDateDesc(String memberId, String accountNumber);
 	
 	@Query("select b"
 			+ " from HouseholdAccountsDTO b"
@@ -54,10 +57,10 @@ public interface HouseholdAccountsRepository extends CrudRepository<HouseholdAcc
 			+ "where exchangeDate > (select ha2.exchangeDate "
 			+ "					   	  from HouseholdAccountsDTO ha2 "
 			+ "					      where detailCode = ?1) "
-//			+ "AND ha.memberId = ?2 "
-//			+ "AND ha.accountNumber = ?3 "
+			+ "AND ha.memberId = ?2 "
+			+ "AND ha.accountNumber = ?3 "
 			+ "order by ha.exchangeDate desc")
-	public List<HouseholdAccountsDTO> getUpListWhenDelete(int detailCode);
+	public List<HouseholdAccountsDTO> getUpListWhenDelete(int detailCode, String memberId, String accountNumber);
 
 	// 총자산 얻기 中 가계부잔액 얻기
 	public List<HouseholdAccountsDTO> findByMemberIdOrderByExchangeDateDesc(String memberId); // OrderBy컬럼명Desc(Asc)
