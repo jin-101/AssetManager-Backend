@@ -38,11 +38,6 @@ public class ApiAptTrade {
 		ApiAptTrade apiAptTrade = new ApiAptTrade();
 		List<AptDTO> aptList = 
 				apiAptTrade.getAptList();
-		
-//		// 테스트용 출력
-//		aptList.forEach(apt->{
-//			System.out.println(apt);
-//		});
 	}
 	
 	// 1. 메인 메소드 
@@ -52,13 +47,11 @@ public class ApiAptTrade {
 		List<String> dateList = AptParamList.getDateList();
 		List<AptDTO> aptList = new ArrayList<>();
 		
-		// [인증키 1개당 하루에 3번밖에 못함...] for(int i=0; i<dateList.size(); i++)
-		for(int i=0; i<1; i++) { // <=== **이 반복문 코드를 어케 바꿔주면 좋을까, 인증키도 바꿔가면서 요청하고 싶은데
+		for(int i=0; i<dateList.size(); i++) {
 			String date = dateList.get(i);
 			System.out.println("계약연월 : "+date);
 			
-			// for(int j=0; j<areaCodeList.length; j++)
-			for(int j=0; j<areaCodeList.length; j++) { // **일단 테스트를 위해 1개만..
+			for(int j=0; j<areaCodeList.length; j++) {
 				Thread.sleep(3000); 
 				String areaCode = areaCodeList[j]; // areaCode : 총 250개
 				String url = urlBuild(areaCode, date); // (0) totalCount 알기 전의 URL
@@ -68,30 +61,10 @@ public class ApiAptTrade {
 				System.out.println(url);
 				
 				aptList = parsingXML(url, totalCount); // (3) totalCount를 이용하여 1페이지에 모든 거래내역이 들어올 수 있게 처리!! 
-				aptList.stream().forEach(apt->{
-					System.out.println(apt.toString());
-				});
-				System.out.println("-------------------------------------------------------------"); 
 			}
 		}
 		return aptList;
 	} 
-	
-	// 5. 서브 메소드
-	// 조건에 따라 URL 생성
-	public static String urlBuild(String areaCode, String date) {
-		List<String> serviceKeyList = AptParamList.getServiceKeyList();
-		String url = null;
-		
-		StringBuilder urlBuilder = new StringBuilder("http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev"); /*URL*/
-		urlBuilder.append("?serviceKey=");
-		urlBuilder.append("FW0FOOhX%2BZP3g%2FeWPgVS8l9opit3y%2Ba1AGvfL2inuxOkfz3jI1OLghrdJYfknlXR3ZurO3Q%2FEviXMszMrIwgtg%3D%3D"); /*Service Key*/
-		urlBuilder.append("&LAWD_CD=" + areaCode); 			
-		urlBuilder.append("&DEAL_YMD=" + date); 
-		url = urlBuilder.toString();
-		
-		return url;
-	}
 	
 	// 2. 서브 메소드
 	// ★ API 요청할 url에 totalCount가 필요해서 이를 얻는 함수를 만들었음.
@@ -225,6 +198,22 @@ public class ApiAptTrade {
 		}
 		
 		return tagValue; 
+	}
+	
+	// 5. 서브 메소드
+	// 조건에 따라 URL 생성
+	public static String urlBuild(String areaCode, String date) {
+		List<String> serviceKeyList = AptParamList.getServiceKeyList();
+		String url = null;
+		
+		StringBuilder urlBuilder = new StringBuilder("http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev"); /*URL*/
+		urlBuilder.append("?serviceKey=");
+		urlBuilder.append("FW0FOOhX%2BZP3g%2FeWPgVS8l9opit3y%2Ba1AGvfL2inuxOkfz3jI1OLghrdJYfknlXR3ZurO3Q%2FEviXMszMrIwgtg%3D%3D"); /*Service Key*/
+		urlBuilder.append("&LAWD_CD=" + areaCode); 			
+		urlBuilder.append("&DEAL_YMD=" + date); 
+		url = urlBuilder.toString();
+		
+		return url;
 	}
 	
 }
