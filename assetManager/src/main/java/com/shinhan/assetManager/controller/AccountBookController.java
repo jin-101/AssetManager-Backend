@@ -154,6 +154,7 @@ public class AccountBookController {
 			accountRepo.save(dto);
 			return "저장";
 		} else {
+			accountRepo.delete(dto);
 			return "잔액부족";
 		}
 		
