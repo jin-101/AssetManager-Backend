@@ -32,7 +32,7 @@
       <th>Tool</th>
       <td>
         <img src="https://img.shields.io/badge/eclipse-2C2255?style=for-the-badge&logo=eclipseide&logoColor=white">
-        <img src="https://img.shields.io/badge/React-61DAFB.svg?&style=for-the-badge&logo=React&logoColor=white">
+        <img src="https://img.shields.io/badge/ReactNative-61DAFB.svg?&style=for-the-badge&logo=React&logoColor=white">
         <img src="https://img.shields.io/badge/Visual%20Studio%20Code-007ACC.svg?&style=for-the-badge&logo=Visual%20Studio%20Code&logoColor=white">
         <img src="https://img.shields.io/badge/Androidstudio-3DDC84.svg?&style=for-the-badge&logo=Androidstudio&logoColor=white">
       </td>
