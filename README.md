@@ -15,7 +15,7 @@
 ## 1️⃣프로젝트 개요
 
 
-## 2️⃣개발환경
+## 2️⃣개발 환경
 <table>
   <tbody>
     <tr>
@@ -92,7 +92,7 @@
 <br/>
 <a href="https://www.youtube.com/watch?v=b4TEy7flwmk&t=7s">시연영상 2</a>
 
-## 7️⃣중요 소스코드 (각 팀원별)
+## 7️⃣중요 소스코드
 ### 1) 추가 중
 <!--
 <img src="https://github.com/ITEM-FARM/itemFarmProject/assets/49816869/4e1b01d0-d505-459a-a368-d15321639f50" width="70%"><br/>
@@ -132,4 +132,3 @@
 ### 17) 
 
 ### 18) 
-
